@@ -66,11 +66,9 @@ open import Data.Sum using (_⊎_; inj₁; inj₂)
 ⭆⇛ x (inj₂ y) (inj₁ z) = True
 ⭆⇛ x y (inj₂ z) = False
 
-⭆T : (ℤ → Set) → (ℤ ⊎ Aexp → Set)
-⭆T x y = True
-
-T : ℤ → Set
-T x = True
+T : (ℤ ⊎ Aexp → Set)
+T (inj₁ x) = True
+T (inj₂ y) = False
 
 Transition : Aexp → Num
 Transition (N x) = x
@@ -83,7 +81,7 @@ Transition [ x ] = Transition x
 AExpSemantic : TransitionSystem
 AExpSemantic .TransitionSystem.Γ = ℤ ⊎ Aexp
 AExpSemantic .TransitionSystem._⇛_ = ⭆⇛ Transition
-AExpSemantic .TransitionSystem.T = ⭆T T
+AExpSemantic .TransitionSystem.T = T
 
 ProofOfBigStep : BigStepSemantics AExpSemantic  -- ∀ (x y : Γ) → (x ⇛ y) → (T y)
 ProofOfBigStep .BigStepSemantics.BigStepping x (inj₁ y) z = True.unit
