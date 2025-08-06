@@ -50,34 +50,27 @@ _≠_ a b = ¬ (a == b)
 
 -- Section End Page 30
 
--- Section Start Page 32
+-- Section Start Page 32-33
 
 -- 3.4.1 A big-step semanticcs of Aexp
 
 open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟; False; True)
 open import transition-and-trees.BigAndSmallStepSemantics using (BigStepSemantics)
 
-open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
+open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-⇛ : ℤ ⊎ Aexp → ℤ ⊎ Aexp → Set
-⇛ (inj₁ x) y = False
-⇛ (inj₂ y₁) (inj₂ y) = False
-⇛ (inj₂ y₁) (inj₁ x) = True
+-- Turn subtype in argument to sumtype
+⭆⇛ : (Aexp → ℤ) → (ℤ ⊎ Aexp → ℤ ⊎ Aexp → Set)
+⭆⇛ x (inj₁ x₁) (inj₁ z) = False
+⭆⇛ x (inj₂ y) (inj₁ z) = True
+⭆⇛ x y (inj₂ z) = False
 
-T : ℤ ⊎ Aexp → Set
-T (inj₁ x) = True
-T (inj₂ y) = False
+⭆T : (ℤ → Set) → (ℤ ⊎ Aexp → Set)
+⭆T x y = True
 
-AExpSemantic : TransitionSystem
-AExpSemantic .TransitionSystem.Γ = ℤ ⊎ Aexp
-AExpSemantic .TransitionSystem._⇛_ = ⇛
-AExpSemantic .TransitionSystem.T = T
-
-ProofOfBigStep : BigStepSemantics AExpSemantic  -- ∀ (x y : Γ) → (x ⇛ y) → (T y)
-ProofOfBigStep .BigStepSemantics.BigStepping x (inj₁ y) z = True.unit
-ProofOfBigStep .BigStepSemantics.BigStepping (inj₁ x) (inj₂ y) ()
-ProofOfBigStep .BigStepSemantics.BigStepping (inj₂ x) (inj₂ y) ()
+T : ℤ → Set
+T x = True
 
 Transition : Aexp → Num
 Transition (N x) = x
@@ -87,4 +80,14 @@ Transition (x * y) = (Transition x) *ℤ (Transition y)
 Transition (x - y) = (Transition x) -ℤ (Transition y)
 Transition [ x ] = Transition x
 
--- Section End Page 32
+AExpSemantic : TransitionSystem
+AExpSemantic .TransitionSystem.Γ = ℤ ⊎ Aexp
+AExpSemantic .TransitionSystem._⇛_ = ⭆⇛ Transition
+AExpSemantic .TransitionSystem.T = ⭆T T
+
+ProofOfBigStep : BigStepSemantics AExpSemantic  -- ∀ (x y : Γ) → (x ⇛ y) → (T y)
+ProofOfBigStep .BigStepSemantics.BigStepping x (inj₁ y) z = True.unit
+ProofOfBigStep .BigStepSemantics.BigStepping (inj₁ x) (inj₂ y) ()
+ProofOfBigStep .BigStepSemantics.BigStepping (inj₂ x) (inj₂ y) ()
+
+-- Section End Page 32-33
