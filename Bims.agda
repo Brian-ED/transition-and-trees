@@ -57,26 +57,27 @@ _≠_ a b = ¬ (a == b)
 open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟; False; True)
 open import transition-and-trees.BigAndSmallStepSemantics using (BigStepSemantics)
 
+open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
+
+⇛ : ℤ ⊎ Aexp → ℤ ⊎ Aexp → Set
+⇛ (inj₁ x) y = False
+⇛ (inj₂ y₁) (inj₂ y) = False
+⇛ (inj₂ y₁) (inj₁ x) = True
+
+T : ℤ ⊎ Aexp → Set
+T (inj₁ x) = True
+T (inj₂ y) = False
+
 AExpSemantic : TransitionSystem
-AExpSemantic .TransitionSystem.Γ = Aexp
-(AExpSemantic TransitionSystem.⇛ x) (N x₁) = True
-(AExpSemantic TransitionSystem.⇛ x) (V x₁) = False
-(AExpSemantic TransitionSystem.⇛ x) (y + y₁) = False
-(AExpSemantic TransitionSystem.⇛ x) (y * y₁) = False
-(AExpSemantic TransitionSystem.⇛ x) (y - y₁) = False
-(AExpSemantic TransitionSystem.⇛ x) [ y ] = False
-AExpSemantic .TransitionSystem.T (N x) = True
-AExpSemantic .TransitionSystem.T (V x) = False
-AExpSemantic .TransitionSystem.T (x + x₁) = False
-AExpSemantic .TransitionSystem.T (x * x₁) = False
-AExpSemantic .TransitionSystem.T (x - x₁) = False
-AExpSemantic .TransitionSystem.T [ x ] = False
+AExpSemantic .TransitionSystem.Γ = ℤ ⊎ Aexp
+AExpSemantic .TransitionSystem._⇛_ = ⇛
+AExpSemantic .TransitionSystem.T = T
 
 ProofOfBigStep : BigStepSemantics AExpSemantic  -- ∀ (x y : Γ) → (x ⇛ y) → (T y)
-ProofOfBigStep .BigStepSemantics.BigStepping x (N y) z = True.unit
-
-open import Data.Integer using () renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
-open import Data.Nat using (ℕ) renaming (_*_ to _*ℕ_)
+ProofOfBigStep .BigStepSemantics.BigStepping x (inj₁ y) z = True.unit
+ProofOfBigStep .BigStepSemantics.BigStepping (inj₁ x) (inj₂ y) ()
+ProofOfBigStep .BigStepSemantics.BigStepping (inj₂ x) (inj₂ y) ()
 
 Transition : Aexp → Num
 Transition (N x) = x
