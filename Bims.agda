@@ -38,6 +38,7 @@ data Stm : Set where
     _while_ : Stm → Bexp → Stm
 
 infixr 5 N_
+infixr 5 ++_
 
 exprPg29 : Aexp₁
 exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
@@ -121,21 +122,60 @@ data Aexp₂ : Set where
 
 _or_ = _⊎_
 
---- SSS stands for Small Step Semantics
-_⇒₂_ : Aexp₂ → Aexp₂ → Set
-(    α₁  +     α₂ ) ⇒₂ (α'₁ + α'₂) = (α₂ ≡ α'₂ and α₁ ⇒₂ α'₁) -- PLUS-1ₛₛₛ
-                                  or (α₁ ≡ α'₁ and α₂ ⇒₂ α'₂) -- PLUS-2ₛₛₛ
-((++ α₁) + (++ α₂)) ⇒₂ (++ v₃)     = (α₁ +ℤ α₂) ≡ v₃          -- PLUS-3ₛₛₛ
-(    α₁  *     α₂ ) ⇒₂ (α'₁ * α'₂) = (α₂ ≡ α'₂ and α₁ ⇒₂ α'₁) -- MULT-1ₛₛₛ
-                                  or (α₁ ≡ α'₁ and α₂ ⇒₂ α'₂) -- MULT-2ₛₛₛ
-((++ α₁) * (++ α₂)) ⇒₂ (++ v₃)     = (α₁ *ℤ α₂) ≡ v₃          -- MULT-3ₛₛₛ
-(    α₁  -     α₂ ) ⇒₂ (α'₁ - α'₂) = (α₂ ≡ α'₂ and α₁ ⇒₂ α'₁) -- SUB-1ₛₛₛ
-                                  or (α₁ ≡ α'₁ and α₂ ⇒₂ α'₂) -- SUB-2ₛₛₛ
-((++ α₁) - (++ α₂)) ⇒₂ (++ v₃)     = (α₁ -ℤ α₂) ≡ v₃          -- SUB-3ₛₛₛ
-[    x ] ⇒₂ [   y ] = x ⇒₂ y                                  -- PARENT-1ₛₛₛ
-[ ++ x ] ⇒₂ (++ y ) = x ≡ y                                   -- PARENT-2ₛₛₛ
-(N x) ⇒₂ (++ y) = x ≡ y                                       -- NUMₛₛₛ
-_ ⇒₂ _ = ⊥ -- Not mentioned, therefore False
+infix 4 _⇒₂_
+
+data _⇒₂_ : Aexp₂ → Aexp₂ → Set where
+
+  -- PLUS
+  PLUS-1ₛₛₛ : ∀ {α₁ α₁′ α₂}
+            → α₁ ⇒₂ α₁′
+            → (α₁ + α₂) ⇒₂ (α₁′ + α₂)
+
+  PLUS-2ₛₛₛ : ∀ {α₁ α₂ α₂′}
+            → α₂ ⇒₂ α₂′
+            → (α₁ + α₂) ⇒₂ (α₁ + α₂′)
+
+  PLUS-3ₛₛₛ : ∀ {x y}
+            → (++ x + ++ y) ⇒₂ ++ x +ℤ y
+
+  -- MULT
+  MULT-1ₛₛₛ : ∀ {α₁ α₁′ α₂}
+            → α₁ ⇒₂ α₁′
+            → (α₁ * α₂) ⇒₂ (α₁′ * α₂)
+
+  MULT-2ₛₛₛ : ∀ {α₁ α₂ α₂′}
+            → α₂ ⇒₂ α₂′
+            → (α₁ * α₂) ⇒₂ (α₁ * α₂′)
+
+  MULT-3ₛₛₛ : ∀ {x y}
+            → (++ x * ++ y) ⇒₂ ++ x *ℤ y
+
+  -- SUB
+  SUB-1ₛₛₛ : ∀ {α₁ α₁′ α₂}
+           → α₁ ⇒₂ α₁′
+           → (α₁ - α₂) ⇒₂ (α₁′ - α₂)
+
+  SUB-2ₛₛₛ : ∀ {α₁ α₂ α₂′}
+           → α₂ ⇒₂ α₂′
+           → (α₁ - α₂) ⇒₂ (α₁ - α₂′)
+
+  SUB-3ₛₛₛ : ∀ {x y}
+           → (++ x - ++ y) ⇒₂ ++ x -ℤ y
+
+  -- PARENTHESES
+  PARENT-1ₛₛₛ : ∀ {x y}
+              → x ⇒₂ y
+              → [ x ] ⇒₂ [ y ]
+
+  PARENT-2ₛₛₛ : ∀ {x y}
+              → x ≡ y
+              → [ ++ x ] ⇒₂ ++ y
+
+  -- NUM
+  NUMₛₛₛ : ∀ {x y}
+         → x ≡ y
+         → N x ⇒₂ ++ y
+
 
 T₂ : (Aexp₂ → Set)
 T₂ (++ x) = ⊤
@@ -151,25 +191,15 @@ Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
 
 open import Data.Nat using (ℕ) renaming ()
 
-open TransitionSystem Aexp₂Semantic using (step-zero; step-suc) renaming (_⇛⟨_⟩_ to _⇒₂⟨_⟩_)
+open TransitionSystem Aexp₂Semantic using () renaming (_⇛⟨_⟩_ to _⇒₂⟨_⟩_; step-zero to step-zero₂; step-suc to step-suc₂)
 
-⇛⟨⟩-refl : ∀ {γ} → γ ⇒₂⟨ 0 ⟩ γ
-⇛⟨⟩-refl = step-zero
-
-step₁₁ : ∀ {a b c : Aexp₂} → a ⇒₂ c → (a * b) ⇒₂ (c * b)
-step₁₁ {a} {b} {c} x = {!   !}
-
-step₁ : ((((N + 3) + (N + 12)) * ((N + 4)*((N + 5)*(N + 8))))) ⇒₂ ((((++ (+ 3)) + (N + 12)) * ((N + 4)*((N + 5)*(N + 8)))))
-step₁ = step₁₁ {!   !}
-
-step₂ : ((((++ (+ 3)) + (N + 12)) * ((N + 4)*((N + 5)*(N + 8))))) ⇒₂ ((((++ (+ 3)) + (++ (+ 12))) * ((N + 4)*((N + 5)*(N + 8)))))
-step₂ = {!   !}
-
-step₃ : ((((++ (+ 3)) + (N + 12)) * ((N + 4)*((N + 5)*(N + 8))))) ⇒₂ (((++ (+ 15)) * ((N + 4) * ((N + 5)*(N + 8)))))
-step₃ = {!   !}
-
-p : ((((N + 3) + (N + 12)) * ((N + 4)*((N + 5)*(N + 8))))) ⇒₂⟨ 3 ⟩ (((++ (+ 15)) * ((N + 4) * ((N + 5)*(N + 8)))))
-p = TransitionSystem.step-suc step₁ (TransitionSystem.step-suc step₂ (TransitionSystem.step-suc step₃ step-zero))
+exampleAexp : (((N + 3) + (N + 12)) * (N + 4)*((N + 5)*(N + 8)))
+      ⇒₂⟨ 3 ⟩ ((++ + 15)            * (N + 4)*((N + 5)*(N + 8)))
+exampleAexp =
+    step-suc₂ (MULT-1ₛₛₛ (PLUS-1ₛₛₛ (NUMₛₛₛ refl)))
+        (step-suc₂ (MULT-1ₛₛₛ (PLUS-2ₛₛₛ (NUMₛₛₛ refl)))
+            (step-suc₂ (MULT-1ₛₛₛ PLUS-3ₛₛₛ)
+                step-zero₂))
 
 -- Aexp₂Semantic .TransitionSystem._⇒⟨_⟩_
 
