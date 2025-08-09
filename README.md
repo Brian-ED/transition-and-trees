@@ -12,8 +12,8 @@ include: .
 
 ## Conventions
 All files are camel-case (HereIsAnExample), except that the first character's case has meaning:
-1. Uppercase: This file is a library file, intented to be imported.
-2. Lowercase: This file is an examples file, not intended to be imported.
+1. Uppercase: This file is a library file, meaning it can not import example files.
+2. Lowercase: This file is an example file, meaning it can import anything and can be imported by other example files.
 
 ## TODO
 1. Split Bims code into big-step semantics and small step semantics.
