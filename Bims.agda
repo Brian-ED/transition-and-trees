@@ -1,13 +1,14 @@
 module transition-and-trees.Bims where
 open import Data.Integer using (+_) renaming (ℤ to Num)
-open import Data.Integer.Literals
+open import Function using (_∘_)
 open import Data.String using () renaming (String to Var)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Data.Product using (∃; ∃₂) renaming (_×_ to _and_)
+open import Data.Product using (∃; ∃₂; _,_) renaming (_×_ to _and_)
 open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
 open import transition-and-trees.BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
+open import Data.Nat using (ℕ; suc; zero) renaming ()
 
 open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
@@ -74,14 +75,29 @@ T₁ : (ℤ ⊎ Aexp₁ → Set)
 T₁ (inj₁ x) = ⊤
 T₁ (inj₂ x) = ⊥
 
-_⇒₁_ : ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set
-inj₂ (α₁ + α₂) ⇒₁ inj₁ v = ∃₂ λ(v₁ v₂ : ℤ)→ inj₂ α₁ ⇒₁ inj₁ v₁ and inj₂ α₂ ⇒₁ inj₁ v₂ → v ≡ (v₁ +ℤ v₂) -- [PLUS_BSS]
-inj₂ (α₁ * α₂) ⇒₁ inj₁ v = ∃₂ λ(v₁ v₂ : ℤ)→ inj₂ α₁ ⇒₁ inj₁ v₁ and inj₂ α₂ ⇒₁ inj₁ v₂ → v ≡ (v₁ *ℤ v₂) -- [MULT_BSS]
-inj₂ (α₁ - α₂) ⇒₁ inj₁ v = ∃₂ λ(v₁ v₂ : ℤ)→ inj₂ α₁ ⇒₁ inj₁ v₁ and inj₂ α₂ ⇒₁ inj₁ v₂ → v ≡ (v₁ -ℤ v₂) -- [MINUS_BSS]
-inj₂ [ x ] ⇒₁ inj₁ v = inj₂ x ⇒₁ inj₁ v  -- [PARENT_BSS]
-inj₂ (N n) ⇒₁ inj₁ v = n ≡ v -- [NUM_BSS]
-inj₁ x ⇒₁ y = ⊥ -- Not mentioned, therefore False
-inj₂ x ⇒₁ inj₂ y = ⊥ -- Not mentioned, therefore False
+data _⇒₁_ : ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set where
+    _PLUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+               → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+               → inj₂ (α₁ + α₂) ⇒₁ inj₁ (v₁ +ℤ v₂)
+
+    _MULT-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+               → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+               → inj₂ (α₁ * α₂) ⇒₁ inj₁ (v₁ *ℤ v₂)
+
+    _MINUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+                → inj₂ ( α₁ - α₂ ) ⇒₁ inj₁ (v₁ -ℤ v₂)
+
+    PARENT-BSS_ : ∀ {α₁ v₁}
+                → inj₂ α₁ ⇒₁ inj₁ v₁
+                → inj₂ [ α₁ ] ⇒₁ inj₁ v₁
+
+    NUM-BSS_ : ∀ {n v}
+             → n ≡ v
+             → inj₂ (N n) ⇒₁ inj₁ v
+
+--    inj₁ x ⇒₁ y = ⊥ -- Not mentioned, therefore False
+--    inj₂ x ⇒₁ inj₂ y = ⊥ -- Not mentioned, therefore False
 
 Aexp₁Semantic : TransitionSystem
 Aexp₁Semantic = ⌞ (ℤ ⊎ Aexp₁) , _⇒₁_ , T₁ ⌟
@@ -90,13 +106,8 @@ Aexp₁-is-big-step : Set
 Aexp₁-is-big-step = (x y : (ℤ ⊎ Aexp₁)) → (x ⇒₁ y) → (T₁ y)
 Aexp₁-is-big-step-proof : Aexp₁-is-big-step
 Aexp₁-is-big-step-proof (inj₁ x) (inj₁ y) = λ z → tt
-Aexp₁-is-big-step-proof (inj₁ x) (inj₂ y) = λ z → z
 Aexp₁-is-big-step-proof (inj₂ x) (inj₁ y) = λ z → tt
-Aexp₁-is-big-step-proof (inj₂ (N x)) (inj₂ y) ()
-Aexp₁-is-big-step-proof (inj₂ (x + x₁)) (inj₂ y) ()
-Aexp₁-is-big-step-proof (inj₂ (x * x₁)) (inj₂ y) ()
-Aexp₁-is-big-step-proof (inj₂ (x - x₁)) (inj₂ y) ()
-Aexp₁-is-big-step-proof (inj₂ [ x ]) (inj₂ y) ()
+Aexp₁-is-big-step-proof x (inj₂ y) ()
 
 Aexp₁big-semantic : BigStepSemantics Aexp₁Semantic
 Aexp₁big-semantic = ⌈> Aexp₁-is-big-step-proof
@@ -124,57 +135,75 @@ _or_ = _⊎_
 
 infix 4 _⇒₂_
 
+infixr 5 PLUS-1ₛₛₛ_
+infixr 5 PLUS-2ₛₛₛ_
+infixr 5 PLUS-3ₛₛₛ
+infixr 5 MULT-1ₛₛₛ_
+infixr 5 MULT-2ₛₛₛ_
+infixr 5 MULT-3ₛₛₛ
+infixr 5 SUB-1ₛₛₛ_
+infixr 5 SUB-2ₛₛₛ_
+infixr 5 SUB-3ₛₛₛ
+infixr 5 PARENT-1ₛₛₛ_
+infixr 5 NUMₛₛₛ_
+
+infixr 5 _PLUS-BSS_
+infixr 5 _MULT-BSS_
+infixr 5 _MINUS-BSS_
+infixr 5 PARENT-BSS_
+infixr 5 NUM-BSS_
+
 data _⇒₂_ : Aexp₂ → Aexp₂ → Set where
 
-  -- PLUS
-  PLUS-1ₛₛₛ : ∀ {α₁ α₁′ α₂}
-            → α₁ ⇒₂ α₁′
-            → (α₁ + α₂) ⇒₂ (α₁′ + α₂)
+    -- PLUS
+    PLUS-1ₛₛₛ_ : ∀ {α₁ α₁′ α₂}
+               → α₁ ⇒₂ α₁′
+               → (α₁ + α₂) ⇒₂ (α₁′ + α₂)
 
-  PLUS-2ₛₛₛ : ∀ {α₁ α₂ α₂′}
-            → α₂ ⇒₂ α₂′
-            → (α₁ + α₂) ⇒₂ (α₁ + α₂′)
+    PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂′}
+               → α₂ ⇒₂ α₂′
+               → (α₁ + α₂) ⇒₂ (α₁ + α₂′)
 
-  PLUS-3ₛₛₛ : ∀ {x y}
-            → (++ x + ++ y) ⇒₂ ++ x +ℤ y
+    PLUS-3ₛₛₛ : ∀ {x y}
+              → (++ x + ++ y) ⇒₂ ++ x +ℤ y
 
-  -- MULT
-  MULT-1ₛₛₛ : ∀ {α₁ α₁′ α₂}
-            → α₁ ⇒₂ α₁′
-            → (α₁ * α₂) ⇒₂ (α₁′ * α₂)
+    -- MULT
+    MULT-1ₛₛₛ_ : ∀ {α₁ α₁′ α₂}
+               → α₁ ⇒₂ α₁′
+               → (α₁ * α₂) ⇒₂ (α₁′ * α₂)
 
-  MULT-2ₛₛₛ : ∀ {α₁ α₂ α₂′}
-            → α₂ ⇒₂ α₂′
-            → (α₁ * α₂) ⇒₂ (α₁ * α₂′)
+    MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂′}
+               → α₂ ⇒₂ α₂′
+               → (α₁ * α₂) ⇒₂ (α₁ * α₂′)
 
-  MULT-3ₛₛₛ : ∀ {x y}
-            → (++ x * ++ y) ⇒₂ ++ x *ℤ y
+    MULT-3ₛₛₛ : ∀ {x y}
+              → (++ x * ++ y) ⇒₂ ++ x *ℤ y
 
-  -- SUB
-  SUB-1ₛₛₛ : ∀ {α₁ α₁′ α₂}
-           → α₁ ⇒₂ α₁′
-           → (α₁ - α₂) ⇒₂ (α₁′ - α₂)
+    -- SUB
+    SUB-1ₛₛₛ_ : ∀ {α₁ α₁′ α₂}
+              → α₁ ⇒₂ α₁′
+              → (α₁ - α₂) ⇒₂ (α₁′ - α₂)
 
-  SUB-2ₛₛₛ : ∀ {α₁ α₂ α₂′}
-           → α₂ ⇒₂ α₂′
-           → (α₁ - α₂) ⇒₂ (α₁ - α₂′)
+    SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂′}
+              → α₂ ⇒₂ α₂′
+              → (α₁ - α₂) ⇒₂ (α₁ - α₂′)
 
-  SUB-3ₛₛₛ : ∀ {x y}
-           → (++ x - ++ y) ⇒₂ ++ x -ℤ y
+    SUB-3ₛₛₛ : ∀ {x y}
+             → (++ x - ++ y) ⇒₂ ++ x -ℤ y
 
-  -- PARENTHESES
-  PARENT-1ₛₛₛ : ∀ {x y}
-              → x ⇒₂ y
-              → [ x ] ⇒₂ [ y ]
+    -- PARENTHESES
+    PARENT-1ₛₛₛ_ : ∀ {x y}
+                 → x ⇒₂ y
+                 → [ x ] ⇒₂ [ y ]
 
-  PARENT-2ₛₛₛ : ∀ {x y}
-              → x ≡ y
-              → [ ++ x ] ⇒₂ ++ y
+    PARENT-2ₛₛₛ_ : ∀ {x y}
+                 → x ≡ y
+                 → [ ++ x ] ⇒₂ ++ y
 
-  -- NUM
-  NUMₛₛₛ : ∀ {x y}
-         → x ≡ y
-         → N x ⇒₂ ++ y
+    -- NUM
+    NUMₛₛₛ_ : ∀ {x y}
+            → x ≡ y
+            → N x ⇒₂ ++ y
 
 
 T₂ : (Aexp₂ → Set)
@@ -185,26 +214,3 @@ Aexp₂Semantic : TransitionSystem
 Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
 
 -- Section End Page 36-37
-
--- Section Start Page 38. This label is place 1
--- page 28 is also done in TransitionSystems.agda
-
-open import Data.Nat using (ℕ) renaming ()
-
-open TransitionSystem Aexp₂Semantic using () renaming (_⇛⟨_⟩_ to _⇒₂⟨_⟩_; step-zero to step-zero₂; step-suc to step-suc₂)
-
-exampleAexp : (((N + 3) + (N + 12)) * (N + 4)*((N + 5)*(N + 8)))
-      ⇒₂⟨ 3 ⟩ ((++ + 15)            * (N + 4)*((N + 5)*(N + 8)))
-exampleAexp =
-    step-suc₂ (MULT-1ₛₛₛ (PLUS-1ₛₛₛ (NUMₛₛₛ refl)))
-        (step-suc₂ (MULT-1ₛₛₛ (PLUS-2ₛₛₛ (NUMₛₛₛ refl)))
-            (step-suc₂ (MULT-1ₛₛₛ PLUS-3ₛₛₛ)
-                step-zero₂))
-
--- Aexp₂Semantic .TransitionSystem._⇒⟨_⟩_
-
---open TransitionSystem using (_⇒*_)
---
---( ) ⇒*
-
--- Section End Page 38
