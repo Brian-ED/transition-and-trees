@@ -160,37 +160,37 @@ infixr 5 NUM-BSS_
 data _⇒₂_ : Aexp₂ → Aexp₂ → Set where
 
     -- PLUS
-    PLUS-1ₛₛₛ_ : ∀ {α₁ α₁′ α₂}
-               → α₁ ⇒₂ α₁′
-               → (α₁ + α₂) ⇒₂ (α₁′ + α₂)
+    PLUS-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+               → α₁ ⇒₂ α₁´
+               → (α₁ + α₂) ⇒₂ (α₁´ + α₂)
 
-    PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂′}
-               → α₂ ⇒₂ α₂′
-               → (α₁ + α₂) ⇒₂ (α₁ + α₂′)
+    PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+               → α₂ ⇒₂ α₂´
+               → (α₁ + α₂) ⇒₂ (α₁ + α₂´)
 
     PLUS-3ₛₛₛ : ∀ {x y}
               → (++ x + ++ y) ⇒₂ ++ x +ℤ y
 
     -- MULT
-    MULT-1ₛₛₛ_ : ∀ {α₁ α₁′ α₂}
-               → α₁ ⇒₂ α₁′
-               → (α₁ * α₂) ⇒₂ (α₁′ * α₂)
+    MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+               → α₁ ⇒₂ α₁´
+               → (α₁ * α₂) ⇒₂ (α₁´ * α₂)
 
-    MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂′}
-               → α₂ ⇒₂ α₂′
-               → (α₁ * α₂) ⇒₂ (α₁ * α₂′)
+    MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+               → α₂ ⇒₂ α₂´
+               → (α₁ * α₂) ⇒₂ (α₁ * α₂´)
 
     MULT-3ₛₛₛ : ∀ {x y}
               → (++ x * ++ y) ⇒₂ ++ x *ℤ y
 
     -- SUB
-    SUB-1ₛₛₛ_ : ∀ {α₁ α₁′ α₂}
-              → α₁ ⇒₂ α₁′
-              → (α₁ - α₂) ⇒₂ (α₁′ - α₂)
+    SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+              → α₁ ⇒₂ α₁´
+              → (α₁ - α₂) ⇒₂ (α₁´ - α₂)
 
-    SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂′}
-              → α₂ ⇒₂ α₂′
-              → (α₁ - α₂) ⇒₂ (α₁ - α₂′)
+    SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+              → α₂ ⇒₂ α₂´
+              → (α₁ - α₂) ⇒₂ (α₁ - α₂´)
 
     SUB-3ₛₛₛ : ∀ {x y}
              → (++ x - ++ y) ⇒₂ ++ x -ℤ y
@@ -367,9 +367,8 @@ data Bexp₃ : Set where
 
 data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set where
 
-    _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                   → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-                   → v₁ ≡ v₂
+    _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
+                   → s ⊢ inj₂ α₁ ⇒₃ inj₁ v  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v
                    → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₃b inj₁ true
 
     _EQUALS-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
@@ -414,11 +413,19 @@ data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set whe
 -- Section Begin Page 47
 
 data Stm₃ : Set where
-    skip : Stm₃
+    skip₃ : Stm₃
     _←₃_ : Var → Aexp₃ → Stm₃
     _Å₃_ : Stm₃ → Stm₃ → Stm₃
     ifStm₃_then_else : Bexp₃ → Stm₃ → Stm₃ → Stm₃
-    _while₃_ : Stm₃ → Bexp₃ → Stm₃
+    while_do₃_ : Bexp₃ → Stm₃ → Stm₃
 
+data ⟨_,_⟩⇒₃_ : Stm₃ → State → State → Set where
+    ASS-BSS         : ∀ {x a s v} → s ⊢ inj₂ a ⇒₃ inj₁ v → ⟨ (x ←₃ a) , s ⟩⇒₃ (s [ x ↦ v ])
+    SKIP-BSS        : ∀ {s} → ⟨ skip₃ , s ⟩⇒₃ s
+    COMP-BSS        : ∀ {S₁ S₂ s s´ s˝} → ⟨ S₁ , s ⟩⇒₃ s˝ → ⟨ S₂ , s˝ ⟩⇒₃ s´ → ⟨ (S₁ Å₃ S₂) , s ⟩⇒₃ s´
+    IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b} → ⟨ S₁ , s ⟩⇒₃ s´ → s ⊢ inj₂ b ⇒₃b inj₁ true  → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
+    IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b} → ⟨ S₂ , s ⟩⇒₃ s´ → s ⊢ inj₂ b ⇒₃b inj₁ false → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
+    WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b} → s ⊢ inj₂ b ⇒₃b inj₁ true → ⟨ S , s ⟩⇒₃ s˝ → ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´ → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
+    WHILE-FALSE-BSS : ∀ {S s b} → s ⊢ inj₂ b ⇒₃b inj₁ false → ⟨ (while b do₃ S) , s ⟩⇒₃ s
 
 -- Section End Page 47
