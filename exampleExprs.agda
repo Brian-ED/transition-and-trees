@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module transition-and-trees.exampleExprs where
 open import Data.Integer using (+_) renaming (ℤ to Num)
 open import Function using (_∘_)
@@ -14,6 +15,8 @@ open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_
 open import transition-and-trees.Bims
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong₂; sym; trans)
+open import transition-and-trees.Bims using (Aexp₂; _⇒₂_; ++_)
+open import transition-and-trees.bims using (T₂; Aexp₂Semantic)
 
 -- Section Start Page 38. This label is place 1
 -- page 28 is also done in TransitionSystems.agda
