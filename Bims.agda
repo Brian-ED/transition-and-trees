@@ -3,7 +3,7 @@ open import Data.Integer using (+_) renaming (ℤ to Num)
 open import Data.String using (toList) renaming (String to Var)
 open import Data.Char.Base using (Char)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Data.Product using (∃; ∃₂; _,_) renaming (_×_ to _and_)
+open import Data.Product using (∃; ∃₂; _,_; _×_)
 open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
 open import transition-and-trees.BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 open import Data.Empty using (⊥; ⊥-elim)
@@ -11,8 +11,6 @@ open import Data.Unit using (⊤) renaming (tt to ttt)
 open import Data.Nat using (ℕ; suc; zero) renaming ()
 open import Relation.Nullary.Negation using () renaming (¬_ to not_)
 open import Agda.Builtin.Maybe using (Maybe; just; nothing)
-open import Data.List using (List; []; _∷_)
-open import Agda.Builtin.Char using (primCharEquality)
 open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 
@@ -46,11 +44,6 @@ data Stm : Set where
 infixr 5 N_
 infixr 5 ++_
 
-exprPg29 : Aexp₁
-exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
-
--- TODO: complain to book owner: Bims in the book doesn't define n like I've done. I don't understand what the syntactic catagory of 3 is, Aexp₁ or Num or both?
-
 -- Section End Page 29
 
 -- Section Start Page 30
@@ -65,19 +58,7 @@ open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ t
 -- Section End Page 30
 
 -- Section Start Page 32-33
-
 -- 3.4.1 A big-step semantics of Aexp₁
-
--- The book doesn't define Transition on Nums. I assume there is no transition, so the extension is simply False
--- Turn subtype in argument to sumtype
-⭆⇒ : (Aexp₁ → ℤ) → (ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set)
-⭆⇒ x (inj₁ x₁) (inj₁ z) = ⊥
-⭆⇒ x (inj₂ y) (inj₁ z) = ⊤
-⭆⇒ x y (inj₂ z) = ⊥
-
-T₁ : (ℤ ⊎ Aexp₁ → Set)
-T₁ (inj₁ x) = ⊤
-T₁ (inj₂ x) = ⊥
 
 data _⇒₁_ : ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set where
     _PLUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
@@ -96,25 +77,8 @@ data _⇒₁_ : ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set where
                 → inj₂ α₁ ⇒₁ inj₁ v₁
                 → inj₂ [ α₁ ] ⇒₁ inj₁ v₁
 
-    NUM-BSS_ : ∀ {n v}
-             → n ≡ v
-             → inj₂ (N n) ⇒₁ inj₁ v
-
---    inj₁ x ⇒₁ y = ⊥ -- Not mentioned, therefore False
---    inj₂ x ⇒₁ inj₂ y = ⊥ -- Not mentioned, therefore False
-
-Aexp₁Semantic : TransitionSystem
-Aexp₁Semantic = ⌞ (ℤ ⊎ Aexp₁) , _⇒₁_ , T₁ ⌟
-
-Aexp₁-is-big-step : Set
-Aexp₁-is-big-step = (x y : (ℤ ⊎ Aexp₁)) → (x ⇒₁ y) → (T₁ y)
-Aexp₁-is-big-step-proof : Aexp₁-is-big-step
-Aexp₁-is-big-step-proof (inj₁ x) (inj₁ y) = λ z → ttt
-Aexp₁-is-big-step-proof (inj₂ x) (inj₁ y) = λ z → ttt
-Aexp₁-is-big-step-proof x (inj₂ y) ()
-
-Aexp₁big-semantic : BigStepSemantics Aexp₁Semantic
-Aexp₁big-semantic = ⌈> Aexp₁-is-big-step-proof
+    NUM-BSS_ : ∀ {n}
+             → inj₂ (N n) ⇒₁ inj₁ n
 
 
 -- Section End Page 32-33
@@ -209,14 +173,6 @@ data _⇒₂_ : Aexp₂ → Aexp₂ → Set where
             → x ≡ y
             → N x ⇒₂ ++ y
 
-
-T₂ : (Aexp₂ → Set)
-T₂ (++ x) = ⊤
-T₂ _ = ⊥
-
-Aexp₂Semantic : TransitionSystem
-Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
-
 -- Section End Page 36-37
 
 -- Section Begin Page 40
@@ -262,31 +218,14 @@ data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
 
     AND-2-BSS : ∀ {b₁ b₂}
               → (inj₂ b₁ ⇒b inj₁ false)
-             or (inj₂ b₂ ⇒b inj₁ false)
+              ⊎ (inj₂ b₂ ⇒b inj₁ false)
               → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
 
 -- Section End Page 40
 
 -- Section Start Page 44-45
 
-State = Var → Maybe Num
-
-stateID : State
-stateID = λ x → nothing
-
-compareList : List Char → List Char → Bool
-compareList [] [] = true
-compareList [] (x ∷ b) = false
-compareList (x ∷ a) [] = false
-compareList (x ∷ a) (y ∷ b) = (primCharEquality x y) ∧B (compareList a b)
-
-_==Str_ : Var → Var → Bool
-_==Str_ a b = compareList (toList a) (toList b)
-
-_[_↦_] : State → Var → Num → State
-_[_↦_] s x v = λ(y : Var) → if (y ==Str x) then (s y) else (just v)
-
-
+open import transition-and-trees.State using (State; _[_↦_]; lookup; emptyState)
 
 data Aexp₃ : Set where
     N_ : Num → Aexp₃ -- Number literals
@@ -315,12 +254,11 @@ data _⊢_⇒₃_ : State → ℤ ⊎ Aexp₃ → ℤ ⊎ Aexp₃ → Set where
                 → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
                 → s ⊢ inj₂ [ α₁ ] ⇒₃ inj₁ v₁
 
-    NUM-BSS_ : ∀ {s n v}
-             → n ≡ v
-             → s ⊢ inj₂ (N n) ⇒₃ inj₁ v
+    NUM-BSS : ∀ {s n}
+            → s ⊢ inj₂ (N n) ⇒₃ inj₁ n
 
     Var-BSS_ : ∀ {s x v}
-             → (s x) ≡ just v
+             → (lookup x s) ≡ just v
              → s ⊢ inj₂ (V x) ⇒₃ inj₁ v
 
 -- The book states this transition system is a big-step-semantic, though does not prove it.
@@ -331,13 +269,13 @@ T₃ (inj₁ x) = ⊤
 T₃ (inj₂ x) = ⊥
 
 Aexp₃Semantic : TransitionSystem
-Aexp₃Semantic = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ stateID) , T₃ ⌟
+Aexp₃Semantic = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ emptyState) , T₃ ⌟
 
-Aexp₃-is-big-step-proof : ∀ x y → stateID ⊢ x ⇒₃ y → T₃ y
-Aexp₃-is-big-step-proof (inj₁ x) (inj₁ y) = λ z → ttt
-Aexp₃-is-big-step-proof (inj₂ x) (inj₁ y) = λ z → ttt
-Aexp₃-is-big-step-proof x (inj₂ y) ()
-
+Aexp₃-is-big-step-proof : ∀ x y → emptyState ⊢ x ⇒₃ y → T₃ y
+Aexp₃-is-big-step-proof (inj₁ x) (inj₁ x₁) = λ _ → ttt
+Aexp₃-is-big-step-proof (inj₁ x) (inj₂ y) ()
+Aexp₃-is-big-step-proof (inj₂ y₁) (inj₁ x) = λ _ → ttt
+Aexp₃-is-big-step-proof (inj₂ y₁) (inj₂ y) ()
 Aexp₃big-semantic : BigStepSemantics Aexp₃Semantic
 Aexp₃big-semantic = ⌈> Aexp₃-is-big-step-proof
 
@@ -371,7 +309,7 @@ data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set whe
                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v
                    → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₃b inj₁ true
 
-    _EQUALS-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+    EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                    → not (v₁ ≡ v₂)
                    → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₃b inj₁ false
@@ -420,12 +358,59 @@ data Stm₃ : Set where
     while_do₃_ : Bexp₃ → Stm₃ → Stm₃
 
 data ⟨_,_⟩⇒₃_ : Stm₃ → State → State → Set where
-    ASS-BSS         : ∀ {x a s v} → s ⊢ inj₂ a ⇒₃ inj₁ v → ⟨ (x ←₃ a) , s ⟩⇒₃ (s [ x ↦ v ])
-    SKIP-BSS        : ∀ {s} → ⟨ skip₃ , s ⟩⇒₃ s
-    COMP-BSS        : ∀ {S₁ S₂ s s´ s˝} → ⟨ S₁ , s ⟩⇒₃ s˝ → ⟨ S₂ , s˝ ⟩⇒₃ s´ → ⟨ (S₁ Å₃ S₂) , s ⟩⇒₃ s´
-    IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b} → ⟨ S₁ , s ⟩⇒₃ s´ → s ⊢ inj₂ b ⇒₃b inj₁ true  → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
-    IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b} → ⟨ S₂ , s ⟩⇒₃ s´ → s ⊢ inj₂ b ⇒₃b inj₁ false → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
-    WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b} → s ⊢ inj₂ b ⇒₃b inj₁ true → ⟨ S , s ⟩⇒₃ s˝ → ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´ → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
-    WHILE-FALSE-BSS : ∀ {S s b} → s ⊢ inj₂ b ⇒₃b inj₁ false → ⟨ (while b do₃ S) , s ⟩⇒₃ s
+    ASS-BSS         : ∀ {x a s v}
+                    → s ⊢ inj₂ a ⇒₃ inj₁ v
+                    → ⟨ (x ←₃ a) , s ⟩⇒₃ (s [ x ↦ v ])
+
+    SKIP-BSS        : ∀ {s}
+                    → ⟨ skip₃ , s ⟩⇒₃ s
+
+    COMP-BSS        : ∀ {S₁ S₂ s s´ s˝}
+                    → ⟨ S₁ , s ⟩⇒₃ s˝  →  ⟨ S₂ , s˝ ⟩⇒₃ s´
+                    → ⟨ (S₁ Å₃ S₂) , s ⟩⇒₃ s´
+
+    IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
+                    → ⟨ S₁ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ true
+                    → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
+
+    IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
+                    → ⟨ S₂ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ false
+                    → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
+
+    WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
+                    → s ⊢ inj₂ b ⇒₃b inj₁ true
+                    → ⟨ S , s ⟩⇒₃ s˝  →  ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´
+                    → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
+
+    WHILE-FALSE-BSS : ∀ {S s s´ b}
+                    → s ⊢ inj₂ b ⇒₃b inj₁ false
+                    → s´ ≡ s
+                    → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
 
 -- Section End Page 47
+
+
+-- Section Begin Page 48-49
+
+
+S2 = ("i" ←₃ (N + 6)) Å₃ (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (("x" ←₃ (V "x" + V "i")) Å₃ ("i" ←₃ ((V "i") - (N + 2)))))
+s2 = emptyState [ "x" ↦ + 5 ]
+r2 = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
+P2 : ⟨ S2 , s2 ⟩⇒₃ r2
+P2 = COMP-BSS
+    (ASS-BSS NUM-BSS)
+    (WHILE-TRUE-BSS
+        (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ ())
+        (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+        (WHILE-TRUE-BSS
+            (NOT-1-BSS (EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ ()))
+            (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+            (WHILE-TRUE-BSS
+                (NOT-1-BSS (EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ ()))
+                (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+                (WHILE-FALSE-BSS (NOT-2-BSS ((Var-BSS refl) EQUAL-1-BSS NUM-BSS)) refl)
+            )
+        )
+    )
+
+-- Section End Page 48-49
