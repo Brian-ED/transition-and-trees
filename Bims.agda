@@ -261,23 +261,23 @@ data _⊢_⇒₃_ : State → ℤ ⊎ Aexp₃ → ℤ ⊎ Aexp₃ → Set where
              → (lookup x s) ≡ just v
              → s ⊢ inj₂ (V x) ⇒₃ inj₁ v
 
--- The book states this transition system is a big-step-semantic, though does not prove it.
--- To make it easier to prove for myself, I have assumed you start out with no state on a given program.
+-- The book states that the `⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
+-- Here is a proof for any starting state s:
 
 T₃ : (ℤ ⊎ Aexp₃ → Set)
 T₃ (inj₁ x) = ⊤
 T₃ (inj₂ x) = ⊥
 
-Aexp₃Semantic : TransitionSystem
-Aexp₃Semantic = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ emptyState) , T₃ ⌟
+Aexp₃Semantic : State → TransitionSystem
+Aexp₃Semantic s = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟
 
-Aexp₃-is-big-step-proof : ∀ x y → emptyState ⊢ x ⇒₃ y → T₃ y
-Aexp₃-is-big-step-proof (inj₁ x) (inj₁ x₁) = λ _ → ttt
-Aexp₃-is-big-step-proof (inj₁ x) (inj₂ y) ()
-Aexp₃-is-big-step-proof (inj₂ y₁) (inj₁ x) = λ _ → ttt
-Aexp₃-is-big-step-proof (inj₂ y₁) (inj₂ y) ()
-Aexp₃big-semantic : BigStepSemantics Aexp₃Semantic
-Aexp₃big-semantic = ⌈> Aexp₃-is-big-step-proof
+Aexp₃-is-big-step-proof : ∀ s x y → s ⊢ x ⇒₃ y → T₃ y
+Aexp₃-is-big-step-proof s (inj₁ x) (inj₁ x₁) = λ _ → ttt
+Aexp₃-is-big-step-proof s (inj₁ x) (inj₂ y) ()
+Aexp₃-is-big-step-proof s (inj₂ y₁) (inj₁ x) = λ _ → ttt
+Aexp₃-is-big-step-proof s (inj₂ y₁) (inj₂ y) ()
+Aexp₃big-semantic : ∀ s → BigStepSemantics (Aexp₃Semantic s)
+Aexp₃big-semantic s = ⌈> (Aexp₃-is-big-step-proof s)
 
 -- Section End Page 44-45
 
