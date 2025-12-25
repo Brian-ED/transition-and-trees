@@ -279,17 +279,6 @@ Aexp₃-is-big-step-proof (inj₂ y₁) (inj₂ y) ()
 Aexp₃big-semantic : BigStepSemantics Aexp₃Semantic
 Aexp₃big-semantic = ⌈> Aexp₃-is-big-step-proof
 
-
---    EQUAL-1-BSS_       : ∀ (s α₁ α₂ v₁ v₂) → (s ⊢ ink₂ α₁ ⇒₃b inj₁ v₁ ) → (s ⊢ ink₂ α₂ ⇒₃b inj₁ v₂ ) →     (v₁ ≡ v₂) → s ⊢ α₁ ⇒₃b α₂
---    EQUAL-2-BSS_       : ∀ (s α₁ α₂ v₁ v₂) → (s ⊢ ink₂ α₁ ⇒₃b inj₁ v₁ ) → (s ⊢ ink₂ α₂ ⇒₃b inj₁ v₂ ) → not (v₁ ≡ v₂) → s ⊢ α₁ ⇒₃b α₂
---    GREATERTHAN-1-BSS_ : ∀ (s α₁ α₂ v₁ v₂) → (s ⊢ ink₂ α₁ ⇒₃b inj₁ v₁ ) → (s ⊢ ink₂ α₂ ⇒₃b inj₁ v₂ ) → 
---    GREATERTHAN-2-BSS_ : ∀ (s α₁ α₂ v₁ v₂) → (s ⊢ ink₂ α₁ ⇒₃b inj₁ v₁ ) → (s ⊢ ink₂ α₂ ⇒₃b inj₁ v₂ ) → 
---    NOT-1-BSS_         : ∀ (s α₁ α₂ v₁ v₂) → ()
---    NOT-2-BSS_         : ∀ (s α₁ α₂ v₁ v₂) → ()
---    PARENT-B-BSS_      : ∀ (s α₁ α₂ v₁ v₂) → ()
---    AND-1-BSS_         : ∀ (s α₁ α₂ v₁ v₂) → ()
---    AND-2-BSS_         : ∀ (s α₁ α₂ v₁ v₂) → ()
-
 -- Section End Page 44-45
 
 -- Section Begin Page 46
