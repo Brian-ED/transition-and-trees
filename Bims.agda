@@ -388,29 +388,3 @@ data ⟨_,_⟩⇒₃_ : Stm₃ → State → State → Set where
                     → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
 
 -- Section End Page 47
-
-
--- Section Begin Page 48-49
-
-
-S2 = ("i" ←₃ (N + 6)) Å₃ (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (("x" ←₃ (V "x" + V "i")) Å₃ ("i" ←₃ ((V "i") - (N + 2)))))
-s2 = emptyState [ "x" ↦ + 5 ]
-r2 = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
-P2 : ⟨ S2 , s2 ⟩⇒₃ r2
-P2 = COMP-BSS
-    (ASS-BSS NUM-BSS)
-    (WHILE-TRUE-BSS
-        (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
-        (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
-        (WHILE-TRUE-BSS
-            (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
-            (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
-            (WHILE-TRUE-BSS
-                (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
-                (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
-                (WHILE-FALSE-BSS (NOT-2-BSS ((Var-BSS refl) EQUAL-1-BSS NUM-BSS)) refl)
-            )
-        )
-    )
-
--- Section End Page 48-49

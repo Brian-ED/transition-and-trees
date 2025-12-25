@@ -1,7 +1,7 @@
 module transition-and-trees.bims where
+open import transition-and-trees.Bims
 
 -- Section Start Page 29
-open import transition-and-trees.Bims using (Aexp₁; Bexp; Stm; N_; _+_; _*_)
 open import Data.Integer using (+_)
 
 exprPg29 : Aexp₁
@@ -60,7 +60,29 @@ Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
 
 -- Section End Page 36-37
 
--- Section Start Page 44-45
+-- Section Begin Page 48-49
 
+open import transition-and-trees.State using (State; _[_↦_]; lookup; emptyState)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
--- Section End Page 44-45
+S2 = ("i" ←₃ (N + 6)) Å₃ (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (("x" ←₃ (V "x" + V "i")) Å₃ ("i" ←₃ ((V "i") - (N + 2)))))
+s2 = emptyState [ "x" ↦ + 5 ]
+r2 = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
+P2 : ⟨ S2 , s2 ⟩⇒₃ r2
+P2 = COMP-BSS
+    (ASS-BSS NUM-BSS)
+    (WHILE-TRUE-BSS
+        (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
+        (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+        (WHILE-TRUE-BSS
+            (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
+            (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+            (WHILE-TRUE-BSS
+                (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
+                (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+                (WHILE-FALSE-BSS (NOT-2-BSS ((Var-BSS refl) EQUAL-1-BSS NUM-BSS)) refl)
+            )
+        )
+    )
+
+-- Section End Page 48-49
