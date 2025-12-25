@@ -8,7 +8,7 @@ open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_
 open import transition-and-trees.BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤) renaming (tt to ttt)
-open import Data.Nat using (ℕ; suc; zero) renaming ()
+open import Data.Nat using (ℕ; suc; zero)
 open import Relation.Nullary.Negation using () renaming (¬_ to not_)
 open import Agda.Builtin.Maybe using (Maybe; just; nothing)
 open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
@@ -400,13 +400,13 @@ P2 : ⟨ S2 , s2 ⟩⇒₃ r2
 P2 = COMP-BSS
     (ASS-BSS NUM-BSS)
     (WHILE-TRUE-BSS
-        (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ ())
+        (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
         (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
         (WHILE-TRUE-BSS
-            (NOT-1-BSS (EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ ()))
+            (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
             (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
             (WHILE-TRUE-BSS
-                (NOT-1-BSS (EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ ()))
+                (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
                 (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
                 (WHILE-FALSE-BSS (NOT-2-BSS ((Var-BSS refl) EQUAL-1-BSS NUM-BSS)) refl)
             )
