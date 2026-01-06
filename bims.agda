@@ -1,5 +1,5 @@
-module transition-and-trees.bims where
-open import transition-and-trees.Bims
+module bims where
+open import Bims
 
 -- Section Start Page 29
 open import Data.Integer using (+_)
@@ -11,13 +11,13 @@ exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
 -- Section Start Page 32-33
 -- 3.4.1 A big-step semantics of Aexp₁
 
-open import transition-and-trees.Bims using (_⇒₁_)
+open import Bims using (_⇒₁_)
 open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤) renaming (tt to ttt)
-open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-open import transition-and-trees.BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
+open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 
 -- The book doesn't define Transition on Nums. I assume there is no transition, so the extension is simply False
 -- Turn subtype in argument to sumtype
@@ -49,7 +49,7 @@ Aexp₁big-semantic = ⌈> Aexp₁-is-big-step-proof
 -- Section Start Page 36-37
 -- A small-step semantics of Aexp₁
 
-open import transition-and-trees.Bims using (Aexp₂; _⇒₂_; ++_)
+open import Bims using (Aexp₂; _⇒₂_; ++_)
 
 T₂ : (Aexp₂ → Set)
 T₂ (++ x) = ⊤
@@ -62,7 +62,7 @@ Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
 
 -- Section Begin Page 48-49
 
-open import transition-and-trees.State using (State; _[_↦_]; lookup; emptyState)
+open import State using (State; _[_↦_]; lookup; emptyState)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 
 S2 = ("i" ←₃ (N + 6)) Å₃ (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (("x" ←₃ (V "x" + V "i")) Å₃ ("i" ←₃ ((V "i") - (N + 2)))))

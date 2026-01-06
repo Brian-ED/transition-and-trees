@@ -1,11 +1,11 @@
-module transition-and-trees.Bims where
+module Bims where
 open import Data.Integer using (+_) renaming (ℤ to Num)
 open import Data.String using (toList) renaming (String to Var)
 open import Data.Char.Base using (Char)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
 open import Data.Product using (∃; ∃₂; _,_; _×_)
-open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-open import transition-and-trees.BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
+open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤) renaming (tt to ttt)
 open import Data.Nat using (ℕ; suc; zero)
@@ -225,7 +225,7 @@ data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
 
 -- Section Start Page 44-45
 
-open import transition-and-trees.State using (State; _[_↦_]; lookup; emptyState)
+open import State using (State; _[_↦_]; lookup; emptyState)
 
 data Aexp₃ : Set where
     N_ : Num → Aexp₃ -- Number literals

@@ -1,10 +1,10 @@
-module transition-and-trees.bigAndSmallStepSemantics where
+module bigAndSmallStepSemantics where
 
-open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)
-open import transition-and-trees.BigAndSmallStepSemantics using (BigStepSemantics; ⌈>)
-open import transition-and-trees.transitionSystems using (Γ₁; T₁_; )
+open import BigAndSmallStepSemantics using (BigStepSemantics; ⌈>)
+open import transitionSystems using (Γ₁; T₁_)
 
 -- Section Start Page 31
 

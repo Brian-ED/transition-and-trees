@@ -1,8 +1,8 @@
-module transition-and-trees.transitionSystems where
+module transitionSystems where
 
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)
-open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
 
 -- Section Start Page 30
 

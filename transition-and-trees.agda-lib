@@ -1,0 +1,3 @@
+name: transition-and-trees
+depend: standard-library
+include: .

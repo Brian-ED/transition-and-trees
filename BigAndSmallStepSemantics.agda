@@ -1,6 +1,6 @@
-module transition-and-trees.BigAndSmallStepSemantics where
+module BigAndSmallStepSemantics where
 
-open import transition-and-trees.TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟; Γ₁; _⇒₁_; T₁_)
 open import Data.Product using (∃; ∃₂) renaming (_×_ to _and_)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
@@ -12,8 +12,6 @@ record BigStepSemantics (TS : TransitionSystem) : Set₁ where
     open TransitionSystem TS
     field
         BigStepping : (x y : Γ) → x ⇒ y → T y
-
-open import transition-and-trees.TransitionSystems using (Γ₁; _⇒₁_; T₁_)
 
 _⇒₂_ : Γ₁ → Γ₁ → Set
 x ⇒₂ Γ₁.γ₁ = ⊥

@@ -1,4 +1,4 @@
-module transition-and-trees.TransitionSystems where
+module TransitionSystems where
 
 open import Data.Nat using (ℕ; suc; zero)
 open import Relation.Binary.PropositionalEquality using (_≡_)

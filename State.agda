@@ -1,4 +1,4 @@
-module transition-and-trees.State where
+module State where
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.Integer using (+_; ℤ)
 open import Data.String using (String; _≟_; _<_)
