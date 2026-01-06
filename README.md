@@ -1,14 +1,6 @@
 #  Proving the book Transition and Trees by Hans Hüttel in Agda
 INCOMPLETE.
-Progress is page 47 out of 267.
-
-This repository assumes you have a agda-lib.agda-lib file on the directory which contains this repository.
-This is the contents:
-```
-name: agda-lib
-depend: standard-library
-include: .
-```
+Progress is page 49 out of 267.
 
 ## Conventions
 All files are camel-case (HereIsAnExample), except that the first character's case has meaning:
