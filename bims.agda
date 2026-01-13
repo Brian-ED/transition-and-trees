@@ -1,88 +1,103 @@
 module bims where
-open import Bims
 
 -- Section Start Page 29
-open import Data.Integer using (+_)
+module Aexp₁-example-expr where
+    open import Data.Integer using (+_)
+    open import Bims using (Aexp₁; _+_; N_; _*_)
 
-exprPg29 : Aexp₁
-exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
+    exprPg29 : Aexp₁
+    exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
 -- Section End Page 29
 
 -- Section Start Page 32-33
 -- 3.4.1 A big-step semantics of Aexp₁
+module Aexp₁-is-big-step where
+    open import Bims using (_⇒₁_)
+    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
+    open import Data.Empty using (⊥; ⊥-elim)
+    open import Data.Unit using (⊤) renaming (tt to ttt)
+    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+    open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 
-open import Bims using (_⇒₁_)
-open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Empty using (⊥; ⊥-elim)
-open import Data.Unit using (⊤) renaming (tt to ttt)
-open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
+    open import Bims using (Aexp₁)
+    open import Data.Integer using (+_)
 
--- The book doesn't define Transition on Nums. I assume there is no transition, so the extension is simply False
--- Turn subtype in argument to sumtype
-⭆⇒ : (Aexp₁ → ℤ) → (ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set)
-⭆⇒ x (inj₁ x₁) (inj₁ z) = ⊥
-⭆⇒ x (inj₂ y) (inj₁ z) = ⊤
-⭆⇒ x y (inj₂ z) = ⊥
 
-T₁ : (ℤ ⊎ Aexp₁ → Set)
-T₁ (inj₁ x) = ⊤
-T₁ (inj₂ x) = ⊥
+    -- The book doesn't define Transition on Nums. I assume there is no transition, so the extension is simply False
+    -- Turn subtype in argument to sumtype
+    ⭆⇒ : (Aexp₁ → ℤ) → (ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set)
+    ⭆⇒ x (inj₁ x₁) (inj₁ z) = ⊥
+    ⭆⇒ x (inj₂ y) (inj₁ z) = ⊤
+    ⭆⇒ x y (inj₂ z) = ⊥
 
-Aexp₁Semantic : TransitionSystem
-Aexp₁Semantic = ⌞ (ℤ ⊎ Aexp₁) , _⇒₁_ , T₁ ⌟
+    T₁ : (ℤ ⊎ Aexp₁ → Set)
+    T₁ (inj₁ x) = ⊤
+    T₁ (inj₂ x) = ⊥
 
-Aexp₁-is-big-step : Set
-Aexp₁-is-big-step = (x y : (ℤ ⊎ Aexp₁)) → (x ⇒₁ y) → (T₁ y)
-Aexp₁-is-big-step-proof : Aexp₁-is-big-step
-Aexp₁-is-big-step-proof (inj₁ x) (inj₁ y) = λ z → ttt
-Aexp₁-is-big-step-proof (inj₂ x) (inj₁ y) = λ z → ttt
-Aexp₁-is-big-step-proof x (inj₂ y) ()
+    Aexp₁Semantic : TransitionSystem
+    Aexp₁Semantic = ⌞ (ℤ ⊎ Aexp₁) , _⇒₁_ , T₁ ⌟
 
-Aexp₁big-semantic : BigStepSemantics Aexp₁Semantic
-Aexp₁big-semantic = ⌈> Aexp₁-is-big-step-proof
+    Aexp₁-is-big-step : Set
+    Aexp₁-is-big-step = (x y : (ℤ ⊎ Aexp₁)) → (x ⇒₁ y) → (T₁ y)
+    Aexp₁-is-big-step-proof : Aexp₁-is-big-step
+    Aexp₁-is-big-step-proof (inj₁ x) (inj₁ y) = λ z → ttt
+    Aexp₁-is-big-step-proof (inj₂ x) (inj₁ y) = λ z → ttt
+    Aexp₁-is-big-step-proof x (inj₂ y) ()
+
+    Aexp₁big-semantic : BigStepSemantics Aexp₁Semantic
+    Aexp₁big-semantic = ⌈> Aexp₁-is-big-step-proof
 
 -- Section End Page 32-33
 
 
 -- Section Start Page 36-37
 -- A small-step semantics of Aexp₁
+module Aexp₂-small-step-semantic where
+    open import Bims using (Aexp₂; _⇒₂_; ++_)
+    open import Data.Unit using (⊤)
+    open import Data.Empty using (⊥)
+    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
 
-open import Bims using (Aexp₂; _⇒₂_; ++_)
+    T₂ : (Aexp₂ → Set)
+    T₂ (++ x) = ⊤
+    T₂ _ = ⊥
 
-T₂ : (Aexp₂ → Set)
-T₂ (++ x) = ⊤
-T₂ _ = ⊥
-
-Aexp₂Semantic : TransitionSystem
-Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
+    Aexp₂Semantic : TransitionSystem
+    Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
 
 -- Section End Page 36-37
 
 -- Section Begin Page 48-49
+module Aexp₃-state-transition-example where
+    open import State using (State; _[_↦_]; emptyState)
+    open import Relation.Binary.PropositionalEquality using (refl)
+    open import Bims using (_+_; N_; _←₃_; _Å₃_; ifStm₃_then_else; while_do₃_; ¬₃_; V_; _==₃_; _-_; ⟨_,_⟩⇒₃_; COMP-BSS; ASS-BSS; NUM-BSS; WHILE-TRUE-BSS; NOT-1-BSS_; EQUALS-2-BSS; VAR-BSS_; _PLUS-BSS_; _MINUS-BSS_; WHILE-FALSE-BSS; NOT-2-BSS_; _EQUAL-1-BSS_)
+    open import Data.Integer using (+_)
 
-open import State using (State; _[_↦_]; lookup; emptyState)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+    code = ("i" ←₃ (N + 6)) Å₃
+        (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (
+            ("x" ←₃ (V "x" + V "i")) Å₃
+            ("i" ←₃ (V "i" - N + 2))
+        ))
 
-S2 = ("i" ←₃ (N + 6)) Å₃ (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (("x" ←₃ (V "x" + V "i")) Å₃ ("i" ←₃ ((V "i") - (N + 2)))))
-s2 = emptyState [ "x" ↦ + 5 ]
-r2 = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
-P2 : ⟨ S2 , s2 ⟩⇒₃ r2
-P2 = COMP-BSS
-    (ASS-BSS NUM-BSS)
-    (WHILE-TRUE-BSS
-        (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
-        (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+    beginState = emptyState [ "x" ↦ + 5 ]
+    endState = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
+    P2 : ⟨ code , beginState ⟩⇒₃ endState
+    P2 = COMP-BSS
+        (ASS-BSS NUM-BSS)
         (WHILE-TRUE-BSS
-            (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
-            (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
+            (NOT-1-BSS EQUALS-2-BSS (VAR-BSS refl) NUM-BSS λ())
+            (COMP-BSS (ASS-BSS ((VAR-BSS refl) PLUS-BSS (VAR-BSS refl))) (ASS-BSS ((VAR-BSS refl) MINUS-BSS NUM-BSS)))
             (WHILE-TRUE-BSS
-                (NOT-1-BSS EQUALS-2-BSS (Var-BSS refl) NUM-BSS λ())
-                (COMP-BSS (ASS-BSS ((Var-BSS refl) PLUS-BSS (Var-BSS refl))) (ASS-BSS ((Var-BSS refl) MINUS-BSS NUM-BSS)))
-                (WHILE-FALSE-BSS (NOT-2-BSS ((Var-BSS refl) EQUAL-1-BSS NUM-BSS)) refl)
+                (NOT-1-BSS EQUALS-2-BSS (VAR-BSS refl) NUM-BSS λ())
+                (COMP-BSS (ASS-BSS ((VAR-BSS refl) PLUS-BSS (VAR-BSS refl))) (ASS-BSS ((VAR-BSS refl) MINUS-BSS NUM-BSS)))
+                (WHILE-TRUE-BSS
+                    (NOT-1-BSS EQUALS-2-BSS (VAR-BSS refl) NUM-BSS λ())
+                    (COMP-BSS (ASS-BSS ((VAR-BSS refl) PLUS-BSS (VAR-BSS refl))) (ASS-BSS ((VAR-BSS refl) MINUS-BSS NUM-BSS)))
+                    (WHILE-FALSE-BSS (NOT-2-BSS ((VAR-BSS refl) EQUAL-1-BSS NUM-BSS)) refl)
+                )
             )
         )
-    )
 
 -- Section End Page 48-49

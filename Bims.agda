@@ -99,8 +99,6 @@ data Aexp₂ : Set where
     _-_ : Aexp₂ → Aexp₂ → Aexp₂
     [_] : Aexp₂ → Aexp₂
 
-_or_ = _⊎_
-
 infix 4 _⇒₂_
 
 infixr 5 PLUS-1ₛₛₛ_
@@ -257,7 +255,7 @@ data _⊢_⇒₃_ : State → ℤ ⊎ Aexp₃ → ℤ ⊎ Aexp₃ → Set where
     NUM-BSS : ∀ {s n}
             → s ⊢ inj₂ (N n) ⇒₃ inj₁ n
 
-    Var-BSS_ : ∀ {s x v}
+    VAR-BSS_ : ∀ {s x v}
              → (lookup x s) ≡ just v
              → s ⊢ inj₂ (V x) ⇒₃ inj₁ v
 
@@ -332,7 +330,7 @@ data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set whe
 
     AND-2-BSS : ∀ {s b₁ b₂}
               → (s ⊢ inj₂ b₁ ⇒₃b inj₁ false)
-             or (s ⊢ inj₂ b₂ ⇒₃b inj₁ false)
+              ⊎ (s ⊢ inj₂ b₂ ⇒₃b inj₁ false)
               → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₃b inj₁ false
 
 -- Section End Page 46
