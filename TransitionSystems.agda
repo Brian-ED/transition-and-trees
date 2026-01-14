@@ -25,9 +25,9 @@ record TransitionSystem : Set₁ where
     data _⇒⟨_⟩_ : Γ → ℕ → Γ → Set where
         step-zero : ∀ {γ} → γ ⇒⟨ 0 ⟩ γ
         _step-suc_ : ∀ {γ γ′ γ″ n}
-                     → γ ⇒ γ′
-                     → γ′ ⇒⟨ n ⟩ γ″
-                     → γ ⇒⟨ suc n ⟩ γ″
+                   → γ ⇒ γ′
+                   → γ′ ⇒⟨ n ⟩ γ″
+                   → γ ⇒⟨ suc n ⟩ γ″
     infixr 4 _step-suc_
 
     _⇒*_ : Γ → Γ → Set
