@@ -2,15 +2,13 @@ module state where
 
 open import State
 
-open import Data.List.Relation.Binary.Lex.Core using (this)
+open import Data.List.Relation.Binary.Lex using (this)
 open import Data.Nat.Base using (_≤_; z≤n) renaming (s≤s to s≤s_)
-open import Data.Nat using (ℕ; zero; suc; _+_)
-open import Data.Nat using (ℕ; zero; suc; _+_)
+open import Data.Nat using (_+_)
 open import Data.Integer using (+_)
 open import Data.Product using (Σ; _×_; _,_)
-open import Data.List using (List; []; _∷_)
-open import Data.String using (String; _≟_; _<_)
-open import Data.String.Properties using (_<?_)
+open import Data.List using ([]; _∷_)
+open import Data.String using (_<_)
 
 
 p1 : emptyState [ "hi" ↦ + 3 ] ≡ (( "hi" , + 3) ∷ [] , sortedOne)
