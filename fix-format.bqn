@@ -10,13 +10,9 @@ IsDecl ← {
   " :"≡2↑ ∨`∘=⟜' '⊸/ ∨`∘≠⟜' '⊸/𝕩
 }
 IsTypeContinuation ← {
-  # GREATERTHAN-1-BSS_ :
   ∨´(continuations≍¨' ')≡¨<2↑∨`∘≠⟜' '⊸/𝕩
 }
 
-#{
-#  •Show +´¨∧`¨' '=𝕨‿𝕩
-#}´˘
 SetIndent ← {
   (𝕨⥊' ')∾∨`∘≠⟜' '⊸/𝕩
 }
@@ -25,4 +21,3 @@ f •Flines¨ {
   F← {(𝕨SetIndent¨¨⊢)⌾((∧`¨IsTypeContinuation¨¨𝕩)⊸(/¨))𝕩}
   p⊸F⌾(1⊸↓¨)𝕩
 } {𝔽⌾((+`IsDecl¨𝕩)⊸⊔)𝕩}¨ •FLines¨ f
-#«⊸∨IsTypeContinuation¨∧⟜»
