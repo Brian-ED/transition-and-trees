@@ -2,7 +2,7 @@ module Bims where
 
 -- Section Start Page 29
 
-module Aexp₁-semantic where
+module Aexp₁-bigstep-semantic where
     open import Data.String using () renaming (String to Var)
     open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
@@ -48,15 +48,18 @@ module Aexp₁-semantic where
 
     data _⇒₁_ : Num ⊎ Aexp₁ → Num ⊎ Aexp₁ → Set where
         _PLUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+                → inj₂ α₁ ⇒₁ inj₁ v₁
+                → inj₂ α₂ ⇒₁ inj₁ v₂
                 → inj₂ (α₁ + α₂) ⇒₁ inj₁ (v₁ +ℤ v₂)
 
         _MULT-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+                → inj₂ α₁ ⇒₁ inj₁ v₁
+                → inj₂ α₂ ⇒₁ inj₁ v₂
                 → inj₂ (α₁ * α₂) ⇒₁ inj₁ (v₁ *ℤ v₂)
 
         _MINUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                    → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+                    → inj₂ α₁ ⇒₁ inj₁ v₁
+                    → inj₂ α₂ ⇒₁ inj₁ v₂
                     → inj₂ ( α₁ - α₂ ) ⇒₁ inj₁ (v₁ -ℤ v₂)
 
         PARENT-BSS_ : ∀ {α₁ v₁}
@@ -77,7 +80,7 @@ module Aexp₁-semantic where
 -- Section Start Page 36-37
 -- A small-step semantics of Aexp₁
 
-module Aexp₂ where
+module Aexp₁-smallstep-semantic where
     open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
     open import Relation.Binary.PropositionalEquality using (_≡_)
 
@@ -93,6 +96,15 @@ module Aexp₂ where
         _*_ : Aexp₂ → Aexp₂ → Aexp₂
         _-_ : Aexp₂ → Aexp₂ → Aexp₂
         [_] : Aexp₂ → Aexp₂
+
+    data Bexp : Set where
+        tt : Bexp
+        ff : Bexp
+        _==_ : Aexp₂ → Aexp₂ → Bexp
+        _<_ : Aexp₂ → Aexp₂ → Bexp
+        ¬_ : Bexp → Bexp
+        _∧_ : Bexp → Bexp → Bexp
+        ⟨_⟩ : Bexp → Bexp
 
     infixr 5 N_
     infixr 5 ++_
@@ -169,8 +181,8 @@ module Aexp₂ where
 
 -- Section Begin Page 40
 
-module Bexp-transition where
-    open Aexp₁-semantic using (Bexp; _⇒₁_; _==_; _<_; ¬_; ⟨_⟩; _∧_)
+module Bexp-bigstep-transition where
+    open Aexp₁-bigstep-semantic using (Bexp; _⇒₁_; _==_; _<_; ¬_; ⟨_⟩; _∧_)
 
     open import Data.Integer using () renaming (_<_ to _<ℤ_)
     open import Relation.Binary.PropositionalEquality using (_≡_)
@@ -182,22 +194,26 @@ module Bexp-transition where
     data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
 
         _EQUALS-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                    → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                    → inj₂ α₁ ⇒₁ inj₁ v₁
+                    → inj₂ α₂ ⇒₁ inj₁ v₂
                     → v₁ ≡ v₂
                     → inj₂ (α₁ == α₂) ⇒b inj₁ true
 
         _EQUALS-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                    → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                    → inj₂ α₁ ⇒₁ inj₁ v₁
+                    → inj₂ α₂ ⇒₁ inj₁ v₂
                     → not (v₁ ≡ v₂)
                     → inj₂ (α₁ == α₂) ⇒b inj₁ false
 
         _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                            → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                            → inj₂ α₁ ⇒₁ inj₁ v₁
+                            → inj₂ α₂ ⇒₁ inj₁ v₂
                             → v₁ <ℤ v₂
                             → inj₂ (α₁ < α₂) ⇒b inj₁ false
 
         _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                            → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                            → inj₂ α₁ ⇒₁ inj₁ v₁
+                            → inj₂ α₂ ⇒₁ inj₁ v₂
                             → not (v₁ <ℤ v₂)
                             → inj₂ (α₁ < α₂) ⇒b inj₁ false
 
@@ -222,6 +238,138 @@ module Bexp-transition where
                 → (inj₂ b₁ ⇒b inj₁ false)
                 ⊎ (inj₂ b₂ ⇒b inj₁ false)
                 → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
+
+-- Problem 3.16
+module Bexp-smallstep-transition where
+    open Aexp₁-smallstep-semantic
+
+    open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _*_ to _*ℤ_; _-_ to _-ℤ_; _<_ to _<ℤ_)
+    open import Relation.Binary.PropositionalEquality using (_≡_)
+    open import Relation.Nullary.Negation using () renaming (¬_ to not_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
+    open import Data.Bool using (Bool; true; false)
+    open import Data.Nat using (_≡ᵇ_)
+
+
+    _==ℤ_ : Num → Num → Bool
+    Num.pos x ==ℤ Num.pos y = x ≡ᵇ y
+    Num.pos x ==ℤ Num.negsuc y = false
+    Num.negsuc x ==ℤ Num.pos y = false
+    Num.negsuc x ==ℤ Num.negsuc y = x ≡ᵇ y
+
+--        NOT-1-BSS_ : ∀ {b}
+--                → inj₂ b ⇒b inj₁ false
+--                → inj₂ (¬ b) ⇒b inj₁ true
+--
+--        NOT-2-BSS_ : ∀ {b}
+--                   → inj₂ b ⇒b inj₁ true
+--                   → inj₂ (¬ b) ⇒b inj₁ false
+--
+--        PARENTH-B-BSS : ∀ {b v}
+--                      → inj₂ b ⇒b v
+--                      → inj₂ ⟨ b ⟩ ⇒b v
+--
+--        AND-1-BSS : ∀ {b₁ b₂}
+--                  → inj₂ b₁ ⇒b inj₁ true
+--                  → inj₂ b₂ ⇒b inj₁ true
+--                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ true
+--
+--        AND-2-BSS : ∀ {b₁ b₂}
+--                  → (inj₂ b₁ ⇒b inj₁ false)
+--                  ⊎ (inj₂ b₂ ⇒b inj₁ false)
+--                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
+
+    open import Data.Bool using (if_then_else_; Bool; true; false)
+
+    data _⇒b_ : Bexp → Bexp → Set where
+
+        EQUALS-1-BSS_ : ∀ {α₁ α₂ α₂´}
+                      → α₂ ⇒₂ α₂´
+                      → (α₁ == α₂) ⇒b (α₁ == α₂´)
+
+        EQUALS-2-BSS_ : ∀ {α₁ α₁´ α₂}
+                      → α₁ ⇒₂ α₁´
+                      → (α₁ == α₂) ⇒b (α₁´ == α₂)
+
+        EQUALS-3-BSS : ∀ {x y}
+                       → ((++ x) == (++ y)) ⇒b (if (x ==ℤ y) then tt else ff)
+
+
+        GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ α₂´}
+                           → α₂ ⇒₂ α₂´
+                           → (α₁ == α₂) ⇒b (α₁ == α₂´)
+
+        GREATERTHAN-2-BSS_ : ∀ {α₁ α₁´ α₂}
+                           → α₁ ⇒₂ α₁´
+                           → (α₁ == α₂) ⇒b (α₁´ == α₂)
+
+        GREATERTHAN-3-BSS : ∀ {x y}
+                          → ((++ x) == (++ y)) ⇒b (if (x ==ℤ y) then tt else ff)
+
+
+--        _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+--                            → α₁ ⇒₂ v₁
+--                            → α₂ ⇒₂ v₂
+--                            → v₁ <ℤ v₂
+--                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
+
+--        _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+--                            → inj₂ α₁ ⇒₂ inj₁ v₁
+--                            → inj₂ α₂ ⇒₂ inj₁ v₂
+--                            → not (v₁ <ℤ v₂)
+--                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
+
+
+--        -- PLUS
+--        PLUS-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+--                → α₁ ⇒₂ α₁´
+--                → (α₁ + α₂) ⇒₂ (α₁´ + α₂)
+--
+--        PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+--                → α₂ ⇒₂ α₂´
+--                → (α₁ + α₂) ⇒₂ (α₁ + α₂´)
+--
+--        PLUS-3ₛₛₛ : ∀ {x y}
+--                → (++ x + ++ y) ⇒₂ ++ x +ℤ y
+--
+--        -- MULT
+--        MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+--                → α₁ ⇒₂ α₁´
+--                → (α₁ * α₂) ⇒₂ (α₁´ * α₂)
+--
+--        MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+--                → α₂ ⇒₂ α₂´
+--                → (α₁ * α₂) ⇒₂ (α₁ * α₂´)
+--
+--        MULT-3ₛₛₛ : ∀ {x y}
+--                → (++ x * ++ y) ⇒₂ ++ x *ℤ y
+--
+--        -- SUB
+--        SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+--                → α₁ ⇒₂ α₁´
+--                → (α₁ - α₂) ⇒₂ (α₁´ - α₂)
+--
+--        SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+--                → α₂ ⇒₂ α₂´
+--                → (α₁ - α₂) ⇒₂ (α₁ - α₂´)
+--
+--        SUB-3ₛₛₛ : ∀ {x y}
+--                → (++ x - ++ y) ⇒₂ ++ x -ℤ y
+--
+--        -- PARENTHESES
+--        PARENT-1ₛₛₛ_ : ∀ {x y}
+--                    → x ⇒₂ y
+--                    → [ x ] ⇒₂ [ y ]
+--
+--        PARENT-2ₛₛₛ_ : ∀ {x y}
+--                    → x ≡ y
+--                    → [ ++ x ] ⇒₂ ++ y
+--
+--        -- NUM
+--        NUMₛₛₛ_ : ∀ {x y}
+--                → x ≡ y
+--                → N x ⇒₂ ++ y
+
 
 -- Section End Page 40
 
@@ -265,15 +413,18 @@ module Aexp₃-semantic where
 
     data _⊢_⇒₃_ : State → Num ⊎ Aexp₃ → Num ⊎ Aexp₃ → Set where
         _PLUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                → s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                 → s ⊢ inj₂ (α₁ + α₂) ⇒₃ inj₁ (v₁ +ℤ v₂)
 
         _MULT-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                → s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                 → s ⊢ inj₂ (α₁ * α₂) ⇒₃ inj₁ (v₁ *ℤ v₂)
 
         _MINUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                    → s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                     → s ⊢ inj₂ ( α₁ - α₂ ) ⇒₃ inj₁ (v₁ -ℤ v₂)
 
         PARENT-BSS_ : ∀ {s α₁ v₁}
@@ -321,21 +472,25 @@ module Aexp₃-semantic where
     data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set where
 
         _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
-                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v
+                    →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v
                     → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₃b inj₁ true
 
         EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                    →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                     → not (v₁ ≡ v₂)
                     → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₃b inj₁ false
 
         _GREATERTHAN-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                            → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                            → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                            →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                             → v₁ <ℤ v₂
                             → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₃b inj₁ false
 
         _GREATERTHAN-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                            → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                            → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                            →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                             → not (v₁ <ℤ v₂)
                             → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₃b inj₁ false
 
@@ -381,20 +536,24 @@ module Aexp₃-semantic where
                         → ⟨ skip₃ , s ⟩⇒₃ s
 
         COMP-BSS        : ∀ {S₁ S₂ s s´ s˝}
-                        → ⟨ S₁ , s ⟩⇒₃ s˝  →  ⟨ S₂ , s˝ ⟩⇒₃ s´
+                        → ⟨ S₁ , s ⟩⇒₃ s˝
+                        → ⟨ S₂ , s˝ ⟩⇒₃ s´
                         → ⟨ (S₁ Å₃ S₂) , s ⟩⇒₃ s´
 
         IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
-                        → ⟨ S₁ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ true
+                        → ⟨ S₁ , s ⟩⇒₃ s´
+                        → s ⊢ inj₂ b ⇒₃b inj₁ true
                         → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
 
         IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
-                        → ⟨ S₂ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ false
+                        → ⟨ S₂ , s ⟩⇒₃ s´
+                        → s ⊢ inj₂ b ⇒₃b inj₁ false
                         → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
 
         WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
                         → s ⊢ inj₂ b ⇒₃b inj₁ true
-                        → ⟨ S , s ⟩⇒₃ s˝  →  ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´
+                        → ⟨ S , s ⟩⇒₃ s˝
+                        → ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´
                         → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
 
         WHILE-FALSE-BSS : ∀ {S s s´ b}
