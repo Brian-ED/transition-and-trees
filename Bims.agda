@@ -225,11 +225,9 @@ module Bexp-transition where
 
 -- Section End Page 40
 
-open import State using (State; _[_↦_]; lookup; emptyState)
-
 module Aexp₃-semantic where
-
-    open import Data.Integer using () renaming (ℤ to Num)
+    open import State using (State; _[_↦_]; lookup; emptyState)
+    open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _<_ to _<ℤ_)
     open import Data.String using () renaming (String to Var)
     open import Relation.Binary.PropositionalEquality using (_≡_)
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
@@ -238,7 +236,6 @@ module Aexp₃-semantic where
     open import Data.Unit using (⊤) renaming (tt to ttt)
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Agda.Builtin.Maybe using (Maybe; just; nothing)
-    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _<_ to _<ℤ_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool; true; false)
 
@@ -266,7 +263,7 @@ module Aexp₃-semantic where
         [_] : Aexp₃ → Aexp₃
 
 
-    data _⊢_⇒₃_ : State → ℤ ⊎ Aexp₃ → ℤ ⊎ Aexp₃ → Set where
+    data _⊢_⇒₃_ : State → Num ⊎ Aexp₃ → Num ⊎ Aexp₃ → Set where
         _PLUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
                 → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
                 → s ⊢ inj₂ (α₁ + α₂) ⇒₃ inj₁ (v₁ +ℤ v₂)
@@ -290,15 +287,15 @@ module Aexp₃-semantic where
                 → (lookup x s) ≡ just v
                 → s ⊢ inj₂ (V x) ⇒₃ inj₁ v
 
-    -- The book states that the `⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
+    -- The book states that the `⌞ (Num ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
     -- Here is a proof for any starting state s:
 
-    T₃ : (ℤ ⊎ Aexp₃ → Set)
+    T₃ : (Num ⊎ Aexp₃ → Set)
     T₃ (inj₁ x) = ⊤
     T₃ (inj₂ x) = ⊥
 
     Aexp₃Semantic : State → TransitionSystem
-    Aexp₃Semantic s = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟
+    Aexp₃Semantic s = ⌞ (Num ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟
 
     Aexp₃-is-big-step-proof : ∀ s x y → s ⊢ x ⇒₃ y → T₃ y
     Aexp₃-is-big-step-proof s (inj₁ x) (inj₁ x₁) = λ _ → ttt
