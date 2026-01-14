@@ -1,377 +1,423 @@
 module Bims where
-open import Data.Integer using (+_) renaming (ℤ to Num)
-open import Data.String using (toList) renaming (String to Var)
-open import Data.Char.Base using (Char)
-open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-open import Data.Product using (∃; ∃₂; _,_; _×_)
-open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
-open import Data.Empty using (⊥; ⊥-elim)
-open import Data.Unit using (⊤) renaming (tt to ttt)
-open import Data.Nat using (ℕ; suc; zero)
-open import Relation.Nullary.Negation using () renaming (¬_ to not_)
-open import Agda.Builtin.Maybe using (Maybe; just; nothing)
-open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
-
 
 -- Section Start Page 29
 
-data Aexp₁ : Set where
-    N_ : Num → Aexp₁
-    -- V_ : Var → Aexp₁ -- The book decides to not define variables yet
-    _+_ : Aexp₁ → Aexp₁ → Aexp₁
-    _*_ : Aexp₁ → Aexp₁ → Aexp₁
-    _-_ : Aexp₁ → Aexp₁ → Aexp₁
-    [_] : Aexp₁ → Aexp₁
+module Aexp₁-semantic where
+    open import Data.String using () renaming (String to Var)
+    open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-data Bexp : Set where
-    tt : Bexp
-    ff : Bexp
-    _==_ : Aexp₁ → Aexp₁ → Bexp
-    _<_ : Aexp₁ → Aexp₁ → Bexp
-    ¬_ : Bexp → Bexp
-    _∧_ : Bexp → Bexp → Bexp
-    ⟨_⟩ : Bexp → Bexp
+    data Aexp₁ : Set where
+        N_ : Num → Aexp₁
+        -- V_ : Var → Aexp₁ -- The book decides to not define variables yet
+        _+_ : Aexp₁ → Aexp₁ → Aexp₁
+        _*_ : Aexp₁ → Aexp₁ → Aexp₁
+        _-_ : Aexp₁ → Aexp₁ → Aexp₁
+        [_] : Aexp₁ → Aexp₁
 
-data Stm : Set where
-    skip : Stm
-    _←_ : Var → Aexp₁ → Stm
-    _Å_ : Stm → Stm → Stm
-    ifStm_then_else : Bexp → Stm → Stm → Stm
-    _while_ : Stm → Bexp → Stm
+    data Bexp : Set where
+        tt : Bexp
+        ff : Bexp
+        _==_ : Aexp₁ → Aexp₁ → Bexp
+        _<_ : Aexp₁ → Aexp₁ → Bexp
+        ¬_ : Bexp → Bexp
+        _∧_ : Bexp → Bexp → Bexp
+        ⟨_⟩ : Bexp → Bexp
 
-infixr 5 N_
-infixr 5 ++_
+    data Stm : Set where
+        skip : Stm
+        _←_ : Var → Aexp₁ → Stm
+        _Å_ : Stm → Stm → Stm
+        ifStm_then_else : Bexp → Stm → Stm → Stm
+        _while_ : Stm → Bexp → Stm
 
--- Section End Page 29
+    infixr 5 N_
+    infixl 2 _Å_
+    infixr 3 _*_
+    infixr 4 _+_
+    infixr 4 _-_
 
--- Section Start Page 30
+    -- Section End Page 29
 
-infixl 2 _Å_
-infixr 3 _*_
-infixr 4 _+_
-infixr 4 _-_
+    -- Section Start Page 30
 
-open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ to _∧B_; _∨_ to _∨B_)
+    -- Section End Page 30
 
--- Section End Page 30
+    -- Section Start Page 32-33
+    -- 3.4.1 A big-step semantics of Aexp₁
 
--- Section Start Page 32-33
--- 3.4.1 A big-step semantics of Aexp₁
-
-data _⇒₁_ : ℤ ⊎ Aexp₁ → ℤ ⊎ Aexp₁ → Set where
-    _PLUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-               → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
-               → inj₂ (α₁ + α₂) ⇒₁ inj₁ (v₁ +ℤ v₂)
-
-    _MULT-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-               → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
-               → inj₂ (α₁ * α₂) ⇒₁ inj₁ (v₁ *ℤ v₂)
-
-    _MINUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+    data _⇒₁_ : Num ⊎ Aexp₁ → Num ⊎ Aexp₁ → Set where
+        _PLUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
                 → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
-                → inj₂ ( α₁ - α₂ ) ⇒₁ inj₁ (v₁ -ℤ v₂)
+                → inj₂ (α₁ + α₂) ⇒₁ inj₁ (v₁ +ℤ v₂)
 
-    PARENT-BSS_ : ∀ {α₁ v₁}
-                → inj₂ α₁ ⇒₁ inj₁ v₁
-                → inj₂ [ α₁ ] ⇒₁ inj₁ v₁
+        _MULT-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+                → inj₂ (α₁ * α₂) ⇒₁ inj₁ (v₁ *ℤ v₂)
 
-    NUM-BSS_ : ∀ {n}
-             → inj₂ (N n) ⇒₁ inj₁ n
+        _MINUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                    → inj₂ α₁ ⇒₁ inj₁ v₁  →  inj₂ α₂ ⇒₁ inj₁ v₂
+                    → inj₂ ( α₁ - α₂ ) ⇒₁ inj₁ (v₁ -ℤ v₂)
 
+        PARENT-BSS_ : ∀ {α₁ v₁}
+                    → inj₂ α₁ ⇒₁ inj₁ v₁
+                    → inj₂ [ α₁ ] ⇒₁ inj₁ v₁
+
+        NUM-BSS_ : ∀ {n}
+                → inj₂ (N n) ⇒₁ inj₁ n
+
+    infixr 5 _PLUS-BSS_
+    infixr 5 _MULT-BSS_
+    infixr 5 _MINUS-BSS_
+    infixr 5 PARENT-BSS_
+    infixr 5 NUM-BSS_
 
 -- Section End Page 32-33
 
 -- Section Start Page 36-37
 -- A small-step semantics of Aexp₁
 
--- Need to redefine Aexp to support non-literals too...
--- "The presentation becomes a little easier if we can let values appear directly
--- in our intermediate results. We do this by extending the formation rules for
--- Aexp such that values become elements of Aexp"
-data Aexp₂ : Set where
-    N_ : Num → Aexp₂ -- Number literals
-    ++_  : Num → Aexp₂ -- Parsed number
-    -- V_ : Var → Aexp₂ -- The book decides to not define variables yet
-    _+_ : Aexp₂ → Aexp₂ → Aexp₂
-    _*_ : Aexp₂ → Aexp₂ → Aexp₂
-    _-_ : Aexp₂ → Aexp₂ → Aexp₂
-    [_] : Aexp₂ → Aexp₂
+module Aexp₂ where
+    open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_)
+    open import Relation.Binary.PropositionalEquality using (_≡_)
 
-infix 4 _⇒₂_
+    -- Need to redefine Aexp to support non-literals too...
+    -- "The presentation becomes a little easier if we can let values appear directly
+    -- in our intermediate results. We do this by extending the formation rules for
+    -- Aexp such that values become elements of Aexp"
+    data Aexp₂ : Set where
+        N_ : Num → Aexp₂ -- Number literals
+        ++_  : Num → Aexp₂ -- Parsed number
+        -- V_ : Var → Aexp₂ -- The book decides to not define variables yet
+        _+_ : Aexp₂ → Aexp₂ → Aexp₂
+        _*_ : Aexp₂ → Aexp₂ → Aexp₂
+        _-_ : Aexp₂ → Aexp₂ → Aexp₂
+        [_] : Aexp₂ → Aexp₂
 
-infixr 5 PLUS-1ₛₛₛ_
-infixr 5 PLUS-2ₛₛₛ_
-infixr 5 PLUS-3ₛₛₛ
-infixr 5 MULT-1ₛₛₛ_
-infixr 5 MULT-2ₛₛₛ_
-infixr 5 MULT-3ₛₛₛ
-infixr 5 SUB-1ₛₛₛ_
-infixr 5 SUB-2ₛₛₛ_
-infixr 5 SUB-3ₛₛₛ
-infixr 5 PARENT-1ₛₛₛ_
-infixr 5 NUMₛₛₛ_
+    infixr 5 N_
+    infixr 5 ++_
+    infixr 3 _*_
+    infixr 4 _+_
+    infixr 4 _-_
+    infix 4 _⇒₂_
 
-infixr 5 _PLUS-BSS_
-infixr 5 _MULT-BSS_
-infixr 5 _MINUS-BSS_
-infixr 5 PARENT-BSS_
-infixr 5 NUM-BSS_
+    infixr 5 PLUS-1ₛₛₛ_
+    infixr 5 PLUS-2ₛₛₛ_
+    infixr 5 PLUS-3ₛₛₛ
+    infixr 5 MULT-1ₛₛₛ_
+    infixr 5 MULT-2ₛₛₛ_
+    infixr 5 MULT-3ₛₛₛ
+    infixr 5 SUB-1ₛₛₛ_
+    infixr 5 SUB-2ₛₛₛ_
+    infixr 5 SUB-3ₛₛₛ
+    infixr 5 PARENT-1ₛₛₛ_
+    infixr 5 NUMₛₛₛ_
 
-data _⇒₂_ : Aexp₂ → Aexp₂ → Set where
+    data _⇒₂_ : Aexp₂ → Aexp₂ → Set where
 
-    -- PLUS
-    PLUS-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
-               → α₁ ⇒₂ α₁´
-               → (α₁ + α₂) ⇒₂ (α₁´ + α₂)
+        -- PLUS
+        PLUS-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+                → α₁ ⇒₂ α₁´
+                → (α₁ + α₂) ⇒₂ (α₁´ + α₂)
 
-    PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
-               → α₂ ⇒₂ α₂´
-               → (α₁ + α₂) ⇒₂ (α₁ + α₂´)
+        PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+                → α₂ ⇒₂ α₂´
+                → (α₁ + α₂) ⇒₂ (α₁ + α₂´)
 
-    PLUS-3ₛₛₛ : ∀ {x y}
-              → (++ x + ++ y) ⇒₂ ++ x +ℤ y
+        PLUS-3ₛₛₛ : ∀ {x y}
+                → (++ x + ++ y) ⇒₂ ++ x +ℤ y
 
-    -- MULT
-    MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
-               → α₁ ⇒₂ α₁´
-               → (α₁ * α₂) ⇒₂ (α₁´ * α₂)
+        -- MULT
+        MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+                → α₁ ⇒₂ α₁´
+                → (α₁ * α₂) ⇒₂ (α₁´ * α₂)
 
-    MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
-               → α₂ ⇒₂ α₂´
-               → (α₁ * α₂) ⇒₂ (α₁ * α₂´)
+        MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+                → α₂ ⇒₂ α₂´
+                → (α₁ * α₂) ⇒₂ (α₁ * α₂´)
 
-    MULT-3ₛₛₛ : ∀ {x y}
-              → (++ x * ++ y) ⇒₂ ++ x *ℤ y
+        MULT-3ₛₛₛ : ∀ {x y}
+                → (++ x * ++ y) ⇒₂ ++ x *ℤ y
 
-    -- SUB
-    SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
-              → α₁ ⇒₂ α₁´
-              → (α₁ - α₂) ⇒₂ (α₁´ - α₂)
+        -- SUB
+        SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
+                → α₁ ⇒₂ α₁´
+                → (α₁ - α₂) ⇒₂ (α₁´ - α₂)
 
-    SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
-              → α₂ ⇒₂ α₂´
-              → (α₁ - α₂) ⇒₂ (α₁ - α₂´)
+        SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
+                → α₂ ⇒₂ α₂´
+                → (α₁ - α₂) ⇒₂ (α₁ - α₂´)
 
-    SUB-3ₛₛₛ : ∀ {x y}
-             → (++ x - ++ y) ⇒₂ ++ x -ℤ y
+        SUB-3ₛₛₛ : ∀ {x y}
+                → (++ x - ++ y) ⇒₂ ++ x -ℤ y
 
-    -- PARENTHESES
-    PARENT-1ₛₛₛ_ : ∀ {x y}
-                 → x ⇒₂ y
-                 → [ x ] ⇒₂ [ y ]
+        -- PARENTHESES
+        PARENT-1ₛₛₛ_ : ∀ {x y}
+                    → x ⇒₂ y
+                    → [ x ] ⇒₂ [ y ]
 
-    PARENT-2ₛₛₛ_ : ∀ {x y}
-                 → x ≡ y
-                 → [ ++ x ] ⇒₂ ++ y
+        PARENT-2ₛₛₛ_ : ∀ {x y}
+                    → x ≡ y
+                    → [ ++ x ] ⇒₂ ++ y
 
-    -- NUM
-    NUMₛₛₛ_ : ∀ {x y}
-            → x ≡ y
-            → N x ⇒₂ ++ y
+        -- NUM
+        NUMₛₛₛ_ : ∀ {x y}
+                → x ≡ y
+                → N x ⇒₂ ++ y
 
 -- Section End Page 36-37
 
 -- Section Begin Page 40
 
-data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
+module Bexp-transition where
+    open Aexp₁-semantic using (Bexp; _⇒₁_; _==_; _<_; ¬_; ⟨_⟩; _∧_)
 
-    _EQUALS-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                   → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
-                   → v₁ ≡ v₂
-                   → inj₂ (α₁ == α₂) ⇒b inj₁ true
+    open import Data.Integer using (+_) renaming (ℤ to Num)
+    open import Relation.Binary.PropositionalEquality using (_≡_)
+    open import Data.Product using (∃; ∃₂; _,_; _×_)
+    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+    open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
+    open import Data.Empty using (⊥; ⊥-elim)
+    open import Data.Unit using (⊤) renaming (tt to ttt)
+    open import Data.Nat using (ℕ; suc; zero)
+    open import Relation.Nullary.Negation using () renaming (¬_ to not_)
+    open import Agda.Builtin.Maybe using (Maybe; just; nothing)
+    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-    _EQUALS-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                   → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
-                   → not (v₁ ≡ v₂)
-                   → inj₂ (α₁ == α₂) ⇒b inj₁ false
+    open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ to _∧B_; _∨_ to _∨B_)
 
-    _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                         → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
-                         → v₁ <ℤ v₂
-                         → inj₂ (α₁ < α₂) ⇒b inj₁ false
 
-    _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                         → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
-                         → not (v₁ <ℤ v₂)
-                         → inj₂ (α₁ < α₂) ⇒b inj₁ false
+    data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
 
-    NOT-1-BSS_ : ∀ {b}
-               → inj₂ b ⇒b inj₁ false
-               → inj₂ (¬ b) ⇒b inj₁ true
+        _EQUALS-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                    → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                    → v₁ ≡ v₂
+                    → inj₂ (α₁ == α₂) ⇒b inj₁ true
 
-    NOT-2-BSS_ : ∀ {b}
-               → inj₂ b ⇒b inj₁ true
-               → inj₂ (¬ b) ⇒b inj₁ false
+        _EQUALS-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                    → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                    → not (v₁ ≡ v₂)
+                    → inj₂ (α₁ == α₂) ⇒b inj₁ false
 
-    PARENTH-B-BSS : ∀ {b v}
-               → inj₂ b ⇒b v
-               → inj₂ ⟨ b ⟩ ⇒b v
+        _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                            → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                            → v₁ <ℤ v₂
+                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
 
-    AND-1-BSS : ∀ {b₁ b₂}
-              → inj₂ b₁ ⇒b inj₁ true
-              → inj₂ b₂ ⇒b inj₁ true
-              → inj₂ (b₁ ∧ b₂) ⇒b inj₁ true
+        _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                            → inj₂ α₁ ⇒₁ inj₁ v₁  → inj₂ α₂ ⇒₁ inj₁ v₂
+                            → not (v₁ <ℤ v₂)
+                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
 
-    AND-2-BSS : ∀ {b₁ b₂}
-              → (inj₂ b₁ ⇒b inj₁ false)
-              ⊎ (inj₂ b₂ ⇒b inj₁ false)
-              → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
+        NOT-1-BSS_ : ∀ {b}
+                → inj₂ b ⇒b inj₁ false
+                → inj₂ (¬ b) ⇒b inj₁ true
+
+        NOT-2-BSS_ : ∀ {b}
+                → inj₂ b ⇒b inj₁ true
+                → inj₂ (¬ b) ⇒b inj₁ false
+
+        PARENTH-B-BSS : ∀ {b v}
+                → inj₂ b ⇒b v
+                → inj₂ ⟨ b ⟩ ⇒b v
+
+        AND-1-BSS : ∀ {b₁ b₂}
+                → inj₂ b₁ ⇒b inj₁ true
+                → inj₂ b₂ ⇒b inj₁ true
+                → inj₂ (b₁ ∧ b₂) ⇒b inj₁ true
+
+        AND-2-BSS : ∀ {b₁ b₂}
+                → (inj₂ b₁ ⇒b inj₁ false)
+                ⊎ (inj₂ b₂ ⇒b inj₁ false)
+                → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
 
 -- Section End Page 40
 
--- Section Start Page 44-45
-
 open import State using (State; _[_↦_]; lookup; emptyState)
 
-data Aexp₃ : Set where
-    N_ : Num → Aexp₃ -- Number literals
-    ++_  : Num → Aexp₃ -- Parsed number
-    V_ : Var → Aexp₃
-    _+_ : Aexp₃ → Aexp₃ → Aexp₃
-    _*_ : Aexp₃ → Aexp₃ → Aexp₃
-    _-_ : Aexp₃ → Aexp₃ → Aexp₃
-    [_] : Aexp₃ → Aexp₃
+module Aexp₃-semantic where
+
+    open import Data.Integer using () renaming (ℤ to Num)
+    open import Data.String using () renaming (String to Var)
+    open import Data.Char.Base using (Char)
+    open import Relation.Binary.PropositionalEquality using (_≡_; refl)
+    open import Data.Product using (∃; ∃₂; _,_; _×_)
+    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+    open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
+    open import Data.Empty using (⊥; ⊥-elim)
+    open import Data.Unit using (⊤) renaming (tt to ttt)
+    open import Data.Nat using (ℕ; suc; zero)
+    open import Relation.Nullary.Negation using () renaming (¬_ to not_)
+    open import Agda.Builtin.Maybe using (Maybe; just; nothing)
+    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
+
+    open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ to _∧B_; _∨_ to _∨B_)
 
 
-data _⊢_⇒₃_ : State → ℤ ⊎ Aexp₃ → ℤ ⊎ Aexp₃ → Set where
-    _PLUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-               → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-               → s ⊢ inj₂ (α₁ + α₂) ⇒₃ inj₁ (v₁ +ℤ v₂)
+    -- Section Start Page 44-45
 
-    _MULT-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-               → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-               → s ⊢ inj₂ (α₁ * α₂) ⇒₃ inj₁ (v₁ *ℤ v₂)
+    infixr 5 N_
+    infixr 5 ++_
+    infixr 3 _*_
+    infixr 4 _+_
+    infixr 4 _-_
 
-    _MINUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+    infixr 5 _PLUS-BSS_
+    infixr 5 _MULT-BSS_
+    infixr 5 _MINUS-BSS_
+    infixr 5 PARENT-BSS_
+
+
+
+    data Aexp₃ : Set where
+        N_ : Num → Aexp₃ -- Number literals
+        ++_  : Num → Aexp₃ -- Parsed number
+        V_ : Var → Aexp₃
+        _+_ : Aexp₃ → Aexp₃ → Aexp₃
+        _*_ : Aexp₃ → Aexp₃ → Aexp₃
+        _-_ : Aexp₃ → Aexp₃ → Aexp₃
+        [_] : Aexp₃ → Aexp₃
+
+
+    data _⊢_⇒₃_ : State → ℤ ⊎ Aexp₃ → ℤ ⊎ Aexp₃ → Set where
+        _PLUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
                 → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-                → s ⊢ inj₂ ( α₁ - α₂ ) ⇒₃ inj₁ (v₁ -ℤ v₂)
+                → s ⊢ inj₂ (α₁ + α₂) ⇒₃ inj₁ (v₁ +ℤ v₂)
 
-    PARENT-BSS_ : ∀ {s α₁ v₁}
-                → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
-                → s ⊢ inj₂ [ α₁ ] ⇒₃ inj₁ v₁
+        _MULT-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+                → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                → s ⊢ inj₂ (α₁ * α₂) ⇒₃ inj₁ (v₁ *ℤ v₂)
 
-    NUM-BSS : ∀ {s n}
-            → s ⊢ inj₂ (N n) ⇒₃ inj₁ n
+        _MINUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                    → s ⊢ inj₂ ( α₁ - α₂ ) ⇒₃ inj₁ (v₁ -ℤ v₂)
 
-    VAR-BSS_ : ∀ {s x v}
-             → (lookup x s) ≡ just v
-             → s ⊢ inj₂ (V x) ⇒₃ inj₁ v
+        PARENT-BSS_ : ∀ {s α₁ v₁}
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁
+                    → s ⊢ inj₂ [ α₁ ] ⇒₃ inj₁ v₁
 
--- The book states that the `⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
--- Here is a proof for any starting state s:
+        NUM-BSS : ∀ {s n}
+                → s ⊢ inj₂ (N n) ⇒₃ inj₁ n
 
-T₃ : (ℤ ⊎ Aexp₃ → Set)
-T₃ (inj₁ x) = ⊤
-T₃ (inj₂ x) = ⊥
+        VAR-BSS_ : ∀ {s x v}
+                → (lookup x s) ≡ just v
+                → s ⊢ inj₂ (V x) ⇒₃ inj₁ v
 
-Aexp₃Semantic : State → TransitionSystem
-Aexp₃Semantic s = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟
+    -- The book states that the `⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
+    -- Here is a proof for any starting state s:
 
-Aexp₃-is-big-step-proof : ∀ s x y → s ⊢ x ⇒₃ y → T₃ y
-Aexp₃-is-big-step-proof s (inj₁ x) (inj₁ x₁) = λ _ → ttt
-Aexp₃-is-big-step-proof s (inj₁ x) (inj₂ y) ()
-Aexp₃-is-big-step-proof s (inj₂ y₁) (inj₁ x) = λ _ → ttt
-Aexp₃-is-big-step-proof s (inj₂ y₁) (inj₂ y) ()
-Aexp₃big-semantic : ∀ s → BigStepSemantics (Aexp₃Semantic s)
-Aexp₃big-semantic s = ⌈> (Aexp₃-is-big-step-proof s)
+    T₃ : (ℤ ⊎ Aexp₃ → Set)
+    T₃ (inj₁ x) = ⊤
+    T₃ (inj₂ x) = ⊥
 
--- Section End Page 44-45
+    Aexp₃Semantic : State → TransitionSystem
+    Aexp₃Semantic s = ⌞ (ℤ ⊎ Aexp₃) , (_⊢_⇒₃_ s) , T₃ ⌟
 
--- Section Begin Page 46
+    Aexp₃-is-big-step-proof : ∀ s x y → s ⊢ x ⇒₃ y → T₃ y
+    Aexp₃-is-big-step-proof s (inj₁ x) (inj₁ x₁) = λ _ → ttt
+    Aexp₃-is-big-step-proof s (inj₁ x) (inj₂ y) ()
+    Aexp₃-is-big-step-proof s (inj₂ y₁) (inj₁ x) = λ _ → ttt
+    Aexp₃-is-big-step-proof s (inj₂ y₁) (inj₂ y) ()
+    Aexp₃big-semantic : ∀ s → BigStepSemantics (Aexp₃Semantic s)
+    Aexp₃big-semantic s = ⌈> (Aexp₃-is-big-step-proof s)
 
-data Bexp₃ : Set where
-    tt₃ : Bexp₃
-    ff₃ : Bexp₃
-    _==₃_ : Aexp₃ → Aexp₃ → Bexp₃
-    _<₃_ : Aexp₃ → Aexp₃ → Bexp₃
-    ¬₃_ : Bexp₃ → Bexp₃
-    _∧₃_ : Bexp₃ → Bexp₃ → Bexp₃
-    ⟨_⟩₃ : Bexp₃ → Bexp₃
+    -- Section End Page 44-45
 
-data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set where
+    -- Section Begin Page 46
 
-    _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
-                   → s ⊢ inj₂ α₁ ⇒₃ inj₁ v  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v
-                   → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₃b inj₁ true
+    data Bexp₃ : Set where
+        tt₃ : Bexp₃
+        ff₃ : Bexp₃
+        _==₃_ : Aexp₃ → Aexp₃ → Bexp₃
+        _<₃_ : Aexp₃ → Aexp₃ → Bexp₃
+        ¬₃_ : Bexp₃ → Bexp₃
+        _∧₃_ : Bexp₃ → Bexp₃ → Bexp₃
+        ⟨_⟩₃ : Bexp₃ → Bexp₃
 
-    EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                   → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-                   → not (v₁ ≡ v₂)
-                   → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₃b inj₁ false
+    data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set where
 
-    _GREATERTHAN-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                         → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-                         → v₁ <ℤ v₂
-                         → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₃b inj₁ false
+        _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v
+                    → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₃b inj₁ true
 
-    _GREATERTHAN-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                         → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
-                         → not (v₁ <ℤ v₂)
-                         → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₃b inj₁ false
+        EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
+                    → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                    → not (v₁ ≡ v₂)
+                    → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₃b inj₁ false
 
-    NOT-1-BSS_ : ∀ {s b}
-               → s ⊢ inj₂ b ⇒₃b inj₁ false
-               → s ⊢ inj₂ (¬₃ b) ⇒₃b inj₁ true
+        _GREATERTHAN-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+                            → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                            → v₁ <ℤ v₂
+                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₃b inj₁ false
 
-    NOT-2-BSS_ : ∀ {s b}
-               → s ⊢ inj₂ b ⇒₃b inj₁ true
-               → s ⊢ inj₂ (¬₃ b) ⇒₃b inj₁ false
+        _GREATERTHAN-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+                            → s ⊢ inj₂ α₁ ⇒₃ inj₁ v₁  →  s ⊢ inj₂ α₂ ⇒₃ inj₁ v₂
+                            → not (v₁ <ℤ v₂)
+                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₃b inj₁ false
 
-    PARENTH-B-BSS : ∀ {s b v}
-               → s ⊢ inj₂ b ⇒₃b v
-               → s ⊢ inj₂ ⟨ b ⟩₃ ⇒₃b v
+        NOT-1-BSS_ : ∀ {s b}
+                → s ⊢ inj₂ b ⇒₃b inj₁ false
+                → s ⊢ inj₂ (¬₃ b) ⇒₃b inj₁ true
 
-    AND-1-BSS : ∀ {s b₁ b₂}
-              → s ⊢ inj₂ b₁ ⇒₃b inj₁ true
-              → s ⊢ inj₂ b₂ ⇒₃b inj₁ true
-              → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₃b inj₁ true
+        NOT-2-BSS_ : ∀ {s b}
+                → s ⊢ inj₂ b ⇒₃b inj₁ true
+                → s ⊢ inj₂ (¬₃ b) ⇒₃b inj₁ false
 
-    AND-2-BSS : ∀ {s b₁ b₂}
-              → (s ⊢ inj₂ b₁ ⇒₃b inj₁ false)
-              ⊎ (s ⊢ inj₂ b₂ ⇒₃b inj₁ false)
-              → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₃b inj₁ false
+        PARENTH-B-BSS : ∀ {s b v}
+                → s ⊢ inj₂ b ⇒₃b v
+                → s ⊢ inj₂ ⟨ b ⟩₃ ⇒₃b v
 
--- Section End Page 46
+        AND-1-BSS : ∀ {s b₁ b₂}
+                → s ⊢ inj₂ b₁ ⇒₃b inj₁ true
+                → s ⊢ inj₂ b₂ ⇒₃b inj₁ true
+                → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₃b inj₁ true
 
--- Section Begin Page 47
+        AND-2-BSS : ∀ {s b₁ b₂}
+                → (s ⊢ inj₂ b₁ ⇒₃b inj₁ false)
+                ⊎ (s ⊢ inj₂ b₂ ⇒₃b inj₁ false)
+                → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₃b inj₁ false
 
-data Stm₃ : Set where
-    skip₃ : Stm₃
-    _←₃_ : Var → Aexp₃ → Stm₃
-    _Å₃_ : Stm₃ → Stm₃ → Stm₃
-    ifStm₃_then_else : Bexp₃ → Stm₃ → Stm₃ → Stm₃
-    while_do₃_ : Bexp₃ → Stm₃ → Stm₃
+    -- Section End Page 46
 
-data ⟨_,_⟩⇒₃_ : Stm₃ → State → State → Set where
-    ASS-BSS         : ∀ {x a s v}
-                    → s ⊢ inj₂ a ⇒₃ inj₁ v
-                    → ⟨ (x ←₃ a) , s ⟩⇒₃ (s [ x ↦ v ])
+    -- Section Begin Page 47
 
-    SKIP-BSS        : ∀ {s}
-                    → ⟨ skip₃ , s ⟩⇒₃ s
+    data Stm₃ : Set where
+        skip₃ : Stm₃
+        _←₃_ : Var → Aexp₃ → Stm₃
+        _Å₃_ : Stm₃ → Stm₃ → Stm₃
+        ifStm₃_then_else : Bexp₃ → Stm₃ → Stm₃ → Stm₃
+        while_do₃_ : Bexp₃ → Stm₃ → Stm₃
 
-    COMP-BSS        : ∀ {S₁ S₂ s s´ s˝}
-                    → ⟨ S₁ , s ⟩⇒₃ s˝  →  ⟨ S₂ , s˝ ⟩⇒₃ s´
-                    → ⟨ (S₁ Å₃ S₂) , s ⟩⇒₃ s´
+    data ⟨_,_⟩⇒₃_ : Stm₃ → State → State → Set where
+        ASS-BSS         : ∀ {x a s v}
+                        → s ⊢ inj₂ a ⇒₃ inj₁ v
+                        → ⟨ (x ←₃ a) , s ⟩⇒₃ (s [ x ↦ v ])
 
-    IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
-                    → ⟨ S₁ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ true
-                    → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
+        SKIP-BSS        : ∀ {s}
+                        → ⟨ skip₃ , s ⟩⇒₃ s
 
-    IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
-                    → ⟨ S₂ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ false
-                    → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
+        COMP-BSS        : ∀ {S₁ S₂ s s´ s˝}
+                        → ⟨ S₁ , s ⟩⇒₃ s˝  →  ⟨ S₂ , s˝ ⟩⇒₃ s´
+                        → ⟨ (S₁ Å₃ S₂) , s ⟩⇒₃ s´
 
-    WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
-                    → s ⊢ inj₂ b ⇒₃b inj₁ true
-                    → ⟨ S , s ⟩⇒₃ s˝  →  ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´
-                    → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
+        IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
+                        → ⟨ S₁ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ true
+                        → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
 
-    WHILE-FALSE-BSS : ∀ {S s s´ b}
-                    → s ⊢ inj₂ b ⇒₃b inj₁ false
-                    → s´ ≡ s
-                    → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
+        IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
+                        → ⟨ S₂ , s ⟩⇒₃ s´  →  s ⊢ inj₂ b ⇒₃b inj₁ false
+                        → ⟨ (ifStm₃ b then S₁ else S₂) , s ⟩⇒₃ s´
 
--- Section End Page 47
+        WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
+                        → s ⊢ inj₂ b ⇒₃b inj₁ true
+                        → ⟨ S , s ⟩⇒₃ s˝  →  ⟨ (while b do₃ S) , s˝ ⟩⇒₃ s´
+                        → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
+
+        WHILE-FALSE-BSS : ∀ {S s s´ b}
+                        → s ⊢ inj₂ b ⇒₃b inj₁ false
+                        → s´ ≡ s
+                        → ⟨ (while b do₃ S) , s ⟩⇒₃ s´
+
+    -- Section End Page 47
