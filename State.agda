@@ -52,36 +52,8 @@ emptyState = [] , sortedNil
 
 open import Relation.Binary.PropositionalEquality         public using (_≡_; refl; cong)
 
-p1 : emptyState [ "hi" ↦ + 3 ] ≡ (( "hi" , + 3) ∷ [] , sortedOne)
-p1 = refl
-
-open import Data.List.Relation.Binary.Lex.Core using (this)
-open import Data.Nat.Base using (_≤_; z≤n) renaming (s≤s to s≤s_)
-open import Data.Nat using (ℕ; zero; suc; _+_)
-
---repeat : {m n g : ℕ} → (r : ℕ) → m ≤ n → zero ≤ g
---repeat zero x = z≤n
---repeat (suc r) x = (repeat r) (s≤s x)
-
-F_ : ∀ {m n} → (m≤n : m ≤ n) → 8 + m ≤ 8 + n
-F x = s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s x
-
-p2:1 : "hi" < "yo"
-p2:1 = this (F F F F F F F F F F F F F s≤s z≤n)
-
-p2 : ((emptyState [ "hi" ↦ + 3 ]) [ "yo" ↦ + 4 ]) ≡ (( "hi" , + 3) ∷ ( "yo" , + 4) ∷ [] , (sortedCons p2:1 sortedOne))
-p2 = refl
-
-p3 : emptyState [ "hi" ↦ + 3 ] [ "yo" ↦ + 4 ] ≡ emptyState [ "yo" ↦ + 4 ] [ "hi" ↦ + 3 ]
-p3 = refl
-
 lookup : String → State → Maybe ℤ
 lookup x ([] , sortedNil) = nothing
 lookup x ((v , i) ∷ rest , sortedOne      ) = if x ==Str v then just i else nothing
 lookup x ((v , i) ∷ rest , sortedCons x₁ p) = if x ==Str v then just i else lookup x (rest , p)
 
-a : State
-a = (( "a" , + 0) ∷ ( "b" , + 0) ∷ [] , (sortedCons (this (s≤s F F F F F F F F F F F F s≤s z≤n)) sortedOne))
-
-p4 : a [ "a" ↦ + 0 ] ≡ a
-p4 = refl
