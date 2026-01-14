@@ -172,20 +172,11 @@ module Aexp₂ where
 module Bexp-transition where
     open Aexp₁-semantic using (Bexp; _⇒₁_; _==_; _<_; ¬_; ⟨_⟩; _∧_)
 
-    open import Data.Integer using (+_) renaming (ℤ to Num)
+    open import Data.Integer using () renaming (_<_ to _<ℤ_)
     open import Relation.Binary.PropositionalEquality using (_≡_)
-    open import Data.Product using (∃; ∃₂; _,_; _×_)
-    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-    open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
-    open import Data.Empty using (⊥; ⊥-elim)
-    open import Data.Unit using (⊤) renaming (tt to ttt)
-    open import Data.Nat using (ℕ; suc; zero)
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
-    open import Agda.Builtin.Maybe using (Maybe; just; nothing)
-    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-
-    open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ to _∧B_; _∨_ to _∨B_)
+    open import Data.Bool using (Bool; true; false)
 
 
     data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
@@ -240,20 +231,16 @@ module Aexp₃-semantic where
 
     open import Data.Integer using () renaming (ℤ to Num)
     open import Data.String using () renaming (String to Var)
-    open import Data.Char.Base using (Char)
-    open import Relation.Binary.PropositionalEquality using (_≡_; refl)
-    open import Data.Product using (∃; ∃₂; _,_; _×_)
+    open import Relation.Binary.PropositionalEquality using (_≡_)
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
     open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
-    open import Data.Empty using (⊥; ⊥-elim)
+    open import Data.Empty using (⊥)
     open import Data.Unit using (⊤) renaming (tt to ttt)
-    open import Data.Nat using (ℕ; suc; zero)
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Agda.Builtin.Maybe using (Maybe; just; nothing)
-    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_; _<_ to _<ℤ_)
+    open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _<_ to _<ℤ_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-
-    open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ to _∧B_; _∨_ to _∨B_)
+    open import Data.Bool using (Bool; true; false)
 
 
     -- Section Start Page 44-45
@@ -268,8 +255,6 @@ module Aexp₃-semantic where
     infixr 5 _MULT-BSS_
     infixr 5 _MINUS-BSS_
     infixr 5 PARENT-BSS_
-
-
 
     data Aexp₃ : Set where
         N_ : Num → Aexp₃ -- Number literals
