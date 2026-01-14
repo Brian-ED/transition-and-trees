@@ -20,7 +20,7 @@ F x = s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s x
 p2:1 : "hi" < "yo"
 p2:1 = this (F F F F F F F F F F F F F s≤s z≤n)
 
-p2 : ((emptyState [ "hi" ↦ + 3 ]) [ "yo" ↦ + 4 ]) ≡ (( "hi" , + 3) ∷ ( "yo" , + 4) ∷ [] , (sortedCons p2:1 sortedOne))
+p2 : ((emptyState [ "hi" ↦ + 3 ]) [ "yo" ↦ + 4 ]) ≡ (( "hi" , + 3) ∷ ( "yo" , + 4) ∷ [] , sortedCons p2:1 sortedOne)
 p2 = refl
 
 p3 : emptyState [ "hi" ↦ + 3 ] [ "yo" ↦ + 4 ] ≡ emptyState [ "yo" ↦ + 4 ] [ "hi" ↦ + 3 ]
@@ -28,7 +28,7 @@ p3 = refl
 
 
 a : State
-a = (( "a" , + 0) ∷ ( "b" , + 0) ∷ [] , (sortedCons (this (s≤s F F F F F F F F F F F F s≤s z≤n)) sortedOne))
+a = ( "a" , + 0) ∷ ( "b" , + 0) ∷ [] , sortedCons (this (s≤s F F F F F F F F F F F F s≤s z≤n)) sortedOne
 
 p4 : a [ "a" ↦ + 0 ] ≡ a
 p4 = refl
