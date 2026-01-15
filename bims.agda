@@ -4,7 +4,7 @@ module bims where
 module Aexp₁-example-expr where
     open import Data.Integer using (+_)
     open import Bims
-    open Aexp₁-semantic using (Aexp₁; _+_; N_; _*_)
+    open Aexp₁-bigstep-semantic using (Aexp₁; _+_; N_; _*_)
 
     exprPg29 : Aexp₁
     exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
@@ -14,7 +14,7 @@ module Aexp₁-example-expr where
 -- 3.4.1 A big-step semantics of Aexp₁
 module Aexp₁-is-big-step where
     open import Bims
-    open Aexp₁-semantic
+    open Aexp₁-bigstep-semantic
     open import Data.Integer using () renaming (ℤ to Num)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Empty using (⊥)
@@ -53,7 +53,7 @@ module Aexp₁-is-big-step where
 -- A small-step semantics of Aexp₁
 module Aexp₂-small-step-semantic where
     open import Bims
-    open Aexp₂
+    open Aexp₁-smallstep-semantic
     open import Data.Unit using (⊤)
     open import Data.Empty using (⊥)
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
@@ -66,6 +66,36 @@ module Aexp₂-small-step-semantic where
     Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
 
 -- Section End Page 36-37
+
+-- Section Begin Page 40
+
+-- Test for solution to problem 3.16, small-step transition for Bexp
+module Bexp-small-step-example where
+    open import Data.Integer using (+_)
+    open import Agda.Builtin.Equality using (refl)
+    open import Bims
+    open Bexp-smallstep-transition
+    open Aexp₁-smallstep-semantic using (ff; tt; N_; _*_; _+_; _∧_; _==_; ++_)
+
+    code1 = ((ff ∧ tt ) ∧ ((N + 6) == (N + 5)))
+    code2 = ff ∧ ((N + 6) == (N + 5))
+    code3 = ff ∧ ((++ + 6) == (N + 5))
+    code4 = ff ∧ ((++ + 6) == (++ + 5))
+    code5 = ff ∧ ff
+    code6 = ff
+
+    a : code1 ⇒b code2
+    a = AND-1-BSS AND-4-BSS
+    b : code2 ⇒b code3
+    b = AND-2-BSS (EQUALS-1-BSS (Aexp₁-smallstep-semantic.NUMₛₛₛ refl))
+    c : code3 ⇒b code4
+    c = AND-2-BSS (EQUALS-2-BSS (Aexp₁-smallstep-semantic.NUMₛₛₛ refl))
+    d : code4 ⇒b code5
+    d = AND-2-BSS (EQUALS-4-BSS (λ ()))
+    e : code5 ⇒b code6
+    e = AND-5-BSS
+
+-- Section End Page 40
 
 -- Section Begin Page 48-49
 module Aexp₃-state-transition-example where

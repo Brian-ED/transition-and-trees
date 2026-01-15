@@ -257,118 +257,75 @@ module Bexp-smallstep-transition where
     Num.negsuc x ==ℤ Num.pos y = false
     Num.negsuc x ==ℤ Num.negsuc y = x ≡ᵇ y
 
---        NOT-1-BSS_ : ∀ {b}
---                → inj₂ b ⇒b inj₁ false
---                → inj₂ (¬ b) ⇒b inj₁ true
---
---        NOT-2-BSS_ : ∀ {b}
---                   → inj₂ b ⇒b inj₁ true
---                   → inj₂ (¬ b) ⇒b inj₁ false
---
---        PARENTH-B-BSS : ∀ {b v}
---                      → inj₂ b ⇒b v
---                      → inj₂ ⟨ b ⟩ ⇒b v
---
---        AND-1-BSS : ∀ {b₁ b₂}
---                  → inj₂ b₁ ⇒b inj₁ true
---                  → inj₂ b₂ ⇒b inj₁ true
---                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ true
---
---        AND-2-BSS : ∀ {b₁ b₂}
---                  → (inj₂ b₁ ⇒b inj₁ false)
---                  ⊎ (inj₂ b₂ ⇒b inj₁ false)
---                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
-
     open import Data.Bool using (if_then_else_; Bool; true; false)
 
     data _⇒b_ : Bexp → Bexp → Set where
 
-        EQUALS-1-BSS_ : ∀ {α₁ α₂ α₂´}
-                      → α₂ ⇒₂ α₂´
-                      → (α₁ == α₂) ⇒b (α₁ == α₂´)
-
-        EQUALS-2-BSS_ : ∀ {α₁ α₁´ α₂}
+        EQUALS-1-BSS_ : ∀ {α₁ α₁´ α₂}
                       → α₁ ⇒₂ α₁´
                       → (α₁ == α₂) ⇒b (α₁´ == α₂)
 
+
+        EQUALS-2-BSS_ : ∀ {α₁ α₂ α₂´}
+                      → α₂ ⇒₂ α₂´
+                      → (α₁ == α₂) ⇒b (α₁ == α₂´)
+
         EQUALS-3-BSS : ∀ {x y}
-                     → ((++ x) == (++ y)) ⇒b (if (x ==ℤ y) then tt else ff)
+                     → x ≡ y
+                     → ((++ x) == (++ y)) ⇒b tt
 
+        EQUALS-4-BSS : ∀ {x y}
+                     → not x ≡ y
+                     → ((++ x) == (++ y)) ⇒b ff
 
-        GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ α₂´}
-                           → α₂ ⇒₂ α₂´
-                           → (α₁ == α₂) ⇒b (α₁ == α₂´)
-
-        GREATERTHAN-2-BSS_ : ∀ {α₁ α₁´ α₂}
+        GREATERTHAN-1-BSS_ : ∀ {α₁ α₁´ α₂}
                            → α₁ ⇒₂ α₁´
-                           → (α₁ == α₂) ⇒b (α₁´ == α₂)
+                           → (α₁ < α₂) ⇒b (α₁´ < α₂)
+
+        GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ α₂´}
+                           → α₂ ⇒₂ α₂´
+                           → (α₁ < α₂) ⇒b (α₁ < α₂´)
 
         GREATERTHAN-3-BSS : ∀ {x y}
-                          → ((++ x) == (++ y)) ⇒b (if (x ==ℤ y) then tt else ff)
+                          → x <ℤ y
+                          → ((++ x) < (++ y)) ⇒b tt
 
+        GREATERTHAN-4-BSS : ∀ {x y}
+                          → not x <ℤ y
+                          → ((++ x) < (++ y)) ⇒b ff
 
---        _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
---                            → α₁ ⇒₂ v₁
---                            → α₂ ⇒₂ v₂
---                            → v₁ <ℤ v₂
---                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
+        NOT-1-BSS_ : ∀ {α α´}
+                   → α ⇒b α´
+                   → (¬ α) ⇒b (¬ α´)
 
---        _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
---                            → inj₂ α₁ ⇒₂ inj₁ v₁
---                            → inj₂ α₂ ⇒₂ inj₁ v₂
---                            → not (v₁ <ℤ v₂)
---                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
+        NOT-2-BSS : (¬ ff) ⇒b tt
 
+        NOT-3-BSS : (¬ tt) ⇒b ff
 
---        -- PLUS
---        PLUS-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
---                → α₁ ⇒₂ α₁´
---                → (α₁ + α₂) ⇒₂ (α₁´ + α₂)
---
---        PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
---                → α₂ ⇒₂ α₂´
---                → (α₁ + α₂) ⇒₂ (α₁ + α₂´)
---
---        PLUS-3ₛₛₛ : ∀ {x y}
---                → (++ x + ++ y) ⇒₂ ++ x +ℤ y
---
---        -- MULT
---        MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
---                → α₁ ⇒₂ α₁´
---                → (α₁ * α₂) ⇒₂ (α₁´ * α₂)
---
---        MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
---                → α₂ ⇒₂ α₂´
---                → (α₁ * α₂) ⇒₂ (α₁ * α₂´)
---
---        MULT-3ₛₛₛ : ∀ {x y}
---                → (++ x * ++ y) ⇒₂ ++ x *ℤ y
---
---        -- SUB
---        SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
---                → α₁ ⇒₂ α₁´
---                → (α₁ - α₂) ⇒₂ (α₁´ - α₂)
---
---        SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
---                → α₂ ⇒₂ α₂´
---                → (α₁ - α₂) ⇒₂ (α₁ - α₂´)
---
---        SUB-3ₛₛₛ : ∀ {x y}
---                → (++ x - ++ y) ⇒₂ ++ x -ℤ y
---
---        -- PARENTHESES
---        PARENT-1ₛₛₛ_ : ∀ {x y}
---                    → x ⇒₂ y
---                    → [ x ] ⇒₂ [ y ]
---
---        PARENT-2ₛₛₛ_ : ∀ {x y}
---                    → x ≡ y
---                    → [ ++ x ] ⇒₂ ++ y
---
---        -- NUM
---        NUMₛₛₛ_ : ∀ {x y}
---                → x ≡ y
---                → N x ⇒₂ ++ y
+        PARENTH-B-1-BSS : ∀ {α α´}
+                        → α ⇒b α´
+                        → ⟨ α ⟩ ⇒b ⟨ α´ ⟩
+
+        PARENTH-B-2-BSS : ∀ {α α´}
+                        → α ⇒b α´
+                        → ⟨ α ⟩ ⇒b ⟨ α´ ⟩
+
+        PARENTH-B-3-BSS : ⟨ tt ⟩ ⇒b tt
+
+        PARENTH-B-4-BSS : ⟨ ff ⟩ ⇒b ff
+
+        AND-1-BSS_ : ∀ {α₁ α₁´ α₂}
+                   → α₁ ⇒b α₁´
+                   → (α₁ ∧ α₂) ⇒b (α₁´ ∧ α₂)
+
+        AND-2-BSS_ : ∀ {α₁ α₂ α₂´}
+                   → α₂ ⇒b α₂´
+                   → (α₁ ∧ α₂) ⇒b (α₁ ∧ α₂´)
+
+        AND-3-BSS : (tt ∧ tt) ⇒b tt
+        AND-4-BSS : (ff ∧ tt) ⇒b ff
+        AND-5-BSS : (ff ∧ ff) ⇒b ff
+        AND-6-BSS : (tt ∧ ff) ⇒b ff
 
 
 -- Section End Page 40
