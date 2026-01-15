@@ -565,10 +565,11 @@ module Stm₂-semantic where
         WHILEₛₛₛ : ∀ {s b S}
             → ⟨ inj₁ (while b do₃ S , s) ⟩⇒₂⟨ inj₁ (ifStm₂ b then while b do₃ S else skip₃ , s) ⟩
 
-    T : (Stm₂ × State) ⊎ State → Set
-    T (inj₁ x) = ⊥
-    T (inj₂ y) = ⊤
-
-    transitionSystem = ⌞ (Stm₂ × State) ⊎ State , ⟨_⟩⇒₂⟨_⟩ , T ⌟
+    transitionSystem = ⌞ Γ , ⟨_⟩⇒₂⟨_⟩ , T ⌟
+        where
+            Γ = (Stm₂ × State) ⊎ State
+            T : Γ → Set
+            T (inj₁ x) = ⊥
+            T (inj₂ y) = ⊤
 
     -- Section End Page 53
