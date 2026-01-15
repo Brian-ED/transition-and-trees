@@ -51,19 +51,19 @@ module Aexp₁-is-big-step where
 
 -- Section Start Page 36-37
 -- A small-step semantics of Aexp₁
-module Aexp₂-small-step-semantic where
+module Aexp₁-small-step-semantic where
     open import Bims
     open Aexp₁-smallstep-semantic
     open import Data.Unit using (⊤)
     open import Data.Empty using (⊥)
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
 
-    T₂ : (Aexp₂ → Set)
+    T₂ : (Aexp₁ss → Set)
     T₂ (++ x) = ⊤
     T₂ _ = ⊥
 
-    Aexp₂Semantic : TransitionSystem
-    Aexp₂Semantic = ⌞ Aexp₂ , _⇒₂_ , T₂ ⌟
+    Aexp₁ssSemantic : TransitionSystem
+    Aexp₁ssSemantic = ⌞ Aexp₁ss , _⇒₂_ , T₂ ⌟
 
 -- Section End Page 36-37
 
@@ -97,11 +97,11 @@ module Bexp-small-step-example where
 -- Section End Page 40
 
 -- Section Begin Page 48-49
-module Aexp₃-state-transition-example where
+module Aexp₂-state-transition-example where
     open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
     open import Bims
-    open Aexp₃-semantic
+    open Aexp₂-semantic
     open import Data.Integer using (+_)
 
     code = ("i" ←₃ (N + 6)) Å₃
@@ -112,7 +112,7 @@ module Aexp₃-state-transition-example where
 
     beginState = emptyState [ "x" ↦ + 5 ]
     endState = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
-    P2 : ⟨ code , beginState ⟩⇒₃ endState
+    P2 : ⟨ code , beginState ⟩⇒₂ endState
     P2 = COMP-BSS
         (ASS-BSS NUM-BSS)
         (WHILE-TRUE-BSS
