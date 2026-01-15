@@ -1,9 +1,6 @@
 module BigAndSmallStepSemantics where
 
 open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-open import Data.Product using (∃; ∃₂) renaming (_×_ to _and_)
-open import Data.Empty using (⊥; ⊥-elim)
-open import Data.Unit using (⊤; tt)
 
 -- Section Start Page 31
 
