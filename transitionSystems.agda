@@ -33,4 +33,7 @@ T₁ γ₄ = ⊤
 testSystem : TransitionSystem
 testSystem = ⌞ Γ₁ , _⇒₁_ , T₁_ ⌟
 
+open TransitionSystem testSystem
+x = _⇒⟨_⟩_
+
 -- Section End Page 30
