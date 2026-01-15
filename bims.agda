@@ -96,12 +96,13 @@ module Bexp-small-step-example where
 
 -- Section End Page 40
 
--- Section Begin Page 48-49
+-- Section Begin Page 48-52
 module Aexp₂-state-transition-example where
     open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
     open import Bims
-    open Aexp₂-semantic
+    open Aexp₂-bigstep-semantic
+    open import Data.Nat using (ℕ)
     open import Data.Integer using (+_)
 
     code = ("i" ←₃ (N + 6)) Å₃
@@ -129,4 +130,22 @@ module Aexp₂-state-transition-example where
             )
         )
 
--- Section End Page 48-49
+    -- Section Begin Page 52
+    -- Problem 4.8
+    open import Data.Product using (∃; _,_)
+    open import Relation.Nullary.Negation using () renaming (¬_ to not_)
+    open import Data.Empty using (⊥)
+
+    S = while (N + 0) ==₃ (N + 0) do₃ skip₃
+
+    neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
+    neverTerminates s = emptyState , f
+        where
+            f : {s : State} → ⟨ S , s ⟩⇒₂ emptyState → ⊥
+            f (WHILE-TRUE-BSS _ _ x₂) = f x₂
+            f (WHILE-FALSE-BSS (EQUALS-2-BSS NUM-BSS NUM-BSS x₃) x₁) = x₃ refl
+
+
+    -- Section End Page 52
+
+-- Section End Page 48-52
