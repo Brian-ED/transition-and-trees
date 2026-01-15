@@ -14,9 +14,7 @@ open import TransitionSystems using (TransitionSystem)
 open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong₂; sym; trans)
-open import bims using (Aexp₂Semantic)
 
-open TransitionSystem Aexp₂Semantic using () renaming (_⇒⟨_⟩_ to _⇒₂⟨_⟩_; step-zero to step-zero₂; _step-suc_ to _step-suc₂_; _⇒*_ to _⇒₂*_)
 
 {-
 -- Determinacy for big step (TODO: Apparently it's supposed to be proven in chapter 5, so might want to move this at some point)
