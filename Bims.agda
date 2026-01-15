@@ -417,16 +417,16 @@ module Aexp₂-semantic where
 
     -- Section Begin Page 46
 
-    data Bexp₃ : Set where
-        tt₃ : Bexp₃
-        ff₃ : Bexp₃
-        _==₃_ : Aexp₂ → Aexp₂ → Bexp₃
-        _<₃_ : Aexp₂ → Aexp₂ → Bexp₃
-        ¬₃_ : Bexp₃ → Bexp₃
-        _∧₃_ : Bexp₃ → Bexp₃ → Bexp₃
-        ⟨_⟩₃ : Bexp₃ → Bexp₃
+    data Bexp₂ : Set where
+        tt₃ : Bexp₂
+        ff₃ : Bexp₂
+        _==₃_ : Aexp₂ → Aexp₂ → Bexp₂
+        _<₃_ : Aexp₂ → Aexp₂ → Bexp₂
+        ¬₃_ : Bexp₂ → Bexp₂
+        _∧₃_ : Bexp₂ → Bexp₂ → Bexp₂
+        ⟨_⟩₃ : Bexp₂ → Bexp₂
 
-    data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₃ → Bool ⊎ Bexp₃ → Set where
+    data _⊢_⇒₃b_ : State → Bool ⊎ Bexp₂ → Bool ⊎ Bexp₂ → Set where
 
         _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
                       → s ⊢ inj₂ α₁ ⇒₃ inj₁ v
@@ -481,8 +481,8 @@ module Aexp₂-semantic where
         skip₃ : Stm₂
         _←₃_ : Var → Aexp₂ → Stm₂
         _Å₃_ : Stm₂ → Stm₂ → Stm₂
-        ifStm₂_then_else : Bexp₃ → Stm₂ → Stm₂ → Stm₂
-        while_do₃_ : Bexp₃ → Stm₂ → Stm₂
+        ifStm₂_then_else : Bexp₂ → Stm₂ → Stm₂ → Stm₂
+        while_do₃_ : Bexp₂ → Stm₂ → Stm₂
 
     data ⟨_,_⟩⇒₂_ : Stm₂ → State → State → Set where
         ASS-BSS         : ∀ {x a s v}
