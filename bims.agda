@@ -68,7 +68,6 @@ module Aexp₂-small-step-semantic where
 -- Section End Page 36-37
 
 -- Section Begin Page 40
-
 -- Test for solution to problem 3.16, small-step transition for Bexp
 module Bexp-small-step-example where
     open import Data.Integer using (+_)
