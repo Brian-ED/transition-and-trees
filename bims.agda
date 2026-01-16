@@ -3,8 +3,8 @@ module bims where
 -- Section Start Page 29
 module Aexp₁-example-expr where
     open import Data.Integer using (+_)
-    open import Bims
-    open Aexp₁-bigstep-semantic using (Aexp₁; _+_; N_; _*_)
+    import Bims
+    open Bims.Aexp₁-bigstep-semantic using (Aexp₁; _+_; N_; _*_)
 
     exprPg29 : Aexp₁
     exprPg29 = (N + 3 + N + 4) * (N + 14 + N + 9)
@@ -13,8 +13,8 @@ module Aexp₁-example-expr where
 -- Section Start Page 32-33
 -- 3.4.1 A big-step semantics of Aexp₁
 module Aexp₁-is-big-step where
-    open import Bims
-    open Aexp₁-bigstep-semantic
+    import Bims
+    open Bims.Aexp₁-bigstep-semantic
     open import Data.Integer using () renaming (ℤ to Num)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Empty using (⊥)
@@ -72,27 +72,29 @@ module Aexp₁-small-step-semantic where
 module Bexp-small-step-example where
     open import Data.Integer using (+_)
     open import Agda.Builtin.Equality using (refl)
-    open import Bims
-    open Bexp-smallstep-transition
-    open Aexp₁-smallstep-semantic using (ff; tt; N_; _*_; _+_; _∧_; _==_; ++_)
+    import Bims
+    open Bims.Bexp-smallstep-transition
+    open Bims.Aexp₁-smallstep-semantic using (N_; _*_; _+_; NUMₛₛₛ_; _∧_; _==_; ++_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
+    open import Data.Bool using (Bool) renaming (true to tt; false to ff; _∧_ to _∧b_)
 
-    code1 = ((ff ∧ tt ) ∧ ((N + 6) == (N + 5)))
-    code2 = ff ∧ ((N + 6) == (N + 5))
-    code3 = ff ∧ ((++ + 6) == (N + 5))
-    code4 = ff ∧ ((++ + 6) == (++ + 5))
-    code5 = ff ∧ ff
+    code1 = ((((++ + 0) == (++ + 1)) ∧ ((++ + 0) == (++ + 0)) ) ∧ ((N + 6) == (N + 5)))
+    code2 = ((++ + 0) == (++ + 1)) ∧ ((N + 6) == (N + 5))
+    code3 = ((++ + 0) == (++ + 1)) ∧ ((++ + 6) == (N + 5))
+    code4 = ((++ + 0) == (++ + 1)) ∧ ((++ + 6) == (++ + 5))
+    code5 = ((++ + 0) == (++ + 1)) ∧ ((++ + 0) == (++ + 1))
     code6 = ff
 
-    a : code1 ⇒b code2
-    a = AND-1-BSS AND-4-BSS
-    b : code2 ⇒b code3
-    b = AND-2-BSS (EQUALS-1-BSS (Aexp₁-smallstep-semantic.NUMₛₛₛ refl))
-    c : code3 ⇒b code4
-    c = AND-2-BSS (EQUALS-2-BSS (Aexp₁-smallstep-semantic.NUMₛₛₛ refl))
-    d : code4 ⇒b code5
-    d = AND-2-BSS (EQUALS-4-BSS (λ ()))
-    e : code5 ⇒b code6
-    e = AND-5-BSS
+    a : inj₁ code1 ⇒b inj₁ code2
+    a = AND-1-BSS {!   !}
+    b : inj₁ code2 ⇒b inj₁ code3
+    b = AND-2-BSS (EQUALS-1-BSS (NUMₛₛₛ refl))
+    c : inj₁ code3 ⇒b inj₁ code4
+    c = AND-2-BSS (EQUALS-2-BSS (NUMₛₛₛ refl))
+    d : inj₁ code4 ⇒b inj₁ code5
+    d = AND-2-BSS {!   !}
+    e : inj₁ code5 ⇒b inj₂ code6
+    e = {!   !}
 
 -- Section End Page 40
 
@@ -100,8 +102,9 @@ module Bexp-small-step-example where
 module Aexp₂-state-transition-example where
     open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
-    open import Bims
-    open Aexp₂-bigstep-semantic
+    import Bims
+    open Bims.Aexp₂-semantic
+    open Bims.Stm₂-semantic
     open import Data.Nat using (ℕ)
     open import Data.Integer using (+_)
 
@@ -149,3 +152,34 @@ module Aexp₂-state-transition-example where
     -- Section End Page 52
 
 -- Section End Page 48-52
+
+-- Section Begin Page 54
+-- Problem 4.9
+
+module Aexp₂-smallstep-example where
+    open import State using (State; _[_↦_]; emptyState)
+    open import Relation.Binary.PropositionalEquality using (refl)
+    import Bims
+    open Bims.Aexp₂-semantic
+    open Bims.Stm₂-semantic
+    open Bims.Aexp₁-smallstep-semantic
+    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+    open TransitionSystem transitionSystem
+    open import Data.Nat using (ℕ)
+    open import Data.Integer using (+_)
+    open import Data.String using (String)
+    open import Data.Product using (_×_; _,_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
+
+    S = ifStm₂ ((N + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
+    s = emptyState [ "x" ↦ + 4 ]
+
+    transition1 : (inj₁ (S , s))
+           ⇒⟨ 1 ⟩ (inj₁ (ifStm₂ ((++ + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
+                ,  s ))
+    transition1 = {!   !} step-suc step-zero
+
+    transition2 : {r : (Stm₂ × State) ⊎ State} → (inj₁ (S , s)) ⇒⟨ 1 ⟩ r → Set
+    transition2 = {!   !}
+
+-- Section End Page 54

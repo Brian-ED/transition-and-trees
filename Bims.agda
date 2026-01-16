@@ -16,8 +16,6 @@ module Aexp₁-bigstep-semantic where
         [_] : Aexp₁ → Aexp₁
 
     data Bexp : Set where
-        tt : Bexp
-        ff : Bexp
         _==_ : Aexp₁ → Aexp₁ → Bexp
         _<_ : Aexp₁ → Aexp₁ → Bexp
         ¬_ : Bexp → Bexp
@@ -98,8 +96,6 @@ module Aexp₁-smallstep-semantic where
         [_] : Aexp₁ss → Aexp₁ss
 
     data Bexp : Set where
-        tt : Bexp
-        ff : Bexp
         _==_ : Aexp₁ss → Aexp₁ss → Bexp
         _<_ : Aexp₁ss → Aexp₁ss → Bexp
         ¬_ : Bexp → Bexp
@@ -188,7 +184,7 @@ module Bexp-bigstep-transition where
     open import Relation.Binary.PropositionalEquality using (_≡_)
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.Bool using (Bool; true; false)
+    open import Data.Bool using (Bool) renaming (true to tt; false to ff)
 
 
     data _⇒b_ : (Bool ⊎ Bexp) → (Bool ⊎ Bexp) → Set where
@@ -197,47 +193,47 @@ module Bexp-bigstep-transition where
                        → inj₂ α₁ ⇒₁ inj₁ v₁
                        → inj₂ α₂ ⇒₁ inj₁ v₂
                        → v₁ ≡ v₂
-                       → inj₂ (α₁ == α₂) ⇒b inj₁ true
+                       → inj₂ (α₁ == α₂) ⇒b inj₁ tt
 
         _EQUALS-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
                        → inj₂ α₁ ⇒₁ inj₁ v₁
                        → inj₂ α₂ ⇒₁ inj₁ v₂
                        → not (v₁ ≡ v₂)
-                       → inj₂ (α₁ == α₂) ⇒b inj₁ false
+                       → inj₂ (α₁ == α₂) ⇒b inj₁ ff
 
         _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
                             → inj₂ α₁ ⇒₁ inj₁ v₁
                             → inj₂ α₂ ⇒₁ inj₁ v₂
                             → v₁ <ℤ v₂
-                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
+                            → inj₂ (α₁ < α₂) ⇒b inj₁ ff
 
         _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
                             → inj₂ α₁ ⇒₁ inj₁ v₁
                             → inj₂ α₂ ⇒₁ inj₁ v₂
                             → not (v₁ <ℤ v₂)
-                            → inj₂ (α₁ < α₂) ⇒b inj₁ false
+                            → inj₂ (α₁ < α₂) ⇒b inj₁ ff
 
         NOT-1-BSS_ : ∀ {b}
-                   → inj₂ b ⇒b inj₁ false
-                   → inj₂ (¬ b) ⇒b inj₁ true
+                   → inj₂ b ⇒b inj₁ ff
+                   → inj₂ (¬ b) ⇒b inj₁ tt
 
         NOT-2-BSS_ : ∀ {b}
-                   → inj₂ b ⇒b inj₁ true
-                   → inj₂ (¬ b) ⇒b inj₁ false
+                   → inj₂ b ⇒b inj₁ tt
+                   → inj₂ (¬ b) ⇒b inj₁ ff
 
         PARENTH-B-BSS : ∀ {b v}
                       → inj₂ b ⇒b v
                       → inj₂ ⟨ b ⟩ ⇒b v
 
         AND-1-BSS : ∀ {b₁ b₂}
-                  → inj₂ b₁ ⇒b inj₁ true
-                  → inj₂ b₂ ⇒b inj₁ true
-                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ true
+                  → inj₂ b₁ ⇒b inj₁ tt
+                  → inj₂ b₂ ⇒b inj₁ tt
+                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ tt
 
         AND-2-BSS : ∀ {b₁ b₂}
-                  → (inj₂ b₁ ⇒b inj₁ false)
-                  ⊎ (inj₂ b₂ ⇒b inj₁ false)
-                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ false
+                  → (inj₂ b₁ ⇒b inj₁ ff)
+                  ⊎ (inj₂ b₂ ⇒b inj₁ ff)
+                  → inj₂ (b₁ ∧ b₂) ⇒b inj₁ ff
 
 -- Problem 3.16
 module Bexp-smallstep-transition where
@@ -247,90 +243,85 @@ module Bexp-smallstep-transition where
     open import Relation.Binary.PropositionalEquality using (_≡_)
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.Bool using (Bool; true; false)
+    open import Data.Bool using (Bool) renaming (true to tt; false to ff; _∧_ to _∧b_)
     open import Data.Nat using (_≡ᵇ_)
 
 
     _==ℤ_ : Num → Num → Bool
     Num.pos x ==ℤ Num.pos y = x ≡ᵇ y
-    Num.pos x ==ℤ Num.negsuc y = false
-    Num.negsuc x ==ℤ Num.pos y = false
+    Num.pos x ==ℤ Num.negsuc y = ff
+    Num.negsuc x ==ℤ Num.pos y = ff
     Num.negsuc x ==ℤ Num.negsuc y = x ≡ᵇ y
 
-    open import Data.Bool using (if_then_else_; Bool; true; false)
+    open import Data.Bool using (if_then_else_; Bool) renaming (true to tt; false to ff)
 
-    data _⇒b_ : Bexp → Bexp → Set where
+    data _⇒b_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Set where
 
         EQUALS-1-BSS_ : ∀ {α₁ α₁´ α₂}
                       → α₁ ⇒₂ α₁´
-                      → (α₁ == α₂) ⇒b (α₁´ == α₂)
+                      → inj₁ (α₁ == α₂) ⇒b inj₁ (α₁´ == α₂)
 
 
         EQUALS-2-BSS_ : ∀ {α₁ α₂ α₂´}
                       → α₂ ⇒₂ α₂´
-                      → (α₁ == α₂) ⇒b (α₁ == α₂´)
+                      → inj₁ (α₁ == α₂) ⇒b inj₁ (α₁ == α₂´)
 
         EQUALS-3-BSS : ∀ {x y}
                      → x ≡ y
-                     → ((++ x) == (++ y)) ⇒b tt
+                     → inj₁ ((++ x) == (++ y)) ⇒b inj₂ tt
 
         EQUALS-4-BSS : ∀ {x y}
                      → not x ≡ y
-                     → ((++ x) == (++ y)) ⇒b ff
+                     → inj₁ ((++ x) == (++ y)) ⇒b inj₂ tt
 
         GREATERTHAN-1-BSS_ : ∀ {α₁ α₁´ α₂}
                            → α₁ ⇒₂ α₁´
-                           → (α₁ < α₂) ⇒b (α₁´ < α₂)
+                           → inj₁(α₁ < α₂) ⇒b inj₁(α₁´ < α₂)
 
         GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ α₂´}
                            → α₂ ⇒₂ α₂´
-                           → (α₁ < α₂) ⇒b (α₁ < α₂´)
+                           → inj₁(α₁ < α₂) ⇒b inj₁(α₁ < α₂´)
 
         GREATERTHAN-3-BSS : ∀ {x y}
                           → x <ℤ y
-                          → ((++ x) < (++ y)) ⇒b tt
+                          → inj₁((++ x) < (++ y)) ⇒b inj₂ tt
 
         GREATERTHAN-4-BSS : ∀ {x y}
                           → not x <ℤ y
-                          → ((++ x) < (++ y)) ⇒b ff
+                          → inj₁((++ x) < (++ y)) ⇒b inj₂ ff
 
         NOT-1-BSS_ : ∀ {α α´}
-                   → α ⇒b α´
-                   → (¬ α) ⇒b (¬ α´)
+                   → inj₁ α ⇒b inj₁ α´
+                   → inj₁ (¬ α) ⇒b inj₁ (¬ α´)
 
-        NOT-2-BSS : (¬ ff) ⇒b tt
+        NOT-2-BSS : ∀ {b}
+            → inj₁ b ⇒b inj₂ ff
+            → inj₁ (¬ b) ⇒b inj₂ tt
 
-        NOT-3-BSS : (¬ tt) ⇒b ff
+        NOT-3-BSS : ∀ {b}
+            → inj₁ b ⇒b inj₂ tt
+            → inj₁ (¬ b) ⇒b inj₂ ff
 
-        PARENTH-B-1-BSS : ∀ {α α´}
-                        → α ⇒b α´
-                        → ⟨ α ⟩ ⇒b ⟨ α´ ⟩
-
-        PARENTH-B-2-BSS : ∀ {α α´}
-                        → α ⇒b α´
-                        → ⟨ α ⟩ ⇒b ⟨ α´ ⟩
-
-        PARENTH-B-3-BSS : ⟨ tt ⟩ ⇒b tt
-
-        PARENTH-B-4-BSS : ⟨ ff ⟩ ⇒b ff
+        PARENTH-B-BSS : ∀ {α α´}
+                        → inj₁ α ⇒b inj₁ α´
+                        → inj₁ ⟨ α ⟩ ⇒b inj₁ ⟨ α´ ⟩
 
         AND-1-BSS_ : ∀ {α₁ α₁´ α₂}
-                   → α₁ ⇒b α₁´
-                   → (α₁ ∧ α₂) ⇒b (α₁´ ∧ α₂)
+                   → inj₁ α₁ ⇒b inj₁ α₁´
+                   → inj₁ (α₁ ∧ α₂) ⇒b inj₁ (α₁´ ∧ α₂)
 
         AND-2-BSS_ : ∀ {α₁ α₂ α₂´}
-                   → α₂ ⇒b α₂´
-                   → (α₁ ∧ α₂) ⇒b (α₁ ∧ α₂´)
+                   → inj₁ α₂ ⇒b inj₁ α₂´
+                   → inj₁ (α₁ ∧ α₂) ⇒b inj₁ (α₁ ∧ α₂´)
 
-        AND-3-BSS : (tt ∧ tt) ⇒b tt
-        AND-4-BSS : (ff ∧ tt) ⇒b ff
-        AND-5-BSS : (ff ∧ ff) ⇒b ff
-        AND-6-BSS : (tt ∧ ff) ⇒b ff
-
+        AND-3-BSS : ∀ {b₁ b₂ α₁ α₂}
+                    → inj₁ α₁ ⇒b inj₂ b₁
+                    → inj₁ α₂ ⇒b inj₂ b₂
+                    → inj₁ (α₁ ∧ α₂) ⇒b inj₂ (b₁ ∧b b₂)
 
 -- Section End Page 40
 
-module Aexp₂-bigstep-semantic where
+module Aexp₂-semantic where
     open import State using (State; _[_↦_]; lookup; emptyState)
     open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _<_ to _<ℤ_)
     open import Data.String using () renaming (String to Var)
@@ -342,7 +333,7 @@ module Aexp₂-bigstep-semantic where
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Agda.Builtin.Maybe using (Maybe; just; nothing)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.Bool using (Bool; true; false)
+    open import Data.Bool using (Bool) renaming (true to tt; false to ff)
 
 
     -- Section Start Page 44-45
@@ -418,8 +409,6 @@ module Aexp₂-bigstep-semantic where
     -- Section Begin Page 46
 
     data Bexp₂ : Set where
-        tt₃ : Bexp₂
-        ff₃ : Bexp₂
         _==₃_ : Aexp₂ → Aexp₂ → Bexp₂
         _<₃_ : Aexp₂ → Aexp₂ → Bexp₂
         ¬₃_ : Bexp₂ → Bexp₂
@@ -430,48 +419,48 @@ module Aexp₂-bigstep-semantic where
 
         _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
                       → s ⊢ inj₂ α₁ ⇒₂ inj₁ v
-                      →  s ⊢ inj₂ α₂ ⇒₂ inj₁ v
-                      → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₂b inj₁ true
+                      → s ⊢ inj₂ α₂ ⇒₂ inj₁ v
+                      → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₂b inj₁ tt
 
         EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
                      → s ⊢ inj₂ α₁ ⇒₂ inj₁ v₁
-                     →  s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
+                     → s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
                      → not (v₁ ≡ v₂)
-                     → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₂b inj₁ false
+                     → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₂b inj₁ ff
 
         _GREATERTHAN-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
                             → s ⊢ inj₂ α₁ ⇒₂ inj₁ v₁
-                            →  s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
+                            → s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
                             → v₁ <ℤ v₂
-                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₂b inj₁ false
+                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₂b inj₁ ff
 
         _GREATERTHAN-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
                             → s ⊢ inj₂ α₁ ⇒₂ inj₁ v₁
-                            →  s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
+                            → s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
                             → not (v₁ <ℤ v₂)
-                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₂b inj₁ false
+                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₂b inj₁ ff
 
         NOT-1-BSS_ : ∀ {s b}
-                   → s ⊢ inj₂ b ⇒₂b inj₁ false
-                   → s ⊢ inj₂ (¬₃ b) ⇒₂b inj₁ true
+                   → s ⊢ inj₂ b ⇒₂b inj₁ ff
+                   → s ⊢ inj₂ (¬₃ b) ⇒₂b inj₁ tt
 
         NOT-2-BSS_ : ∀ {s b}
-                   → s ⊢ inj₂ b ⇒₂b inj₁ true
-                   → s ⊢ inj₂ (¬₃ b) ⇒₂b inj₁ false
+                   → s ⊢ inj₂ b ⇒₂b inj₁ tt
+                   → s ⊢ inj₂ (¬₃ b) ⇒₂b inj₁ ff
 
         PARENTH-B-BSS : ∀ {s b v}
                       → s ⊢ inj₂ b ⇒₂b v
                       → s ⊢ inj₂ ⟨ b ⟩₃ ⇒₂b v
 
         AND-1-BSS : ∀ {s b₁ b₂}
-                  → s ⊢ inj₂ b₁ ⇒₂b inj₁ true
-                  → s ⊢ inj₂ b₂ ⇒₂b inj₁ true
-                  → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₂b inj₁ true
+                  → s ⊢ inj₂ b₁ ⇒₂b inj₁ tt
+                  → s ⊢ inj₂ b₂ ⇒₂b inj₁ tt
+                  → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₂b inj₁ tt
 
         AND-2-BSS : ∀ {s b₁ b₂}
-                  → (s ⊢ inj₂ b₁ ⇒₂b inj₁ false)
-                  ⊎ (s ⊢ inj₂ b₂ ⇒₂b inj₁ false)
-                  → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₂b inj₁ false
+                  → (s ⊢ inj₂ b₁ ⇒₂b inj₁ ff)
+                  ⊎ (s ⊢ inj₂ b₂ ⇒₂b inj₁ ff)
+                  → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₂b inj₁ ff
 
     -- Section End Page 46
 
@@ -488,8 +477,8 @@ module Stm₂-semantic where
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Agda.Builtin.Maybe using (Maybe; just; nothing)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.Bool using (Bool; true; false)
-    open Aexp₂-bigstep-semantic using (Aexp₂; Bexp₂; tt₃; ff₃; _⊢_⇒₂_; _⊢_⇒₂b_)
+    open import Data.Bool using (Bool) renaming (true to tt; false to ff)
+    open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒₂_; _⊢_⇒₂b_)
 
     -- Section Begin Page 47
 
@@ -515,22 +504,22 @@ module Stm₂-semantic where
 
         IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
                         → ⟨ S₁ , s ⟩⇒₂ s´
-                        → s ⊢ inj₂ b ⇒₂b inj₁ true
+                        → s ⊢ inj₂ b ⇒₂b inj₁ tt
                         → ⟨ (ifStm₂ b then S₁ else S₂) , s ⟩⇒₂ s´
 
         IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
                         → ⟨ S₂ , s ⟩⇒₂ s´
-                        → s ⊢ inj₂ b ⇒₂b inj₁ false
+                        → s ⊢ inj₂ b ⇒₂b inj₁ ff
                         → ⟨ (ifStm₂ b then S₁ else S₂) , s ⟩⇒₂ s´
 
         WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
-                        → s ⊢ inj₂ b ⇒₂b inj₁ true
+                        → s ⊢ inj₂ b ⇒₂b inj₁ tt
                         → ⟨ S , s ⟩⇒₂ s˝
                         → ⟨ (while b do₃ S) , s˝ ⟩⇒₂ s´
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
 
         WHILE-FALSE-BSS : ∀ {S s s´ b}
-                        → s ⊢ inj₂ b ⇒₂b inj₁ false
+                        → s ⊢ inj₂ b ⇒₂b inj₁ ff
                         → s´ ≡ s
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
 
@@ -555,11 +544,11 @@ module Stm₂-semantic where
             → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s´) ⟩
 
         IF-TRUEₛₛₛ : ∀ {s b S₁ S₂}
-            → s ⊢ inj₂ b ⇒₂b inj₂ tt₃ -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
+            → s ⊢ inj₂ b ⇒₂b inj₁ tt -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
             → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₁ , s) ⟩
 
         IF-FALSEₛₛₛ : ∀ {s b S₁ S₂}
-            → s ⊢ inj₂ b ⇒₂b inj₂ ff₃ -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
+            → s ⊢ inj₂ b ⇒₂b inj₁ ff -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
             → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
 
         WHILEₛₛₛ : ∀ {s b S}
