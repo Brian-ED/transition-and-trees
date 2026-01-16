@@ -415,52 +415,52 @@ module Aexp₂-semantic where
         _∧₃_ : Bexp₂ → Bexp₂ → Bexp₂
         ⟨_⟩₃ : Bexp₂ → Bexp₂
 
-    data _⊢_⇒₂b_ : State → Bool ⊎ Bexp₂ → Bool ⊎ Bexp₂ → Set where
+    data _⊢_⇒₂b_ : State → Bexp₂ ⊎ Bool → Bexp₂ ⊎ Bool → Set where
 
         _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
                       → s ⊢ inj₂ α₁ ⇒₂ inj₁ v
                       → s ⊢ inj₂ α₂ ⇒₂ inj₁ v
-                      → s ⊢ (inj₂ (α₁ ==₃ α₂)) ⇒₂b inj₁ tt
+                      → s ⊢ (inj₁ (α₁ ==₃ α₂)) ⇒₂b inj₂ tt
 
         EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
                      → s ⊢ inj₂ α₁ ⇒₂ inj₁ v₁
                      → s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
                      → not (v₁ ≡ v₂)
-                     → s ⊢ inj₂ (α₁ ==₃ α₂) ⇒₂b inj₁ ff
+                     → s ⊢ inj₁ (α₁ ==₃ α₂) ⇒₂b inj₂ ff
 
         _GREATERTHAN-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
                             → s ⊢ inj₂ α₁ ⇒₂ inj₁ v₁
                             → s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
                             → v₁ <ℤ v₂
-                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₂b inj₁ ff
+                            → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
 
         _GREATERTHAN-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
                             → s ⊢ inj₂ α₁ ⇒₂ inj₁ v₁
                             → s ⊢ inj₂ α₂ ⇒₂ inj₁ v₂
                             → not (v₁ <ℤ v₂)
-                            → s ⊢ inj₂ (α₁ <₃ α₂) ⇒₂b inj₁ ff
+                            → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
 
         NOT-1-BSS_ : ∀ {s b}
-                   → s ⊢ inj₂ b ⇒₂b inj₁ ff
-                   → s ⊢ inj₂ (¬₃ b) ⇒₂b inj₁ tt
+                   → s ⊢ inj₁ b ⇒₂b inj₂ ff
+                   → s ⊢ inj₁ (¬₃ b) ⇒₂b inj₂ tt
 
         NOT-2-BSS_ : ∀ {s b}
-                   → s ⊢ inj₂ b ⇒₂b inj₁ tt
-                   → s ⊢ inj₂ (¬₃ b) ⇒₂b inj₁ ff
+                   → s ⊢ inj₁ b ⇒₂b inj₂ tt
+                   → s ⊢ inj₁ (¬₃ b) ⇒₂b inj₂ ff
 
         PARENTH-B-BSS : ∀ {s b v}
-                      → s ⊢ inj₂ b ⇒₂b v
-                      → s ⊢ inj₂ ⟨ b ⟩₃ ⇒₂b v
+                      → s ⊢ inj₁ b ⇒₂b v
+                      → s ⊢ inj₁ ⟨ b ⟩₃ ⇒₂b v
 
         AND-1-BSS : ∀ {s b₁ b₂}
-                  → s ⊢ inj₂ b₁ ⇒₂b inj₁ tt
-                  → s ⊢ inj₂ b₂ ⇒₂b inj₁ tt
-                  → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₂b inj₁ tt
+                  → s ⊢ inj₁ b₁ ⇒₂b inj₂ tt
+                  → s ⊢ inj₁ b₂ ⇒₂b inj₂ tt
+                  → s ⊢ inj₁ (b₁ ∧₃ b₂) ⇒₂b inj₂ tt
 
         AND-2-BSS : ∀ {s b₁ b₂}
-                  → (s ⊢ inj₂ b₁ ⇒₂b inj₁ ff)
-                  ⊎ (s ⊢ inj₂ b₂ ⇒₂b inj₁ ff)
-                  → s ⊢ inj₂ (b₁ ∧₃ b₂) ⇒₂b inj₁ ff
+                  → (s ⊢ inj₁ b₁ ⇒₂b inj₂ ff)
+                  ⊎ (s ⊢ inj₁ b₂ ⇒₂b inj₂ ff)
+                  → s ⊢ inj₁ (b₁ ∧₃ b₂) ⇒₂b inj₂ ff
 
     -- Section End Page 46
 
@@ -504,22 +504,22 @@ module Stm₂-semantic where
 
         IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
                         → ⟨ S₁ , s ⟩⇒₂ s´
-                        → s ⊢ inj₂ b ⇒₂b inj₁ tt
+                        → s ⊢ inj₁ b ⇒₂b inj₂ tt
                         → ⟨ (ifStm₂ b then S₁ else S₂) , s ⟩⇒₂ s´
 
         IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
                         → ⟨ S₂ , s ⟩⇒₂ s´
-                        → s ⊢ inj₂ b ⇒₂b inj₁ ff
+                        → s ⊢ inj₁ b ⇒₂b inj₂ ff
                         → ⟨ (ifStm₂ b then S₁ else S₂) , s ⟩⇒₂ s´
 
         WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
-                        → s ⊢ inj₂ b ⇒₂b inj₁ tt
+                        → s ⊢ inj₁ b ⇒₂b inj₂ tt
                         → ⟨ S , s ⟩⇒₂ s˝
                         → ⟨ (while b do₃ S) , s˝ ⟩⇒₂ s´
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
 
         WHILE-FALSE-BSS : ∀ {S s s´ b}
-                        → s ⊢ inj₂ b ⇒₂b inj₁ ff
+                        → s ⊢ inj₁ b ⇒₂b inj₂ ff
                         → s´ ≡ s
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
 
@@ -544,11 +544,11 @@ module Stm₂-semantic where
             → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s´) ⟩
 
         IF-TRUEₛₛₛ : ∀ {s b S₁ S₂}
-            → s ⊢ inj₂ b ⇒₂b inj₁ tt -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
+            → s ⊢ inj₁ b ⇒₂b inj₂ tt -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
             → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₁ , s) ⟩
 
         IF-FALSEₛₛₛ : ∀ {s b S₁ S₂}
-            → s ⊢ inj₂ b ⇒₂b inj₁ ff -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
+            → s ⊢ inj₁ b ⇒₂b inj₂ ff -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj1, which seems wrong
             → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
 
         WHILEₛₛₛ : ∀ {s b S}
