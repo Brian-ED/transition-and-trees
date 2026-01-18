@@ -1,6 +1,6 @@
 module BigAndSmallStepSemantics where
 
-open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+open import TransitionSystems using (TransitionSystem)
 
 -- Section Start Page 31
 
@@ -11,6 +11,5 @@ record BigStepSemantics (TS : TransitionSystem) : Set₁ where
         BigStepping : (x y : Γ) → x ⇒ y → T y
 
 -- TODO: Complain to book maker that a SmallStepSemantic is a big step semantic too.
-SmallStepSemantics = TransitionSystem
 
 -- Section End Page 31
