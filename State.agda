@@ -8,6 +8,7 @@ open import Data.Bool using (Bool; true; false; if_then_else_) renaming (_∧_ t
 open import Agda.Builtin.Maybe using (Maybe; just; nothing)
 open import Relation.Nullary using (Dec; yes; no; _because_; Reflects; ofʸ; ofⁿ)
 open import Data.List using (List; []; _∷_)
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 
 data Sorted : List (String × ℤ) → Set where
   sortedNil  : Sorted []
@@ -50,10 +51,8 @@ _                                             [ _ ↦ _ ]    |               f  
 emptyState : State
 emptyState = [] , sortedNil
 
-open import Relation.Binary.PropositionalEquality         public using (_≡_; refl; cong)
 
 lookup : String → State → Maybe ℤ
 lookup x ([] , sortedNil) = nothing
 lookup x ((v , i) ∷ rest , sortedOne      ) = if x ==Str v then just i else nothing
 lookup x ((v , i) ∷ rest , sortedCons x₁ p) = if x ==Str v then just i else lookup x (rest , p)
-
