@@ -159,15 +159,14 @@ module Aexp₂-state-transition-example where
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Data.Empty using (⊥)
 
---    S = while (N + 0) ==₃ (N + 0) do₃ skip₃
---
---    neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
---    neverTerminates s = emptyState , f
---        where
---            f : {s : State} → ⟨ S , s ⟩⇒₂ emptyState → ⊥
---            f (WHILE-TRUE-BSS _ _ x₂) = f x₂
---            f (WHILE-FALSE-BSS (EQUALS-2-BSS NUM-BSS NUM-BSS x₃) x₁) = x₃ refl
+    S = while inj₁(inj₁(N + 0) ==₃ inj₁(N + 0)) do₃ skip₃
 
+    neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
+    neverTerminates s = emptyState , f
+        where
+            f : {s : State} → ⟨ S , s ⟩⇒₂ emptyState → ⊥
+            f (WHILE-TRUE-BSS _ _ x₂) = f x₂
+            f (WHILE-FALSE-BSS (EQUALS-2-BSS NUM-BSS NUM-BSS x₃) x₁) = x₃ refl
 
     -- Section End Page 52
 
