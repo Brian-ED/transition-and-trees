@@ -128,10 +128,10 @@ module Aexp₂-state-transition-example where
     open import Data.Integer using (+_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-    code = ("i" ←₃ (N + 6)) Å₃
-        (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (
-            ("x" ←₃ ((inj₂ (V "x")) + (inj₂(V "i")))) Å₃
-            ("i" ←₃ (V "i" - N + 2))
+    code = ("i" ←₃ (inj₁ (N + 6))) Å₃
+        (while inj₁(¬₃ inj₁((inj₁(V "i")) ==₃ (inj₁ (N + 0)))) do₃ (
+            ("x" ←₃ inj₁(inj₁(V "x") + (inj₁(V "i")))) Å₃
+            ("i" ←₃ inj₁(inj₁(V "i") - inj₁(N + 2)))
         ))
 
     beginState = emptyState [ "x" ↦ + 5 ]
