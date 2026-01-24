@@ -22,26 +22,21 @@ module Aexp₁-is-big-step where
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
     open import BigAndSmallStepSemantics using (⌈>; BigStepSemantics)
 
-    -- The book doesn't define Transition on Nums. I assume there is no transition, so the extension is simply False
-    -- Turn subtype in argument to sumtype
-    ⭆⇒ : (Aexp₁ → Num) → (Num ⊎ Aexp₁ → Num ⊎ Aexp₁ → Set)
-    ⭆⇒ x (inj₁ x₁) (inj₁ z) = ⊥
-    ⭆⇒ x (inj₂ y) (inj₁ z) = ⊤
-    ⭆⇒ x y (inj₂ z) = ⊥
+    Γ₁ = Aexp₁ ⊎ Num
 
-    T₁ : (Num ⊎ Aexp₁ → Set)
-    T₁ (inj₁ x) = ⊤
-    T₁ (inj₂ x) = ⊥
+    T₁ : (Aexp₁ ⊎ Num → Set)
+    T₁ (inj₁ x) = ⊥
+    T₁ (inj₂ x) = ⊤
 
     Aexp₁Semantic : TransitionSystem
-    Aexp₁Semantic = ⌞ (Num ⊎ Aexp₁) , _⇒₁_ , T₁ ⌟
+    Aexp₁Semantic = ⌞ Γ₁ , _⇒₁_ , T₁ ⌟
 
     Aexp₁-is-big-step : Set
-    Aexp₁-is-big-step = (x y : (Num ⊎ Aexp₁)) → (x ⇒₁ y) → (T₁ y)
+    Aexp₁-is-big-step = (x y : Γ₁) → (x ⇒₁ y) → (T₁ y)
     Aexp₁-is-big-step-proof : Aexp₁-is-big-step
-    Aexp₁-is-big-step-proof (inj₁ x) (inj₁ y) = λ z → ttt
-    Aexp₁-is-big-step-proof (inj₂ x) (inj₁ y) = λ z → ttt
-    Aexp₁-is-big-step-proof x (inj₂ y) ()
+    Aexp₁-is-big-step-proof (inj₂ x) (inj₂ y) = λ z → ttt
+    Aexp₁-is-big-step-proof (inj₁ x) (inj₂ y) = λ z → ttt
+    Aexp₁-is-big-step-proof x (inj₁ y) ()
 
     Aexp₁big-semantic : BigStepSemantics Aexp₁Semantic
     Aexp₁big-semantic = ⌈> Aexp₁-is-big-step-proof
@@ -57,44 +52,68 @@ module Aexp₁-small-step-semantic where
     open import Data.Unit using (⊤)
     open import Data.Empty using (⊥)
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-
-    T₂ : (Aexp₁ss → Set)
-    T₂ (++ x) = ⊤
-    T₂ _ = ⊥
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
+    open import Data.Integer using () renaming (ℤ to Num)
 
     Aexp₁ssSemantic : TransitionSystem
-    Aexp₁ssSemantic = ⌞ Aexp₁ss , _⇒₂_ , T₂ ⌟
+    Aexp₁ssSemantic = ⌞ Aexp₁ss ⊎ Num , _⇒₂_ , T₁ ⌟
+        where
+            Γ₁ = Aexp₁ss ⊎ Num
+            T₁ : Γ₁ → Set
+            T₁ (inj₂ x) = ⊤
+            T₁ (inj₁ x) = ⊥
 
 -- Section End Page 36-37
 
 -- Section Begin Page 40
 -- Test for solution to problem 3.16, small-step transition for Bexp
 module Bexp-small-step-example where
-    open import Data.Integer using (+_)
     open import Agda.Builtin.Equality using (refl)
     import Bims
     open Bims.Bexp-smallstep-transition
-    open Bims.Aexp₁-smallstep-semantic using (N_; _*_; _+_; NUMₛₛₛ_; _∧_; _==_; ++_)
+    open Bims.Aexp₁-smallstep-semantic using (Aexp₁ss; Bexp; N_; _*_; _+_; NUMₛₛₛ_; _∧_; _==_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff; _∧_ to _∧b_)
+    open import Data.Integer using (+_) renaming (ℤ to Num)
+    open import Data.Nat using (ℕ)
 
-    code1 = ((((++ + 0) == (++ + 1)) ∧ ((++ + 0) == (++ + 0)) ) ∧ ((N + 6) == (N + 5)))
-    code2 = ((++ + 0) == (++ + 1)) ∧ ((N + 6) == (N + 5))
-    code3 = ((++ + 0) == (++ + 1)) ∧ ((++ + 6) == (N + 5))
-    code4 = ((++ + 0) == (++ + 1)) ∧ ((++ + 6) == (++ + 5))
-    code5 = ((++ + 0) == (++ + 1)) ∧ ((++ + 0) == (++ + 1))
-    code6 = ff
+    infixl 40 _ₙ==_
+    _ₙ==_ : ℕ → ℕ → Bexp ⊎ Bool
+    x ₙ== y = inj₁ ((inj₂ (+ x)) == (inj₂ (+ y)))
 
-    a : inj₁ code1 ⇒b inj₁ code2
-    a = AND-1-BSS {!   !}
-    b : inj₁ code2 ⇒b inj₁ code3
-    b = AND-2-BSS (EQUALS-1-BSS (NUMₛₛₛ refl))
-    c : inj₁ code3 ⇒b inj₁ code4
+    infixl 40 _ₛ==_
+    _ₛ==_ : ℕ → ℕ → Bexp ⊎ Bool
+    x ₛ== y = inj₁ ((inj₁ (N (+ x))) == (inj₁ (N (+ y))))
+
+    infixl 39 _ₛ∧_
+    _ₛ∧_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Bexp ⊎ Bool
+    x ₛ∧ y = inj₁ (x ∧ y)
+
+    ᵥtt : Bexp ⊎ Bool
+    ᵥtt = inj₂ tt
+    ᵥff : Bexp ⊎ Bool
+    ᵥff = inj₂ ff
+
+    code1 = 0 ₙ== 1 ₛ∧ 0 ₙ== 0 ₛ∧ 6 ₛ== 5
+    code2 = ᵥff     ₛ∧ 0 ₙ== 0 ₛ∧ 6 ₛ== 5
+    code3 = ᵥff     ₛ∧ ᵥtt     ₛ∧ 6 ₛ== 5
+    code4 = ᵥff     ₛ∧ ᵥtt     ₛ∧ inj₁ (inj₁ (N + 6) == inj₂ (+ 5))
+    code5 = ᵥff     ₛ∧ ᵥtt     ₛ∧ 6 ₙ== 5
+    code6 = ᵥff     ₛ∧ ᵥtt     ₛ∧ ᵥff
+    code7 = ᵥff
+
+    a : code1 ⇒b code2
+    a = AND-1-BSS (AND-1-BSS (EQUALS-4-BSS λ ()))
+    b : code2 ⇒b code3
+    b = AND-1-BSS (AND-2-BSS (EQUALS-3-BSS refl))
+    c : code3 ⇒b code4
     c = AND-2-BSS (EQUALS-2-BSS (NUMₛₛₛ refl))
-    d : inj₁ code4 ⇒b inj₁ code5
-    d = AND-2-BSS {!   !}
-    e : inj₁ code5 ⇒b inj₂ code6
-    e = {!   !}
+    d : code4 ⇒b code5
+    d = AND-2-BSS (EQUALS-1-BSS (NUMₛₛₛ refl))
+    e : code5 ⇒b code6
+    e = AND-2-BSS (EQUALS-4-BSS (λ ()))
+    g : code6 ⇒b code7
+    g = AND-5-BSS refl
 
 -- Section End Page 40
 
@@ -107,10 +126,11 @@ module Aexp₂-state-transition-example where
     open Bims.Stm₂-semantic
     open import Data.Nat using (ℕ)
     open import Data.Integer using (+_)
+    open import Data.Sum using (_⊎_; inj₁; inj₂)
 
     code = ("i" ←₃ (N + 6)) Å₃
         (while ¬₃ ((V "i") ==₃ (N + 0)) do₃ (
-            ("x" ←₃ (V "x" + V "i")) Å₃
+            ("x" ←₃ ((inj₂ (V "x")) + (inj₂(V "i")))) Å₃
             ("i" ←₃ (V "i" - N + 2))
         ))
 
@@ -139,14 +159,14 @@ module Aexp₂-state-transition-example where
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Data.Empty using (⊥)
 
-    S = while (N + 0) ==₃ (N + 0) do₃ skip₃
-
-    neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
-    neverTerminates s = emptyState , f
-        where
-            f : {s : State} → ⟨ S , s ⟩⇒₂ emptyState → ⊥
-            f (WHILE-TRUE-BSS _ _ x₂) = f x₂
-            f (WHILE-FALSE-BSS (EQUALS-2-BSS NUM-BSS NUM-BSS x₃) x₁) = x₃ refl
+--    S = while (N + 0) ==₃ (N + 0) do₃ skip₃
+--
+--    neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
+--    neverTerminates s = emptyState , f
+--        where
+--            f : {s : State} → ⟨ S , s ⟩⇒₂ emptyState → ⊥
+--            f (WHILE-TRUE-BSS _ _ x₂) = f x₂
+--            f (WHILE-FALSE-BSS (EQUALS-2-BSS NUM-BSS NUM-BSS x₃) x₁) = x₃ refl
 
 
     -- Section End Page 52
@@ -160,26 +180,26 @@ module Aexp₂-smallstep-example where
     open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
-    open Bims.Aexp₂-semantic
-    open Bims.Stm₂-semantic
-    open Bims.Aexp₁-smallstep-semantic
+--    open Bims.Aexp₂-semantic
+--    open Bims.Stm₂-semantic
+--    open Bims.Aexp₁-smallstep-semantic
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
-    open TransitionSystem transitionSystem
+--    open TransitionSystem transitionSystem
     open import Data.Nat using (ℕ)
     open import Data.Integer using (+_)
     open import Data.String using (String)
     open import Data.Product using (_×_; _,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-    S = ifStm₂ ((N + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
-    s = emptyState [ "x" ↦ + 4 ]
-
-    transition1 : (inj₁ (S , s))
-           ⇒⟨ 1 ⟩ (inj₁ (ifStm₂ ((++ + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
-                ,  s ))
-    transition1 = {!   !} step-suc step-zero
-
-    transition2 : {r : (Stm₂ × State) ⊎ State} → (inj₁ (S , s)) ⇒⟨ 1 ⟩ r → Set
-    transition2 = {!   !}
+--    S = ifStm₂ ((N + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
+--    s = emptyState [ "x" ↦ + 4 ]
+--
+--    transition1 : (inj₁ (S , s))
+--           ⇒⟨ 1 ⟩ (inj₁ (ifStm₂ ((inj₂ + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
+--                ,  s ))
+--    transition1 = {!   !} step-suc step-zero
+--
+--    transition2 : {r : (Stm₂ × State) ⊎ State} → (inj₁ (S , s)) ⇒⟨ 1 ⟩ r → Set
+--    transition2 = {!   !}
 
 -- Section End Page 54
