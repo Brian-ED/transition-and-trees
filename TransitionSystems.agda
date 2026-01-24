@@ -18,10 +18,6 @@ record TransitionSystem : Set₁ where
 
     -- INNER Section Begin Page 38. This label is place 2
 
---    _⇒⟨_⟩_ : Γ → ℕ → Γ → Set
---    γ ⇒⟨ ℕ.zero  ⟩ γ′ = γ ≡ γ′
---    γ ⇒⟨ ℕ.suc n ⟩ γ′ = ∃ λ γ′′ → γ ⇒ γ′′ and (γ′′ ⇒⟨ n ⟩  γ′)
-
     data _⇒⟨_⟩_ : Γ → ℕ → Γ → Set where
         step-zero : ∀ {γ} → γ ⇒⟨ 0 ⟩ γ
         _step-suc_ : ∀ {γ γ′ γ″ n}
