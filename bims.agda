@@ -179,26 +179,73 @@ module Aexp₂-smallstep-example where
     open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
---    open Bims.Aexp₂-semantic
---    open Bims.Stm₂-semantic
---    open Bims.Aexp₁-smallstep-semantic
-    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
---    open TransitionSystem transitionSystem
+    open Bims.Aexp₂-semantic
+    open Bims.Stm₂-semantic
+    import TransitionSystems as TS
     open import Data.Nat using (ℕ)
     open import Data.Integer using (+_)
     open import Data.String using (String)
     open import Data.Product using (_×_; _,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
---    S = ifStm₂ ((N + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
---    s = emptyState [ "x" ↦ + 4 ]
---
---    transition1 : (inj₁ (S , s))
---           ⇒⟨ 1 ⟩ (inj₁ (ifStm₂ ((inj₂ + 3) <₃ (V "x")) then (("x" ←₃ ((N + 3) + (V "x"))) Å₃ ("y" ←₃ (N + 4))) else skip₃
---                ,  s ))
---    transition1 = {!   !} step-suc step-zero
---
---    transition2 : {r : (Stm₂ × State) ⊎ State} → (inj₁ (S , s)) ⇒⟨ 1 ⟩ r → Set
---    transition2 = {!   !}
+    S =
+        ifStm₂
+            inj₁(inj₁(N + 3) <₃ inj₁(V "x"))
+        then
+            (
+                ("x" ←₃ inj₁(inj₁(N + 3) + inj₁(V "x"))) Å₃
+                ("y" ←₃ inj₁(N + 4))
+            )
+        else skip₃
+    s = emptyState [ "x" ↦ + 4 ]
+
+    open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
+
+    open TS.TransitionSystem ⟨_⟩⇒₂⟨_⟩-transition using (_⇒⟨_⟩_)
+    open TS.TransitionSystem using (_step-suc_; step-zero)
+
+    open import Data.Bool using (true)
+    f : s ⊢ inj₁ (inj₁ (N + 3) <₃ inj₁ (V "x")) ⇒₂b inj₂ true
+    f = GREATERTHAN-1-BSS NUM-BSS (VAR-BSS refl)
+        (Data.Integer.+<+ (Data.Nat.s≤s
+            (Data.Nat.s≤s (Data.Nat.s≤s (Data.Nat.s≤s Data.Nat.z≤n)))
+        ))
+
+    -- Problem 4.9
+    -- There's only one transition from the starte state
+    transition1 :
+            inj₁ (S , s )
+            ⇒⟨ 1 ⟩
+            inj₁ (
+                ("x" ←₃ inj₁(inj₁(N + 3) + inj₁(V "x"))) Å₃
+                ("y" ←₃ inj₁(N + 4))
+                , s
+            )
+    transition1 = IF-TRUEₛₛₛ f step-suc step-zero
+
+    -- There's only one transition from the start state
+    transition2 :
+        inj₁ (
+            ("x" ←₃ inj₁(inj₁(N + 3) + inj₁(V "x"))) Å₃
+            ("y" ←₃ inj₁(N + 4))
+            , s
+        )
+        ⇒⟨ 1 ⟩
+        inj₁ (
+            ("y" ←₃ inj₁(N + 4))
+            , (s [ "x" ↦ + 7 ])
+        )
+    transition2 = (COMP-2ₛₛₛ (ASSₛₛₛ (NUM-BSS PLUS-BSS (VAR-BSS refl)))) step-suc step-zero
+
+    transition3 :
+        inj₁ (
+            ("y" ←₃ inj₁(N + 4))
+            , (s [ "x" ↦ + 7 ])
+        )
+        ⇒⟨ 1 ⟩
+        inj₂ (
+            s [ "x" ↦ + 7 ] [ "y" ↦ + 4 ]
+        )
+    transition3 = ASSₛₛₛ NUM-BSS step-suc step-zero
 
 -- Section End Page 54

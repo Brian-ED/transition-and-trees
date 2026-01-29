@@ -206,25 +206,25 @@ module Bexp-bigstep-transition where
 
     data _⇒b_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Set where
 
-        _EQUALS-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+        EQUALS-1-BSS : ∀ {α₁ α₂ v₁ v₂}
                        → inj₁ α₁ ⇒₁ inj₂ v₁
                        → inj₁ α₂ ⇒₁ inj₂ v₂
                        → v₁ ≡ v₂
                        → inj₁ (α₁ == α₂) ⇒b inj₂ tt
 
-        _EQUALS-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+        EQUALS-2-BSS : ∀ {α₁ α₂ v₁ v₂}
                        → inj₁ α₁ ⇒₁ inj₂ v₁
                        → inj₁ α₂ ⇒₁ inj₂ v₂
                        → not (v₁ ≡ v₂)
                        → inj₁ (α₁ == α₂) ⇒b inj₂ ff
 
-        _GREATERTHAN-1-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+        GREATERTHAN-1-BSS : ∀ {α₁ α₂ v₁ v₂}
                             → inj₁ α₁ ⇒₁ inj₂ v₁
                             → inj₁ α₂ ⇒₁ inj₂ v₂
                             → v₁ <ℤ v₂
                             → inj₁ (α₁ < α₂) ⇒b inj₂ ff
 
-        _GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+        GREATERTHAN-2-BSS : ∀ {α₁ α₂ v₁ v₂}
                             → inj₁ α₁ ⇒₁ inj₂ v₁
                             → inj₁ α₂ ⇒₁ inj₂ v₂
                             → not (v₁ <ℤ v₂)
@@ -450,13 +450,13 @@ module Aexp₂-semantic where
                      → not (v₁ ≡ v₂)
                      → s ⊢ inj₁ (α₁ ==₃ α₂) ⇒₂b inj₂ ff
 
-        _GREATERTHAN-1-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+        GREATERTHAN-1-BSS : ∀ {s α₁ α₂ v₁ v₂}
                             → s ⊢ α₁ ⇒₂ inj₂ v₁
                             → s ⊢ α₂ ⇒₂ inj₂ v₂
                             → v₁ <ℤ v₂
-                            → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
+                            → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ tt
 
-        _GREATERTHAN-2-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+        GREATERTHAN-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
                             → s ⊢ α₁ ⇒₂ inj₂ v₁
                             → s ⊢ α₂ ⇒₂ inj₂ v₂
                             → not (v₁ <ℤ v₂)
@@ -576,13 +576,13 @@ module Stm₂-semantic where
         WHILEₛₛₛ : ∀ {s b S}
             → ⟨ inj₁ (while b do₃ S , s) ⟩⇒₂⟨ inj₁ (ifStm₂ b then while b do₃ S else skip₃ , s) ⟩
 
-    transitionSystem = ⌞ Γ , ⟨_⟩⇒₂⟨_⟩ , T ⌟
+    ⟨_⟩⇒₂⟨_⟩-transition = ⌞ Γ , ⟨_⟩⇒₂⟨_⟩ , T ⌟
         where
             Γ = (Stm₂ × State) ⊎ State
             T : Γ → Set
             T (inj₁ x) = ⊥
             T (inj₂ y) = ⊤
 
-    open TransitionSystem transitionSystem public
+    -- Imported via: open TransitionSystem ⟨_⟩⇒₂⟨_⟩-transition public
 
     -- Section End Page 53
