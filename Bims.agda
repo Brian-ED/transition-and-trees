@@ -207,28 +207,28 @@ module Bexp-bigstep-transition where
     data _⇒b_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Set where
 
         EQUALS-1-BSS : ∀ {α₁ α₂ v₁ v₂}
-                       → inj₁ α₁ ⇒₁ inj₂ v₁
-                       → inj₁ α₂ ⇒₁ inj₂ v₂
-                       → v₁ ≡ v₂
-                       → inj₁ (α₁ == α₂) ⇒b inj₂ tt
+                     → inj₁ α₁ ⇒₁ inj₂ v₁
+                     → inj₁ α₂ ⇒₁ inj₂ v₂
+                     → v₁ ≡ v₂
+                     → inj₁ (α₁ == α₂) ⇒b inj₂ tt
 
         EQUALS-2-BSS : ∀ {α₁ α₂ v₁ v₂}
-                       → inj₁ α₁ ⇒₁ inj₂ v₁
-                       → inj₁ α₂ ⇒₁ inj₂ v₂
-                       → not (v₁ ≡ v₂)
-                       → inj₁ (α₁ == α₂) ⇒b inj₂ ff
+                     → inj₁ α₁ ⇒₁ inj₂ v₁
+                     → inj₁ α₂ ⇒₁ inj₂ v₂
+                     → not (v₁ ≡ v₂)
+                     → inj₁ (α₁ == α₂) ⇒b inj₂ ff
 
         GREATERTHAN-1-BSS : ∀ {α₁ α₂ v₁ v₂}
-                            → inj₁ α₁ ⇒₁ inj₂ v₁
-                            → inj₁ α₂ ⇒₁ inj₂ v₂
-                            → v₁ <ℤ v₂
-                            → inj₁ (α₁ < α₂) ⇒b inj₂ ff
+                          → inj₁ α₁ ⇒₁ inj₂ v₁
+                          → inj₁ α₂ ⇒₁ inj₂ v₂
+                          → v₁ <ℤ v₂
+                          → inj₁ (α₁ < α₂) ⇒b inj₂ ff
 
         GREATERTHAN-2-BSS : ∀ {α₁ α₂ v₁ v₂}
-                            → inj₁ α₁ ⇒₁ inj₂ v₁
-                            → inj₁ α₂ ⇒₁ inj₂ v₂
-                            → not (v₁ <ℤ v₂)
-                            → inj₁ (α₁ < α₂) ⇒b inj₂ ff
+                          → inj₁ α₁ ⇒₁ inj₂ v₁
+                          → inj₁ α₂ ⇒₁ inj₂ v₂
+                          → not (v₁ <ℤ v₂)
+                          → inj₁ (α₁ < α₂) ⇒b inj₂ ff
 
         NOT-1-BSS_ : ∀ {b}
                    → inj₁ b ⇒b inj₂ ff
@@ -310,16 +310,16 @@ module Bexp-smallstep-transition where
                    → inj₁ (¬ α) ⇒b inj₁ (¬ α´)
 
         NOT-2-BSS : ∀ {b}
-            → b ⇒b inj₂ ff
-            → inj₁ (¬ b) ⇒b inj₂ tt
+                  → b ⇒b inj₂ ff
+                  → inj₁ (¬ b) ⇒b inj₂ tt
 
         NOT-3-BSS : ∀ {b}
-            → b ⇒b inj₂ tt
-            → inj₁ (¬ b) ⇒b inj₂ ff
+                  → b ⇒b inj₂ tt
+                  → inj₁ (¬ b) ⇒b inj₂ ff
 
         PARENTH-B-BSS : ∀ {α α´}
-                        → α ⇒b α´
-                        → inj₁ ⟨ α ⟩ ⇒b inj₁ ⟨ α´ ⟩
+                      → α ⇒b α´
+                      → inj₁ ⟨ α ⟩ ⇒b inj₁ ⟨ α´ ⟩
 
         AND-1-BSS_ : ∀ {α₁ α₁´ α₂}
                    → α₁ ⇒b α₁´
@@ -330,17 +330,17 @@ module Bexp-smallstep-transition where
                    → inj₁ (α₁ ∧ α₂) ⇒b inj₁ (α₁ ∧ α₂´)
 
         AND-3-BSS : ∀ {α₁ α₂}
-                    → α₁ ⇒b inj₂ tt
-                    → α₂ ⇒b inj₂ tt
-                    → inj₁ (α₁ ∧ α₂) ⇒b inj₂ tt
+                  → α₁ ⇒b inj₂ tt
+                  → α₂ ⇒b inj₂ tt
+                  → inj₁ (α₁ ∧ α₂) ⇒b inj₂ tt
 
         AND-4-BSS : ∀ {α₁ α₂}
-                    → α₁ ≡ ff
-                    → inj₁ (inj₂ α₁ ∧ α₂) ⇒b inj₂ ff
+                  → α₁ ≡ ff
+                  → inj₁ (inj₂ α₁ ∧ α₂) ⇒b inj₂ ff
 
         AND-5-BSS : ∀ {α₁ α₂}
-                    → α₂ ≡ ff
-                    → inj₁ (α₁ ∧ inj₂ α₂) ⇒b inj₂ ff
+                  → α₂ ≡ ff
+                  → inj₁ (α₁ ∧ inj₂ α₂) ⇒b inj₂ ff
 
 
 -- Section End Page 40
@@ -451,16 +451,16 @@ module Aexp₂-semantic where
                      → s ⊢ inj₁ (α₁ ==₃ α₂) ⇒₂b inj₂ ff
 
         GREATERTHAN-1-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                            → s ⊢ α₁ ⇒₂ inj₂ v₁
-                            → s ⊢ α₂ ⇒₂ inj₂ v₂
-                            → v₁ <ℤ v₂
-                            → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ tt
+                          → s ⊢ α₁ ⇒₂ inj₂ v₁
+                          → s ⊢ α₂ ⇒₂ inj₂ v₂
+                          → v₁ <ℤ v₂
+                          → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ tt
 
         GREATERTHAN-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                            → s ⊢ α₁ ⇒₂ inj₂ v₁
-                            → s ⊢ α₂ ⇒₂ inj₂ v₂
-                            → not (v₁ <ℤ v₂)
-                            → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
+                          → s ⊢ α₁ ⇒₂ inj₂ v₁
+                          → s ⊢ α₂ ⇒₂ inj₂ v₂
+                          → not (v₁ <ℤ v₂)
+                          → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
 
         NOT-1-BSS_ : ∀ {s b}
                    → s ⊢ b ⇒₂b inj₂ ff
@@ -551,30 +551,30 @@ module Stm₂-semantic where
     open import Data.Product using (_×_; _,_)
     data ⟨_⟩⇒₂⟨_⟩ : (Stm₂ × State) ⊎ State → (Stm₂ × State) ⊎ State → Set where
         ASSₛₛₛ : ∀ {x a v s}
-            → s ⊢ a ⇒₂ inj₂ v
-            → ⟨ inj₁ (x ←₃ a , s) ⟩⇒₂⟨ inj₂ (s [ x ↦ v ]) ⟩
+               → s ⊢ a ⇒₂ inj₂ v
+               → ⟨ inj₁ (x ←₃ a , s) ⟩⇒₂⟨ inj₂ (s [ x ↦ v ]) ⟩
 
         SKIPₛₛₛ : ∀ {s}
-            → ⟨ inj₁ (skip₃ , s) ⟩⇒₂⟨ inj₂ s ⟩
+                → ⟨ inj₁ (skip₃ , s) ⟩⇒₂⟨ inj₂ s ⟩
 
         COMP-1ₛₛₛ : ∀ {s s´ S₁ S₁´ S₂}
-            → ⟨ inj₁ (S₁ , s) ⟩⇒₂⟨ inj₁ (S₁´ , s´) ⟩
-            → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ ((S₁´ Å₃ S₂) , s´) ⟩
+                  → ⟨ inj₁ (S₁ , s) ⟩⇒₂⟨ inj₁ (S₁´ , s´) ⟩
+                  → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ ((S₁´ Å₃ S₂) , s´) ⟩
 
         COMP-2ₛₛₛ : ∀ {s s´ S₁ S₂}
-            → ⟨ inj₁ (S₁ , s) ⟩⇒₂⟨ inj₂ s´ ⟩
-            → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s´) ⟩
+                  → ⟨ inj₁ (S₁ , s) ⟩⇒₂⟨ inj₂ s´ ⟩
+                  → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s´) ⟩
 
         IF-TRUEₛₛₛ : ∀ {s b S₁ S₂}
-            → s ⊢ b ⇒₂b inj₂ tt -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj₁, which seems wrong
-            → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₁ , s) ⟩
+                   → s ⊢ b ⇒₂b inj₂ tt -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj₁, which seems wrong
+                   → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₁ , s) ⟩
 
         IF-FALSEₛₛₛ : ∀ {s b S₁ S₂}
-            → s ⊢ b ⇒₂b inj₂ ff -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj₁, which seems wrong
-            → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
+                    → s ⊢ b ⇒₂b inj₂ ff -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj₁, which seems wrong
+                    → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
 
         WHILEₛₛₛ : ∀ {s b S}
-            → ⟨ inj₁ (while b do₃ S , s) ⟩⇒₂⟨ inj₁ (ifStm₂ b then while b do₃ S else skip₃ , s) ⟩
+                 → ⟨ inj₁ (while b do₃ S , s) ⟩⇒₂⟨ inj₁ (ifStm₂ b then while b do₃ S else skip₃ , s) ⟩
 
     ⟨_⟩⇒₂⟨_⟩-transition = ⌞ Γ , ⟨_⟩⇒₂⟨_⟩ , T ⌟
         where
