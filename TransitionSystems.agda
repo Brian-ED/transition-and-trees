@@ -2,7 +2,7 @@ module TransitionSystems where
 
 open import Data.Nat using (ℕ; suc; zero)
 open import Relation.Binary.PropositionalEquality using (_≡_)
-open import Data.Product using (∃; _×_)
+open import Data.Product using (∃; _×_; _,_)
 open import Function using (_∘_; id)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
@@ -19,15 +19,22 @@ record TransitionSystem : Set₁ where
     -- INNER Section Begin Page 38. This label is place 2
 
     data _⇒⟨_⟩_ : Γ → ℕ → Γ → Set where
-        step-zero : ∀ {γ} → γ ⇒⟨ 0 ⟩ γ
-        step-suc_ : ∀ {γ γ´ k}
-                   → (∃ λ γ˝ → (γ ⇒ γ˝) × (γ˝ ⇒⟨ k ⟩ γ´))
-                   → γ ⇒⟨ suc k ⟩ γ´
-
-    infixr 4 step-suc_
+        x⇒x : ∀ {γ} → γ ⇒⟨ 0 ⟩ γ
+        _⇒∘⇒_ : ∀ {γ γ´ k γ˝}
+              → γ ⇒ γ˝
+              → γ˝ ⇒⟨ k ⟩ γ´
+              → γ ⇒⟨ suc k ⟩ γ´
 
     _⇒*_ : Γ → Γ → Set
     γ ⇒* γ′ = ∃ λ k → γ ⇒⟨ k ⟩ γ′
+
+    _∘⇒_ : ∀ {x y z} → (z ⇒ x) → x ⇒* y → z ⇒* y
+    a ∘⇒ fst , snd = suc fst , a ⇒∘⇒ snd
+
+    infixr 4 _⇒∘⇒_
+    infixr 4 _∘⇒_
+    infixr 4 _⇒*_
+
 
     -- INNER Section End Page 38
 

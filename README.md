@@ -23,3 +23,5 @@ Problem 4.9 uses `>`, which is not defined, only `<` is defined.
 
 Lemma 4.12 has a insufficient proof. It assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be an integer.
 
+### Opinionated
+The generic transition ⇒ᵏ in transition systems I believe would be simpler if instead of defining it using step 0 and step suc k, and defining ⇒* afterwards, you could just define ⇒* first. Every induction, instead of being reliant on an intiger, could just rely on the length of the transition sequence itself. The reason I believe this is simpler is that it avoids the duplicate information from k, since it's determined by the transition sequence anyways. Duplicate information is annoying when unifying things. It could be that I only believe this because Agda proves by construction, and needs unification a lot.

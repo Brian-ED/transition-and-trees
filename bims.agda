@@ -68,7 +68,7 @@ module Aexp₁-small-step-semantic where
 -- Section Begin Page 40
 -- Test for solution to problem 3.16, small-step transition for Bexp
 module Bexp-small-step-example where
-    open import Agda.Builtin.Equality using (refl)
+    open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
     open Bims.Bexp-smallstep-transition
     open Bims.Aexp₁-smallstep-semantic using (Aexp₁ss; Bexp; N_; _*_; _+_; NUMₛₛₛ_; _∧_; _==_)
@@ -187,9 +187,6 @@ module Aexp₂-smallstep-example where
     open import Data.String using (String)
     open import Data.Product using (_×_; _,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.List using (_∷_; [])
-    open import Data.List.Relation.Binary.Lex using (∷<∷-⇔)
-    open import Function using (Equivalence)
 
     S =
         ifStm₂
@@ -205,29 +202,21 @@ module Aexp₂-smallstep-example where
     open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 
     open TS.TransitionSystem ⟨_⟩⇒₂⟨_⟩-transition using (_⇒⟨_⟩_)
-    open TS.TransitionSystem using (step-suc_; step-zero)
+    open TS.TransitionSystem using (_⇒∘⇒_; x⇒x)
     open import Data.Bool using (true)
 
     -- Problem 4.9
     -- There's only one transition from the starte state
-    expr : (Stm₂ × State) ⊎ State
-    expr =
+    transition1 :
+        inj₁ (S , s )
+        ⇒⟨ 1 ⟩
         inj₁ ((
             ("x" ←₃ inj₁(inj₁(N + 3) + inj₁(V "x"))) Å₃
             ("y" ←₃ inj₁(N + 4))
         ) , s)
-    transition1 : inj₁ (S , s ) ⇒⟨ 1 ⟩ expr
-    transition1 = _⇒⟨_⟩_.step-suc expr , IF-TRUEₛₛₛ
-        (GREATERTHAN-1-BSS NUM-BSS (VAR-BSS refl)
-            (+<+ s≤s s≤s s≤s s≤s z≤n)
-        ) , step-zero
+    transition1 = IF-TRUEₛₛₛ (GREATERTHAN-1-BSS NUM-BSS (VAR-BSS refl) (+<+ s≤s s≤s s≤s s≤s z≤n)) ⇒∘⇒ x⇒x
 
     -- There's only one transition from the start state
-    outExpr : Stm₂ × State ⊎ State
-    outExpr = inj₁ (
-            ("y" ←₃ inj₁(N + 4))
-            , (s [ "x" ↦ + 7 ])
-        )
     f : s ⊢ inj₁ (inj₁ (N + 3) + inj₁ (V "x")) ⇒ₐ inj₂ (+ 7)
     f = NUM-BSS PLUS-BSS (VAR-BSS refl)
     transition2 :
@@ -237,8 +226,11 @@ module Aexp₂-smallstep-example where
             , s
         )
         ⇒⟨ 1 ⟩
-        outExpr
-    transition2 = step-suc outExpr , (COMP-2ₛₛₛ (ASSₛₛₛ f) , step-zero)
+        inj₁ (
+            ("y" ←₃ inj₁(N + 4))
+            , (s [ "x" ↦ + 7 ])
+        )
+    transition2 = COMP-2ₛₛₛ (ASSₛₛₛ (NUM-BSS PLUS-BSS (VAR-BSS refl))) ⇒∘⇒ x⇒x --step-suc outExpr , (COMP-2ₛₛₛ (ASSₛₛₛ f) , x⇒x)
 
     transition3 :
         inj₁ (
@@ -249,13 +241,7 @@ module Aexp₂-smallstep-example where
         inj₂ (
             s [ "x" ↦ + 7 ] [ "y" ↦ + 4 ]
         )
-    transition3 = step-suc
-      inj₂
-      (("x" , + 7) ∷ ("y" , + 4) ∷ [] ,
-       State.sortedCons
-       (Equivalence.to ∷<∷-⇔ (inj₁ (s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s s≤s z≤n)))
-       State.sortedOne)
-      , ASSₛₛₛ NUM-BSS , step-zero
+    transition3 = ASSₛₛₛ NUM-BSS ⇒∘⇒ x⇒x
 
 -- Section End Page 54
 
@@ -272,22 +258,21 @@ module SmallStep-BigStep-Equivalence where
     open import Data.Nat using (ℕ; suc; zero)
     open import Data.Integer using (+_)
     open import Data.String using (String)
-    open import Data.Product using (_×_; _,_)
+    open import Data.Product using (_×_; _,_; proj₁; proj₂)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-    open TS.TransitionSystem ⟨_⟩⇒₂⟨_⟩-transition using (step-suc_; step-zero; _⇒*_; _⇒⟨_⟩_)
+    open TS.TransitionSystem ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _∘⇒_)
 
     open import Data.Product using (∃)
 
-    L4-12 : (S₁ S₂ : Stm₂) (s s´ : State)
+    L4-12 : {S₁ S₂ : Stm₂} {s s´ : State}
           → inj₁(S₁ , s) ⇒* inj₂ s´
           → inj₁(S₁ Å₃ S₂ , s) ⇒* inj₁(S₂ , s´)
-    L4-12 S₁ S₂ s s´ (suc fst , TS.TransitionSystem.step-suc inj₂ y , fst₁ , TS.TransitionSystem.step-zero) = 1 , step-suc inj₁ (S₂ , s´) , COMP-2ₛₛₛ fst₁ , step-zero
-    L4-12 S₁ S₂ s s´ (suc k   , step-suc inj₁ (S₁´ , s˝) , (premise , snd)) with L4-12 S₁´ S₂ s˝ s´ (k , snd)
-    ... | (k2 , b) = (suc k2) , step-suc (inj₁ ((S₁´ Å₃ S₂) , s˝) , (COMP-1ₛₛₛ premise) , b)
+    L4-12 (suc fst , fst₁ ⇒∘⇒ x⇒x) = 1 , COMP-2ₛₛₛ fst₁ ⇒∘⇒ x⇒x
+    L4-12 (suc k , (_⇒∘⇒_ {γ˝ = inj₁ (S₁´ , s˝)} premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ⟨S₁´,s˝⟩⇒ᵏy)) = COMP-1ₛₛₛ premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ∘⇒ L4-12 (k , ⟨S₁´,s˝⟩⇒ᵏy)
 
     -- Theorem 4.11
---    T4-11 : {S₁ S₂ : Stm₂} → {s s' : State} → ⟨ inj₁(S₁ , s) ⟩⇒₂⟨ inj₂ s' ⟩ → inj₁(S₁ , s) ⇒* inj₂ s'
---    T4-11 x = {! x  !}
+    T4-11 : {S₁ S₂ : Stm₂} → {s s' : State} → ⟨ inj₁(S₁ , s) ⟩⇒₂⟨ inj₂ s' ⟩ → inj₁(S₁ , s) ⇒* inj₂ s'
+    T4-11 x = {! x  !}
 
 -- Section End Page 55
