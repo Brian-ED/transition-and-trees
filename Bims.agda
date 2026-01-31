@@ -381,34 +381,34 @@ module Aexp₂-semantic where
         [_] : Aexp₂ ⊎ Num → Aexp₂
 
 
-    data _⊢_⇒₂_ : State → Aexp₂ ⊎ Num → Aexp₂ ⊎ Num → Set where
+    data _⊢_⇒ₐ_ : State → Aexp₂ ⊎ Num → Aexp₂ ⊎ Num → Set where
         _PLUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                   → s ⊢ α₁ ⇒₂ inj₂ v₁
-                   → s ⊢ α₂ ⇒₂ inj₂ v₂
-                   → s ⊢ inj₁ (α₁ + α₂) ⇒₂ inj₂ (v₁ +ℤ v₂)
-
-        _MULT-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                   → s ⊢ α₁ ⇒₂ inj₂ v₁
-                   → s ⊢ α₂ ⇒₂ inj₂ v₂
-                   → s ⊢ inj₁ (α₁ * α₂) ⇒₂ inj₂ (v₁ *ℤ v₂)
+                   → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                   → s ⊢ α₂ ⇒ₐ inj₂ v₂
+                   → s ⊢ inj₁ (α₁ + α₂) ⇒ₐ inj₂ (v₁ +ℤ v₂)
 
         _MINUS-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
-                    → s ⊢ α₁ ⇒₂ inj₂ v₁
-                    → s ⊢ α₂ ⇒₂ inj₂ v₂
-                    → s ⊢ inj₁ ( α₁ - α₂ ) ⇒₂ inj₂ (v₁ -ℤ v₂)
+                    → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                    → s ⊢ α₂ ⇒ₐ inj₂ v₂
+                    → s ⊢ inj₁ ( α₁ - α₂ ) ⇒ₐ inj₂ (v₁ -ℤ v₂)
+
+        _MULT-BSS_ : ∀ {s α₁ α₂ v₁ v₂}
+                   → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                   → s ⊢ α₂ ⇒ₐ inj₂ v₂
+                   → s ⊢ inj₁ (α₁ * α₂) ⇒ₐ inj₂ (v₁ *ℤ v₂)
 
         PARENT-BSS_ : ∀ {s α₁ v₁}
-                    → s ⊢ α₁ ⇒₂ inj₂ v₁
-                    → s ⊢ inj₁ [ α₁ ] ⇒₂ inj₂ v₁
+                    → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                    → s ⊢ inj₁ [ α₁ ] ⇒ₐ inj₂ v₁
 
         NUM-BSS : ∀ {s n}
-                → s ⊢ inj₁ (N n) ⇒₂ inj₂ n
+                → s ⊢ inj₁ (N n) ⇒ₐ inj₂ n
 
         VAR-BSS_ : ∀ {s x v}
                  → (lookup x s) ≡ just v
-                 → s ⊢ inj₁ (V x) ⇒₂ inj₂ v
+                 → s ⊢ inj₁ (V x) ⇒ₐ inj₂ v
 
-    -- The book states that the `⌞ (Aexp₂ ⊎ Num) , (_⊢_⇒₂_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
+    -- The book states that the `⌞ (Aexp₂ ⊎ Num) , (_⊢_⇒ₐ_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
     -- Here is a proof for any starting state s:
 
     T₃ : Aexp₂ ⊎ Num → Set
@@ -416,9 +416,9 @@ module Aexp₂-semantic where
     T₃ (inj₁ x) = ⊥
 
     Aexp₂Semantic : State → TransitionSystem
-    Aexp₂Semantic s = ⌞ (Aexp₂ ⊎ Num) , (_⊢_⇒₂_ s) , T₃ ⌟
+    Aexp₂Semantic s = ⌞ (Aexp₂ ⊎ Num) , (_⊢_⇒ₐ_ s) , T₃ ⌟
 
-    Aexp₂-is-big-step-proof : ∀ s x y → s ⊢ x ⇒₂ y → T₃ y
+    Aexp₂-is-big-step-proof : ∀ s x y → s ⊢ x ⇒ₐ y → T₃ y
     Aexp₂-is-big-step-proof s (inj₂ x) (inj₂ x₁) = λ _ → ttt
     Aexp₂-is-big-step-proof s (inj₂ x) (inj₁ y) ()
     Aexp₂-is-big-step-proof s (inj₁ y₁) (inj₂ x) = λ _ → ttt
@@ -440,25 +440,25 @@ module Aexp₂-semantic where
     data _⊢_⇒₂b_ : State → Bexp₂ ⊎ Bool → Bexp₂ ⊎ Bool → Set where
 
         _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
-                      → s ⊢ α₁ ⇒₂ inj₂ v
-                      → s ⊢ α₂ ⇒₂ inj₂ v
+                      → s ⊢ α₁ ⇒ₐ inj₂ v
+                      → s ⊢ α₂ ⇒ₐ inj₂ v
                       → s ⊢ (inj₁ (α₁ ==₃ α₂)) ⇒₂b inj₂ tt
 
         EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                     → s ⊢ α₁ ⇒₂ inj₂ v₁
-                     → s ⊢ α₂ ⇒₂ inj₂ v₂
+                     → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                     → s ⊢ α₂ ⇒ₐ inj₂ v₂
                      → not (v₁ ≡ v₂)
                      → s ⊢ inj₁ (α₁ ==₃ α₂) ⇒₂b inj₂ ff
 
         GREATERTHAN-1-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                          → s ⊢ α₁ ⇒₂ inj₂ v₁
-                          → s ⊢ α₂ ⇒₂ inj₂ v₂
+                          → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                          → s ⊢ α₂ ⇒ₐ inj₂ v₂
                           → v₁ <ℤ v₂
                           → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ tt
 
         GREATERTHAN-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
-                          → s ⊢ α₁ ⇒₂ inj₂ v₁
-                          → s ⊢ α₂ ⇒₂ inj₂ v₂
+                          → s ⊢ α₁ ⇒ₐ inj₂ v₁
+                          → s ⊢ α₂ ⇒ₐ inj₂ v₂
                           → not (v₁ <ℤ v₂)
                           → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
 
@@ -500,7 +500,7 @@ module Stm₂-semantic where
     open import Agda.Builtin.Maybe using (Maybe; just; nothing)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
-    open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒₂_; _⊢_⇒₂b_)
+    open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_)
 
     -- Section Begin Page 47
 
@@ -513,7 +513,7 @@ module Stm₂-semantic where
 
     data ⟨_,_⟩⇒₂_ : Stm₂ → State → State → Set where
         ASS-BSS         : ∀ {x a s v}
-                        → s ⊢ a ⇒₂ inj₂ v
+                        → s ⊢ a ⇒ₐ inj₂ v
                         → ⟨ (x ←₃ a) , s ⟩⇒₂ (s [ x ↦ v ])
 
         SKIP-BSS        : ∀ {s}
@@ -551,7 +551,7 @@ module Stm₂-semantic where
     open import Data.Product using (_×_; _,_)
     data ⟨_⟩⇒₂⟨_⟩ : (Stm₂ × State) ⊎ State → (Stm₂ × State) ⊎ State → Set where
         ASSₛₛₛ : ∀ {x a v s}
-               → s ⊢ a ⇒₂ inj₂ v
+               → s ⊢ a ⇒ₐ inj₂ v
                → ⟨ inj₁ (x ←₃ a , s) ⟩⇒₂⟨ inj₂ (s [ x ↦ v ]) ⟩
 
         SKIPₛₛₛ : ∀ {s}
