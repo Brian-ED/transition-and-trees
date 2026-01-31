@@ -20,3 +20,6 @@ In Table 4.2, the rule PARENT-BBSS has 2 'B's, which could be intentional but I 
 In page 31, under `3.3 Big-step vs small-step semantics`, it states that a small-step semantics's transition rule does not need to result in a terminal configuration, which is not a restriction. Therefore the set of semantics that are SmallStepSemantics is equal to the set of all transition systems.
 
 Problem 4.9 uses `>`, which is not defined, only `<` is defined.
+
+Lemma 4.12 has a insufficient proof. It assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be an integer.
+

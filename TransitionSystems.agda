@@ -2,7 +2,7 @@ module TransitionSystems where
 
 open import Data.Nat using (ℕ; suc; zero)
 open import Relation.Binary.PropositionalEquality using (_≡_)
-open import Data.Product using (∃) renaming (_×_ to _and_)
+open import Data.Product using (∃; _×_)
 open import Function using (_∘_; id)
 open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
@@ -20,11 +20,11 @@ record TransitionSystem : Set₁ where
 
     data _⇒⟨_⟩_ : Γ → ℕ → Γ → Set where
         step-zero : ∀ {γ} → γ ⇒⟨ 0 ⟩ γ
-        _step-suc_ : ∀ {γ γ′ γ″ n}
-                   → γ ⇒ γ′
-                   → γ′ ⇒⟨ n ⟩ γ″
-                   → γ ⇒⟨ suc n ⟩ γ″
-    infixr 4 _step-suc_
+        step-suc_ : ∀ {γ γ´ k}
+                   → (∃ λ γ˝ → (γ ⇒ γ˝) × (γ˝ ⇒⟨ k ⟩ γ´))
+                   → γ ⇒⟨ suc k ⟩ γ´
+
+    infixr 4 step-suc_
 
     _⇒*_ : Γ → Γ → Set
     γ ⇒* γ′ = ∃ λ k → γ ⇒⟨ k ⟩ γ′
