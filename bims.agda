@@ -269,10 +269,14 @@ module SmallStep-BigStep-Equivalence where
           → inj₁(S₁ , s) ⇒* inj₂ s´
           → inj₁(S₁ Å₃ S₂ , s) ⇒* inj₁(S₂ , s´)
     L4-12 (suc fst , fst₁ ⇒∘⇒ x⇒x) = 1 , COMP-2ₛₛₛ fst₁ ⇒∘⇒ x⇒x
-    L4-12 (suc k , (_⇒∘⇒_ {γ˝ = inj₁ (S₁´ , s˝)} premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ⟨S₁´,s˝⟩⇒ᵏy)) = COMP-1ₛₛₛ premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ∘⇒ L4-12 (k , ⟨S₁´,s˝⟩⇒ᵏy)
+    L4-12 (suc k , (_⇒∘⇒_ {γ˝ = inj₁ S₁´,s˝} premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ⟨S₁´,s˝⟩⇒ᵏy)) = COMP-1ₛₛₛ premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ∘⇒ L4-12 (k , ⟨S₁´,s˝⟩⇒ᵏy)
 
-    -- Theorem 4.11
-    T4-11 : {S₁ S₂ : Stm₂} → {s s' : State} → ⟨ inj₁(S₁ , s) ⟩⇒₂⟨ inj₂ s' ⟩ → inj₁(S₁ , s) ⇒* inj₂ s'
-    T4-11 x = {! x  !}
+    -- Theorem 4.11 -- Apparently this should be hard to prove, and needs the lemma, though agda figures it out without the lemma
+    T4-11 : {S : Stm₂} → {s s' : State} → ⟨ inj₁(S , s) ⟩⇒₂⟨ inj₂ s' ⟩ → inj₁(S , s) ⇒* inj₂ s'
+    T4-11 x = 1 , x ⇒∘⇒ x⇒x
+
+    -- Theorem 4.13
+    T4-13 : {S : Stm₂} → {s s' : State} → inj₁(S , s) ⇒* inj₂ s' → ⟨ inj₁(S , s) ⟩⇒₂⟨ inj₂ s' ⟩
+    T4-13 x = {!   !}
 
 -- Section End Page 55
