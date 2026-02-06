@@ -23,7 +23,9 @@ In page 31, under `3.3 Big-step vs small-step semantics`, it states that a small
 
 Problem 4.9 uses `>`, which is not defined, only `<` is defined.
 
-Lemma 4.12 has a insufficient proof. It assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be an integer.
+Lemma 4.12 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
+
+Theorem 4.13 at the start of page 59 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
 
 It is stated that theorem 4.11 requires lemma 4.12. However, the proof in Agda didn't need the lemma. The lemma itself was way harder to prove. Agda accepts the proof `T4-11 x = 1 , x ⇒∘⇒ x⇒x`, because the theorem is true simply because the definition of `⇒*` is any length, meaning you can just wrap the given transition in a transition sequence.
 
