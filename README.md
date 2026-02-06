@@ -11,6 +11,8 @@ All files are camel-case (HereIsAnExample), except that the first character's ca
 Feel free to contribute. I'm going through the book in order. To contribute, you can look for the latest page. Since page numbers are commented above and below (hopefully) all code, you can look for the biggest page number and prove/define the next thing that isn't proven/defined.
 
 ## Mistakes found in the book
+Mistakes mentioned in the [errata](http://www.operationalsemantics.net/errata.pdf) (meaning the official corrections) won't be repeated here.
+
 Author uses PLUS and SUB in tandom in the small-step transition rules for Aexp, when it should be ADD and SUB, or PLUS and MINUS. Found at Table 3.2.
 
 Bexp on Table 3.4 defines the rule EQUALS-1BSS. Bexp on Table 4.2 defines EQUAL-1BSS. There is a leading S after EQUAL in one case, and not the other.
@@ -26,6 +28,8 @@ Lemma 4.12 has a insufficient proof. It assumes that the transition sequence `a�
 It is stated that theorem 4.11 requires lemma 4.12. However, the proof in Agda didn't need the lemma. The lemma itself was way harder to prove. Agda accepts the proof `T4-11 x = 1 , x ⇒∘⇒ x⇒x`, because the theorem is true simply because the definition of `⇒*` is any length, meaning you can just wrap the given transition in a transition sequence.
 
 Lemma 4.14 has ⟨S₁;S₂⟩⇒ᵏs˝, which isn't a valid statement, state in left side is ommitted.
+
+Lemma 4.14, sentence "k₂ = k₂₂". k₂₂ is never defined, only k₂₁, which I have assumed the author meant.
 
 ### Opinionated
 The generic transition ⇒ᵏ in transition systems I believe would be simpler if instead of defining it using step 0 and step suc k, and defining ⇒* afterwards, you could just define ⇒* first. Every induction, instead of being reliant on an intiger, could just rely on the length of the transition sequence itself. The reason I believe this is simpler is that it avoids the duplicate information from k, since it's determined by the transition sequence anyways. Duplicate information is annoying when unifying things. It could be that I only believe this because Agda proves by construction, and needs unification a lot.
