@@ -273,15 +273,15 @@ module SmallStep-BigStep-Equivalence where
     T4-11 : {S : Stm₂} → {s s' : State} → inj₁(S , s) ⇒ inj₂ s' → inj₁(S , s) ⇒* inj₂ s'
     T4-11 x = 1 , x ⇒∘⇒ x⇒x
 
-    L4-14 : (S₁ S₂ : Stm₂) (s s˝ : State) (k : ℕ)
+    L4-14 : {S₁ S₂ : Stm₂} {s s˝ : State} {k : ℕ}
         → inj₁(S₁ Å₃ S₂ , s) ⇒⟨ k ⟩ inj₂ s˝
           → ∃ λ k₁ → ∃ λ k₂ → ∃ λ s´
             → (inj₁(S₁ , s) ⇒⟨ k₁ ⟩ inj₂ s´) × (inj₁(S₂ , s´) ⇒⟨ k₂ ⟩ inj₂ s˝) × (k ≡ k₁ +ℕ k₂)
 
-    L4-14 _ S₂ _ s˝ (suc k) (COMP-1ₛₛₛ {s´ = s˝´} {S₁´ = S₁´} _ ⇒∘⇒ x₁) with L4-14 S₁´ S₂ s˝´ s˝ k x₁
-    L4-14 _ _ _ _ (suc k) (COMP-1ₛₛₛ x ⇒∘⇒ _) | k₁₁ , k₂₁ , s´ , fst₁ , snd , refl = suc k₁₁ , k₂₁ , s´ , (x ⇒∘⇒ fst₁) , snd , refl
+    L4-14 {S₂ = S₂} {s˝ = s˝} {k = suc k} (COMP-1ₛₛₛ {s´ = s˝´} {S₁´ = S₁´} _ ⇒∘⇒ x₁) with L4-14 x₁
+    L4-14 {k = suc k} (COMP-1ₛₛₛ x ⇒∘⇒ _) | k₁₁ , k₂₁ , s´ , fst₁ , snd , refl = suc k₁₁ , k₂₁ , s´ , (x ⇒∘⇒ fst₁) , snd , refl
 
-    L4-14 _ _ _ _ (suc k) (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
+    L4-14 {k = suc k} (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
 
     -- Theorem 4.13
 --    T4-13 : {S : Stm₂} → {s s' : State} → inj₁(S , s) ⇒* inj₂ s' → ⟨ inj₁(S , s) ⟩⇒₂⟨ inj₂ s' ⟩
