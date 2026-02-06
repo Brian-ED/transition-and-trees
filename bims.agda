@@ -245,25 +245,23 @@ module Aexp₂-smallstep-example where
 
 -- Section End Page 54
 
--- Section Begin Page 55
+-- Section Begin Page 55-58
 
 module SmallStep-BigStep-Equivalence where
     open import State using (State; _[_↦_]; emptyState)
-    open import Relation.Binary.PropositionalEquality using (refl)
+    open import Relation.Binary.PropositionalEquality using (_≡_; refl)
     import Bims
     open Bims.Aexp₂-semantic
     open Bims.Stm₂-semantic
     open Bims.Aexp₁-bigstep-semantic
-    import TransitionSystems as TS
-    open import Data.Nat using (ℕ; suc; zero)
+    open import Data.Nat using (ℕ; suc; zero) renaming (_+_ to _+ℕ_)
     open import Data.Integer using (+_)
     open import Data.String using (String)
     open import Data.Product using (_×_; _,_; proj₁; proj₂)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-
-    open TS.TransitionSystem ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _∘⇒_)
-
     open import Data.Product using (∃)
+    open import TransitionSystems using () renaming (TransitionSystem to T)
+    open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _∘⇒_; _⇒_)
 
     L4-12 : {S₁ S₂ : Stm₂} {s s´ : State}
           → inj₁(S₁ , s) ⇒* inj₂ s´
@@ -275,8 +273,18 @@ module SmallStep-BigStep-Equivalence where
     T4-11 : {S : Stm₂} → {s s' : State} → ⟨ inj₁(S , s) ⟩⇒₂⟨ inj₂ s' ⟩ → inj₁(S , s) ⇒* inj₂ s'
     T4-11 x = 1 , x ⇒∘⇒ x⇒x
 
-    -- Theorem 4.13
-    T4-13 : {S : Stm₂} → {s s' : State} → inj₁(S , s) ⇒* inj₂ s' → ⟨ inj₁(S , s) ⟩⇒₂⟨ inj₂ s' ⟩
-    T4-13 x = {!   !}
+    L4-14 : (S₁ S₂ : Stm₂) (s s˝ : State) (k : ℕ)
+        → inj₁(S₁ Å₃ S₂ , s) ⇒⟨ k ⟩ inj₂ s˝
+          → ∃ λ k₁ → ∃ λ k₂ → ∃ λ s´
+            → (inj₁(S₁ , s) ⇒⟨ k₁ ⟩ inj₂ s´) × (inj₁(S₂ , s´) ⇒⟨ k₂ ⟩ inj₂ s˝) × (k ≡ k₁ +ℕ k₂)
 
--- Section End Page 55
+    L4-14 _ S₂ _ s˝ (suc k) (COMP-1ₛₛₛ {s´ = s˝´} {S₁´ = S₁´} _ ⇒∘⇒ x₁) with L4-14 S₁´ S₂ s˝´ s˝ k x₁
+    L4-14 _ _ _ _ (suc k) (COMP-1ₛₛₛ x ⇒∘⇒ _) | k₁₁ , k₂₁ , s´ , fst₁ , snd , refl = suc k₁₁ , k₂₁ , s´ , (x ⇒∘⇒ fst₁) , snd , refl
+
+    L4-14 _ _ _ _ (suc k) (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
+
+    -- Theorem 4.13
+--    T4-13 : {S : Stm₂} → {s s' : State} → inj₁(S , s) ⇒* inj₂ s' → ⟨ inj₁(S , s) ⟩⇒₂⟨ inj₂ s' ⟩
+--    T4-13 x = {!   !}
+
+-- Section End Page 55-58
