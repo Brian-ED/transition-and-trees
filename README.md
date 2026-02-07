@@ -25,6 +25,10 @@ Problem 4.9 uses `>`, which is not defined, only `<` is defined.
 
 Theorem 4.11, in step comp-BSS, in the last sentence, it is assumed that `x ⇒* y` and `y ⇒* z` means you can do `x ⇒* z`. It is true, but no axiom or rule is invoked.
 
+Theorem 4.11, in step while-false-BSS, IF-FALSK-SSS isn't defined. Seems to be an accidental use of the danish "falsk" instead of "false".
+
+Theorem 4.11, in step while-false-BSS, in the conclusion, the first `⇒*` should be a `⇒`.
+
 Lemma 4.12 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
 
 Theorem 4.13 at the start of page 59 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
