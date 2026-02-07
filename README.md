@@ -27,8 +27,6 @@ Lemma 4.12 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten 
 
 Theorem 4.13 at the start of page 59 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
 
-It is stated that theorem 4.11 requires lemma 4.12. However, the proof in Agda didn't need the lemma. The lemma itself was way harder to prove. Agda accepts the proof `T4-11 x = 1 , x ⇒∘⇒ x⇒x`, because the theorem is true simply because the definition of `⇒*` is any length, meaning you can just wrap the given transition in a transition sequence.
-
 Lemma 4.14 has ⟨S₁;S₂⟩⇒ᵏs˝, which isn't a valid statement, state in left side is ommitted.
 
 Lemma 4.14, sentence "k₂ = k₂₂". k₂₂ is never defined, only k₂₁, which I have assumed the author meant.
