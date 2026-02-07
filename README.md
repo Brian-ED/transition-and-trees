@@ -23,6 +23,8 @@ In page 31, under `3.3 Big-step vs small-step semantics`, it states that a small
 
 Problem 4.9 uses `>`, which is not defined, only `<` is defined.
 
+Theorem 4.11, in step comp-BSS, in the last sentence, it is assumed that `x ⇒* y` and `y ⇒* z` means you can do `x ⇒* z`. It is true, but no axiom or rule is invoked.
+
 Lemma 4.12 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
 
 Theorem 4.13 at the start of page 59 assumes that the transition sequence `a⇒b⇒ᵏc` can be rewritten as `a⇒⟨S,s⟩⇒ᵏc`, which is a mistake, `b` can also be a state. Trivially fixed by proving this case.
