@@ -1,11 +1,7 @@
 module TransitionSystems where
 
-open import Data.Nat using (ℕ; suc; zero)
-open import Relation.Binary.PropositionalEquality using (_≡_)
-open import Data.Product using (∃; _×_; _,_)
-open import Function using (_∘_; id)
-open import Data.Empty using (⊥; ⊥-elim)
-open import Data.Unit using (⊤; tt)
+open import Data.Nat using (ℕ; suc)
+open import Data.Product using (∃; _,_)
 
 -- Section Start Page 30
 
@@ -31,9 +27,17 @@ record TransitionSystem : Set₁ where
     _∘⇒_ : ∀ {x y z} → (z ⇒ x) → x ⇒* y → z ⇒* y
     a ∘⇒ fst , snd = suc fst , a ⇒∘⇒ snd
 
+    _∘⇒∘_ : ∀ {x y z}
+        → x ⇒* y
+        → y ⇒* z
+        → x ⇒* z
+    (0 , x⇒x) ∘⇒∘ x₁ = x₁
+    (suc fst , x ⇒∘⇒ snd) ∘⇒∘ x₁ = x ∘⇒ ((fst , snd) ∘⇒∘ x₁)
+
     infixr 4 _⇒∘⇒_
     infixr 4 _∘⇒_
     infixr 4 _⇒*_
+    infixr 4 _∘⇒∘_
 
 
     -- INNER Section End Page 38
