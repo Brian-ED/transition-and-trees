@@ -508,7 +508,7 @@ module Stm₂-semantic where
         skip₃ : Stm₂
         _←₃_ : Var → Aexp₂ ⊎ Num → Stm₂
         _Å₃_ : Stm₂ → Stm₂ → Stm₂
-        ifStm₂_then_else : Bexp₂ ⊎ Bool → Stm₂ → Stm₂ → Stm₂
+        ifStm₂_then_else_ : Bexp₂ ⊎ Bool → Stm₂ → Stm₂ → Stm₂
         while_do₃_ : Bexp₂ ⊎ Bool → Stm₂ → Stm₂
 
     data ⟨_,_⟩⇒₂_ : Stm₂ → State → State → Set where
@@ -540,10 +540,9 @@ module Stm₂-semantic where
                         → ⟨ (while b do₃ S) , s˝ ⟩⇒₂ s´
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
 
-        WHILE-FALSE-BSS : ∀ {S s s´ b}
+        WHILE-FALSE-BSS : ∀ {S s b}
                         → s ⊢ b ⇒₂b inj₂ ff
-                        → s´ ≡ s
-                        → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
+                        → ⟨ (while b do₃ S) , s ⟩⇒₂ s
 
     -- Section End Page 47
 
@@ -574,7 +573,7 @@ module Stm₂-semantic where
                     → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
 
         WHILEₛₛₛ : ∀ {s b S}
-                 → ⟨ inj₁ (while b do₃ S , s) ⟩⇒₂⟨ inj₁ (ifStm₂ b then while b do₃ S else skip₃ , s) ⟩
+                 → ⟨ inj₁ (while b do₃ S , s) ⟩⇒₂⟨ inj₁ (ifStm₂ b then S Å₃ (while b do₃ S) else skip₃ , s) ⟩
 
     ⟨_⟩⇒₂⟨_⟩-transition = ⌞ Γ , ⟨_⟩⇒₂⟨_⟩ , T ⌟
         where
