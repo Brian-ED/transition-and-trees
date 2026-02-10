@@ -185,7 +185,7 @@ module Aexp₂-smallstep-example where
     open import Data.Nat using (ℕ; z≤n) renaming (s≤s to s≤s_)
     open import Data.Integer using (+_) renaming (+<+ to +<+_)
     open import Data.String using (String)
-    open import Data.Product using (_×_; _,_)
+    open import Data.Product using (_,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
     S =
@@ -257,9 +257,9 @@ module SmallStep-BigStep-Equivalence where
     open import Data.Nat using (ℕ; suc; zero) renaming (_+_ to _+ℕ_)
     open import Data.Integer using (+_)
     open import Data.String using (String)
-    open import Data.Product using (_×_; _,_; proj₁; proj₂)
-    open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.Product using (∃)
+    open import Data.Product using (_×_; _,_; Σ; ∃; proj₁; proj₂)
+    open import Data.Sum using (inj₁; inj₂)
+    open import Data.Bool using (false; true)
     open import TransitionSystems using () renaming (TransitionSystem to T)
     open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _⇒∘_; _⇒_; _∘⇒∘_; x⇒*x)
 
@@ -280,15 +280,14 @@ module SmallStep-BigStep-Equivalence where
     T4-11 (WHILE-FALSE-BSS s⊢b⇒ᵇff) = WHILEₛₛₛ ⇒∘ IF-FALSEₛₛₛ s⊢b⇒ᵇff ⇒∘ SKIPₛₛₛ ⇒∘ x⇒*x
 
     L4-14 : {S₁ S₂ : Stm₂} {s s˝ : State} {k : ℕ}
-        → inj₁(S₁ Å₃ S₂ , s) ⇒⟨ k ⟩ inj₂ s˝
-          → ∃ λ k₁ → ∃ λ k₂ → ∃ λ s´
-            → (inj₁(S₁ , s) ⇒⟨ k₁ ⟩ inj₂ s´) × (inj₁(S₂ , s´) ⇒⟨ k₂ ⟩ inj₂ s˝) × (k ≡ k₁ +ℕ k₂)
-
+          → inj₁(S₁ Å₃ S₂ , s) ⇒⟨ k ⟩ inj₂ s˝
+          → ∃ λ s´ →
+            Σ (inj₁(S₁ , s ) ⇒* inj₂ s´) λ lSeq →
+            Σ (inj₁(S₂ , s´) ⇒* inj₂ s˝) λ rSeq →
+            k ≡ lSeq .proj₁ +ℕ rSeq .proj₁
     L4-14 (COMP-1ₛₛₛ x ⇒∘⇒ x₁) with L4-14 x₁
-    ... | k₁₁     , k₂₁ , s´ , fst₁         , snd , refl
-        = suc k₁₁ , k₂₁ , s´ , (x ⇒∘⇒ fst₁) , snd , refl
-
-    L4-14 {k = suc k} (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
+    ... | s´ , xx , y , refl = s´ , x ⇒∘ xx , y , refl
+    L4-14 {k = suc k} (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = s˝´ , x ⇒∘ x⇒*x , (k , x₁) , refl -- 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
 
     -- Theorem 4.13
 --    T4-13 : {S : Stm₂} → {s s´ : State} → inj₁(S , s) ⇒* inj₂ s´ → ⟨ S , s ⟩⇒₂ s´
