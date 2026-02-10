@@ -39,3 +39,5 @@ Lemma 4.14, sentence "k₂ = k₂₂". k₂₂ is never defined, only k₂₁, w
 
 ### Opinionated
 The generic transition ⇒ᵏ in transition systems I believe would be simpler if instead of defining it using step 0 and step suc k, and defining ⇒* afterwards, you could just define ⇒* first. Every induction, instead of being reliant on an intiger, could just rely on the length of the transition sequence itself. The reason I believe this is simpler is that it avoids the duplicate information from k, since it's determined by the transition sequence anyways. Duplicate information is annoying when unifying things. It could be that I only believe this because Agda proves by construction, and needs unification a lot.
+
+In the proof of Theorem 4.13, there's a form of referencing done for the sentence "transition sequence (4.11)", which isn't done before this point, where parenthesis referencing their definition is done. This implicitly applies the lemma 4.11. It is, in my opinion, confusing to introduce new syntax never before defined or mentioned.
