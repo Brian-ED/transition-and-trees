@@ -24,20 +24,23 @@ record TransitionSystem : Set₁ where
     _⇒*_ : Γ → Γ → Set
     γ ⇒* γ′ = ∃ λ k → γ ⇒⟨ k ⟩ γ′
 
-    _∘⇒_ : ∀ {x y z} → (z ⇒ x) → x ⇒* y → z ⇒* y
-    a ∘⇒ fst , snd = suc fst , a ⇒∘⇒ snd
+    x⇒*x : ∀ {x} → x ⇒* x
+    x⇒*x = 0 , x⇒x
+
+    _⇒∘_ : ∀ {x y z} → (z ⇒ x) → x ⇒* y → z ⇒* y
+    a ⇒∘ (fst , snd) = suc fst , a ⇒∘⇒ snd
 
     _∘⇒∘_ : ∀ {x y z}
-        → x ⇒* y
-        → y ⇒* z
-        → x ⇒* z
+          → x ⇒* y
+          → y ⇒* z
+          → x ⇒* z
     (0 , x⇒x) ∘⇒∘ x₁ = x₁
-    (suc fst , x ⇒∘⇒ snd) ∘⇒∘ x₁ = x ∘⇒ ((fst , snd) ∘⇒∘ x₁)
+    (suc fst , x ⇒∘⇒ snd) ∘⇒∘ x₁ = x ⇒∘ ((fst , snd) ∘⇒∘ x₁)
 
-    infixr 4 _⇒∘⇒_
-    infixr 4 _∘⇒_
-    infixr 4 _⇒*_
-    infixr 4 _∘⇒∘_
+    infixr 5 _⇒∘⇒_
+    infixr 5 _⇒∘_
+    infixr 5 _⇒*_
+    infixr 5 _∘⇒∘_
 
 
     -- INNER Section End Page 38
