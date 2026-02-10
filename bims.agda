@@ -261,34 +261,32 @@ module SmallStep-BigStep-Equivalence where
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Product using (∃)
     open import TransitionSystems using () renaming (TransitionSystem to T)
-    open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _∘⇒_; _⇒_; _∘⇒∘_)
+    open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _⇒∘_; _⇒_; _∘⇒∘_; x⇒*x)
 
     L4-12 : {S₁ S₂ : Stm₂} {s s´ : State}
           → inj₁(S₁ , s) ⇒* inj₂ s´
           → inj₁(S₁ Å₃ S₂ , s) ⇒* inj₁(S₂ , s´)
-    L4-12 (suc fst , fst₁ ⇒∘⇒ x⇒x) = 1 , COMP-2ₛₛₛ fst₁ ⇒∘⇒ x⇒x
-    L4-12 (suc k , (_⇒∘⇒_ {γ˝ = inj₁ S₁´,s˝} premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ⟨S₁´,s˝⟩⇒ᵏy)) = COMP-1ₛₛₛ premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ∘⇒ L4-12 (k , ⟨S₁´,s˝⟩⇒ᵏy)
+    L4-12 (suc fst , fst₁ ⇒∘⇒ x⇒x) = COMP-2ₛₛₛ fst₁ ⇒∘ x⇒*x
+    L4-12 (suc k , (_⇒∘⇒_ {γ˝ = inj₁ S₁´,s˝} premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ⟨S₁´,s˝⟩⇒ᵏy)) = COMP-1ₛₛₛ premise⟨S₁,s⟩⇒⟨S₁´,s˝⟩ ⇒∘ L4-12 (k , ⟨S₁´,s˝⟩⇒ᵏy)
 
     -- Theorem 4.11 -- Apparently this should be hard to prove, and needs the lemma, though agda figures it out without the lemma
     T4-11 : {S : Stm₂} → {s s´ : State} → ⟨ S , s ⟩⇒₂ s´ → inj₁(S , s) ⇒* inj₂ s´
-    T4-11 (ASS-BSS x) = 1 , ASSₛₛₛ x ⇒∘⇒ x⇒x
-    T4-11 SKIP-BSS = 1 , SKIPₛₛₛ ⇒∘⇒ x⇒x
-    T4-11 (COMP-BSS {S₁} {S₂} {s} {s˝} {s´} ⟨S₁,s⟩⇒s´ ⟨S₂,s´⟩⇒s˝) = L4-12 (T4-11 ⟨S₁,s⟩⇒s´) ∘⇒∘ T4-11 ⟨S₂,s´⟩⇒s˝
-    T4-11 (IF-TRUE-BSS x x₁) =  IF-TRUEₛₛₛ x₁ ∘⇒ T4-11 x
-    T4-11 (IF-FALSE-BSS x x₁) = IF-FALSEₛₛₛ x₁ ∘⇒ T4-11 x
-    T4-11 (WHILE-TRUE-BSS {S = S} {s = s} {s´ = s´} {s˝ = s˝} {b = b} s⊢b⇒ᵇtt ⟨S,s⟩⇒s˝ ⟨while-b-do-S,s˝⟩⇒s´) with T4-11 ⟨S,s⟩⇒s˝ | T4-11 ⟨while-b-do-S,s˝⟩⇒s´ | L4-12 {S₂ = while b do₃ S} (T4-11 ⟨S,s⟩⇒s˝)
-    ... |  k1 , ⟨S,s⟩⇒*s˝ | k2 , ⟨while-b-do-S,s˝⟩⇒*s´ | k3 , ⟨S:while-b-do-S,s⟩⇒ᵏ³⟨while-b-do-S,s˝⟩
-        =  (2 +ℕ k3 , WHILEₛₛₛ ⇒∘⇒ IF-TRUEₛₛₛ s⊢b⇒ᵇtt ⇒∘⇒ ⟨S:while-b-do-S,s⟩⇒ᵏ³⟨while-b-do-S,s˝⟩)
-           ∘⇒∘ (k2 , ⟨while-b-do-S,s˝⟩⇒*s´)
-    T4-11 (WHILE-FALSE-BSS s⊢b⇒ᵇff) = 3 , WHILEₛₛₛ ⇒∘⇒ IF-FALSEₛₛₛ s⊢b⇒ᵇff ⇒∘⇒ SKIPₛₛₛ ⇒∘⇒ x⇒x
+    T4-11 (ASS-BSS x) = ASSₛₛₛ x ⇒∘ x⇒*x
+    T4-11 SKIP-BSS = SKIPₛₛₛ ⇒∘ x⇒*x
+    T4-11 (COMP-BSS ⟨S₁,s⟩⇒s´ ⟨S₂,s´⟩⇒s˝) = L4-12 (T4-11 ⟨S₁,s⟩⇒s´) ∘⇒∘ T4-11 ⟨S₂,s´⟩⇒s˝
+    T4-11 (IF-TRUE-BSS x x₁) =  IF-TRUEₛₛₛ x₁ ⇒∘ T4-11 x
+    T4-11 (IF-FALSE-BSS x x₁) = IF-FALSEₛₛₛ x₁ ⇒∘ T4-11 x
+    T4-11 (WHILE-TRUE-BSS s⊢b⇒ᵇtt ⟨S,s⟩⇒s˝ ⟨while-b-do-S,s˝⟩⇒s´) = WHILEₛₛₛ ⇒∘ IF-TRUEₛₛₛ s⊢b⇒ᵇtt ⇒∘ L4-12 (T4-11 ⟨S,s⟩⇒s˝) ∘⇒∘ T4-11 ⟨while-b-do-S,s˝⟩⇒s´
+    T4-11 (WHILE-FALSE-BSS s⊢b⇒ᵇff) = WHILEₛₛₛ ⇒∘ IF-FALSEₛₛₛ s⊢b⇒ᵇff ⇒∘ SKIPₛₛₛ ⇒∘ x⇒*x
 
     L4-14 : {S₁ S₂ : Stm₂} {s s˝ : State} {k : ℕ}
         → inj₁(S₁ Å₃ S₂ , s) ⇒⟨ k ⟩ inj₂ s˝
           → ∃ λ k₁ → ∃ λ k₂ → ∃ λ s´
             → (inj₁(S₁ , s) ⇒⟨ k₁ ⟩ inj₂ s´) × (inj₁(S₂ , s´) ⇒⟨ k₂ ⟩ inj₂ s˝) × (k ≡ k₁ +ℕ k₂)
 
-    L4-14 (COMP-1ₛₛₛ _ ⇒∘⇒ x₁) with L4-14 x₁
-    L4-14 (COMP-1ₛₛₛ x ⇒∘⇒ _) | k₁₁ , k₂₁ , s´ , fst₁ , snd , refl = suc k₁₁ , k₂₁ , s´ , (x ⇒∘⇒ fst₁) , snd , refl
+    L4-14 (COMP-1ₛₛₛ x ⇒∘⇒ x₁) with L4-14 x₁
+    ... | k₁₁     , k₂₁ , s´ , fst₁         , snd , refl
+        = suc k₁₁ , k₂₁ , s´ , (x ⇒∘⇒ fst₁) , snd , refl
 
     L4-14 {k = suc k} (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
 
