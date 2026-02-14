@@ -558,7 +558,7 @@ module Stm₂-semantic where
 
         COMP-1ₛₛₛ : ∀ {s s´ S₁ S₁´ S₂}
                   → ⟨ inj₁ (S₁ , s) ⟩⇒₂⟨ inj₁ (S₁´ , s´) ⟩
-                  → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ ((S₁´ Å₃ S₂) , s´) ⟩
+                  → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₁´ Å₃ S₂ , s´) ⟩
 
         COMP-2ₛₛₛ : ∀ {s s´ S₁ S₂}
                   → ⟨ inj₁ (S₁ , s) ⟩⇒₂⟨ inj₂ s´ ⟩
