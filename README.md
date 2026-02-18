@@ -1,6 +1,6 @@
 #  Proving the book Transition and Trees by Hans Hüttel in Agda
 INCOMPLETE.
-Progress is page 60 out of 267.
+Progress is page 66 out of 267.
 
 ## Conventions
 All files are camel-case (HereIsAnExample), except that the first character's case has meaning:
