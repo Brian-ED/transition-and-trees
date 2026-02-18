@@ -286,19 +286,37 @@ module SmallStep-BigStep-Equivalence where
             Σ (inj₁(S₂ , s´) ⇒* inj₂ s˝) λ rSeq →
             k ≡ lSeq .proj₁ +ℕ rSeq .proj₁
     L4-14 (COMP-1ₛₛₛ x ⇒∘⇒ x₁) with L4-14 x₁
-    ... | s´ , xx , y , refl = s´ , x ⇒∘ xx , y , refl
-    L4-14 {k = suc k} (COMP-2ₛₛₛ {s´ = s˝´} x ⇒∘⇒ x₁) = s˝´ , x ⇒∘ x⇒*x , (k , x₁) , refl -- 1 , k , s˝´ , (x ⇒∘⇒ x⇒x) , x₁ , refl
+    L4-14 (COMP-1ₛₛₛ x ⇒∘⇒ x₁) | s´ , xx , y , refl = s´ , x ⇒∘ xx , y , refl
+    L4-14 {k = suc (suc k)} (COMP-2ₛₛₛ x ⇒∘⇒ x₁) = _ , x ⇒∘ x⇒*x , (_ , x₁) , refl
+
+    step-then-big :  {S S´ : Stm₂} {s s´ s˝ : State}
+        → inj₁(S , s) ⇒ inj₁(S´ , s´)
+        → ⟨ S´ , s´ ⟩⇒₂ s˝
+        → ⟨ S , s ⟩⇒₂ s˝
+    step-then-big (COMP-1ₛₛₛ x) (COMP-BSS y y₁) = COMP-BSS (step-then-big x y) y₁
+    step-then-big (COMP-2ₛₛₛ (ASSₛₛₛ x)) y = COMP-BSS (ASS-BSS x) y
+    step-then-big (COMP-2ₛₛₛ SKIPₛₛₛ) y = COMP-BSS SKIP-BSS y
+    step-then-big (IF-TRUEₛₛₛ x) y = IF-TRUE-BSS y x
+    step-then-big (IF-FALSEₛₛₛ x) y = IF-FALSE-BSS y x
+    step-then-big WHILEₛₛₛ (IF-TRUE-BSS (COMP-BSS y y₁) x) = WHILE-TRUE-BSS x y y₁
+    step-then-big WHILEₛₛₛ (IF-FALSE-BSS SKIP-BSS x) = WHILE-FALSE-BSS x
 
     -- Theorem 4.13
---    T4-13 : {S : Stm₂} → {s s´ : State} → inj₁(S , s) ⇒* inj₂ s´ → ⟨ S , s ⟩⇒₂ s´
---    T4-13 (_ , ASSₛₛₛ x T.⇒∘⇒ T.x⇒x) = ASS-BSS x
---    T4-13 (_ , SKIPₛₛₛ T.⇒∘⇒ T.x⇒x) = SKIP-BSS
---    T4-13 (suc k , T._⇒∘⇒_ {γ´ = .(inj₂ _)} {γ˝ = inj₁ (S´ , s˝)} (COMP-1ₛₛₛ x) snd) = {!   !}
---    T4-13 (suc k , T._⇒∘⇒_ {γ´ = .(inj₂ _)} {γ˝ = inj₁ (S´ , s˝)} (COMP-2ₛₛₛ x) snd) with L4-14 (COMP-2ₛₛₛ x ⇒∘⇒ snd)
---    ... | k₁ , k₂ , s˝´ , ⟨S₁,s⟩⇒ᵏ¹s˝ , ⟨S₂,s˝⟩⇒ᵏ²s´ , 1+k≡k₁+k₂ with T4-13 (k , snd)
---    ...                                                                 | ⟨S´,s˝⟩⇒s´ = {!  ⟨S´,s˝⟩⇒s´ !}
---    T4-13 (suc k , T._⇒∘⇒_ {γ´ = .(inj₂ _)} {γ˝ = inj₁ (S´ , s˝)} (IF-TRUEₛₛₛ x) snd) = {!   !}
---    T4-13 (suc k , T._⇒∘⇒_ {γ´ = .(inj₂ _)} {γ˝ = inj₁ (S´ , s˝)} (IF-FALSEₛₛₛ x) snd) = {!   !}
---    T4-13 (suc k , T._⇒∘⇒_ {γ´ = .(inj₂ _)} {γ˝ = inj₁ (S´ , s˝)} WHILEₛₛₛ snd) = {!   !}
+    T4-13 : {S : Stm₂} {s s´ : State} {k : ℕ}
+          → inj₁(S , s) ⇒⟨ k ⟩ inj₂ s´
+          → ⟨ S , s ⟩⇒₂ s´
+    T4-13 (ASSₛₛₛ x ⇒∘⇒ x⇒x) = ASS-BSS x
+    T4-13 (SKIPₛₛₛ ⇒∘⇒ x⇒x) = SKIP-BSS
+    T4-13 (COMP-1ₛₛₛ ⟨S₁,s⟩⇒₂⟨S₁´,s´⟩  ⇒∘⇒  ⟨S₁´:S₂,s´⟩⇒s´₁) with T4-13 ⟨S₁´:S₂,s´⟩⇒s´₁
+    ... | COMP-BSS ⟨S₁´,s₁´⟩⇒s˝ ⟨S₂,s˝⟩⇒s´ = COMP-BSS (step-then-big ⟨S₁,s⟩⇒₂⟨S₁´,s´⟩ ⟨S₁´,s₁´⟩⇒s˝) ⟨S₂,s˝⟩⇒s´
+
+    T4-13 (COMP-2ₛₛₛ x ⇒∘⇒ snd) = COMP-BSS (T4-13 (x ⇒∘⇒ x⇒x)) (T4-13 snd)
+    T4-13 (IF-TRUEₛₛₛ x ⇒∘⇒ snd) = IF-TRUE-BSS (T4-13 snd) x
+    T4-13 (IF-FALSEₛₛₛ x ⇒∘⇒ snd) = IF-FALSE-BSS (T4-13 snd) x
+
+    T4-13 (WHILEₛₛₛ ⇒∘⇒ IF-TRUEₛₛₛ x ⇒∘⇒ snd) with T4-13 snd
+    ... | COMP-BSS a b = WHILE-TRUE-BSS x a b
+    T4-13 (WHILEₛₛₛ ⇒∘⇒ IF-FALSEₛₛₛ x ⇒∘⇒ SKIPₛₛₛ ⇒∘⇒ x⇒x) = WHILE-FALSE-BSS x
+
 
 -- Section End Page 55-58
