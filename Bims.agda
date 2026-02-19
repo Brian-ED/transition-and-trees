@@ -132,10 +132,8 @@ module Aexp₁-smallstep-semantic where
                    → α₂ ⇒₂ α₂´
                    → inj₁ (α₁ + α₂) ⇒₂ inj₁ (α₁ + α₂´)
 
-        PLUS-3ₛₛₛ : ∀ {α₁ α₂ n₁ n₂}
-                  → α₁ ⇒₂ inj₂ n₁
-                  → α₂ ⇒₂ inj₂ n₂
-                  → inj₁ (α₁ + α₂) ⇒₂ inj₂ (n₁ +ℤ n₂)
+        PLUS-3ₛₛₛ : ∀ {n₁ n₂}
+                  → inj₁ (inj₂ n₁ + inj₂ n₂) ⇒₂ inj₂ (n₁ +ℤ n₂)
 
         -- MULT
         MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
@@ -148,7 +146,7 @@ module Aexp₁-smallstep-semantic where
 
         MULT-3ₛₛₛ : ∀ {v v₁ v₂}
                   → v ≡ v₁ *ℤ v₂
-                  → inj₁ (inj₂ v₁ * inj₂ v₂) ⇒₂ inj₂ v₂
+                  → inj₁ (inj₂ v₁ * inj₂ v₂) ⇒₂ inj₂ v
 
         -- SUB
         SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}

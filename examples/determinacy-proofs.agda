@@ -1,4 +1,4 @@
-module determinacy-proofs where
+module examples.determinacy-proofs where
 -- Section Begin Page 39
 
 open import Data.Integer using (+_) renaming (ℤ to Num)
@@ -32,7 +32,6 @@ module Aexp₁-smallstep-determinacy where
   -- Determinacy for eventual small step (TODO: Apparently it's supposed to be proven in chapter 5, so might want to move this at some point)
   -- Proof for Theorem 3.15
   open Aexp₁-smallstep-semantic
-  open TransitionSystem using (_step-suc_; step-zero)
   open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong; cong₂)
 
   -- TODO unfinished, finish it at chapter 5

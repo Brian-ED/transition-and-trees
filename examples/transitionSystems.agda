@@ -1,4 +1,4 @@
-module transitionSystems where
+module examples.transitionSystems where
 
 open import Data.Empty using (⊥)
 open import Data.Unit using (⊤)

@@ -1,4 +1,4 @@
-module bims where
+module examples.bims where
 
 -- Section Start Page 29
 module Aexp₁-example-expr where
@@ -230,7 +230,7 @@ module Aexp₂-smallstep-example where
             ("y" ←₃ inj₁(N + 4))
             , (s [ "x" ↦ + 7 ])
         )
-    transition2 = COMP-2ₛₛₛ (ASSₛₛₛ (NUM-BSS PLUS-BSS (VAR-BSS refl))) ⇒∘⇒ x⇒x --step-suc outExpr , (COMP-2ₛₛₛ (ASSₛₛₛ f) , x⇒x)
+    transition2 = COMP-2ₛₛₛ (ASSₛₛₛ (NUM-BSS PLUS-BSS (VAR-BSS refl))) ⇒∘⇒ x⇒x
 
     transition3 :
         inj₁ (
