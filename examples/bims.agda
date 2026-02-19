@@ -289,10 +289,10 @@ module SmallStep-BigStep-Equivalence where
     L4-14 (COMP-1ₛₛₛ x ⇒∘⇒ x₁) | s´ , xx , y , refl = s´ , x ⇒∘ xx , y , refl
     L4-14 {k = suc (suc k)} (COMP-2ₛₛₛ x ⇒∘⇒ x₁) = _ , x ⇒∘ x⇒*x , (_ , x₁) , refl
 
-    step-then-big :  {S S´ : Stm₂} {s s´ s˝ : State}
-        → inj₁(S , s) ⇒ inj₁(S´ , s´)
-        → ⟨ S´ , s´ ⟩⇒₂ s˝
-        → ⟨ S , s ⟩⇒₂ s˝
+    step-then-big : {S S´ : Stm₂} {s s´ s˝ : State}
+                  → inj₁(S , s) ⇒ inj₁(S´ , s´)
+                  → ⟨ S´ , s´ ⟩⇒₂ s˝
+                  → ⟨ S , s ⟩⇒₂ s˝
     step-then-big (COMP-1ₛₛₛ x) (COMP-BSS y y₁) = COMP-BSS (step-then-big x y) y₁
     step-then-big (COMP-2ₛₛₛ (ASSₛₛₛ x)) y = COMP-BSS (ASS-BSS x) y
     step-then-big (COMP-2ₛₛₛ SKIPₛₛₛ) y = COMP-BSS SKIP-BSS y

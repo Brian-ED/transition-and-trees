@@ -65,7 +65,7 @@ module Aexp₁-bigstep-semantic where
                     → inj₁ [ α₁ ] ⇒₁ inj₂ v₁
 
         NUM-BSS : ∀ {n}
-                  → inj₁ (N n) ⇒₁ inj₂ n
+                → inj₁ (N n) ⇒₁ inj₂ n
 
     infixr 5 _PLUS-BSS_
     infixr 5 _MULT-BSS_
