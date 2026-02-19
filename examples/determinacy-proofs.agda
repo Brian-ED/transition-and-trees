@@ -26,7 +26,7 @@ module Aexp₁-bigstep-determinacy where
   Determinacy₁ (x MULT-BSS x₁) (y MULT-BSS y₁) = cong₂ _*ℤ_ (Determinacy₁ x y) (Determinacy₁ x₁ y₁)
   Determinacy₁ (x MINUS-BSS x₁) (y MINUS-BSS y₁) = cong₂ _-ℤ_ (Determinacy₁ x y) (Determinacy₁ x₁ y₁)
   Determinacy₁ (PARENT-BSS x) (PARENT-BSS y) = Determinacy₁ x y
-  Determinacy₁ NUM-BSS_ NUM-BSS_ = refl
+  Determinacy₁ NUM-BSS NUM-BSS = refl
 
 module Aexp₁-smallstep-determinacy where
   -- Determinacy for eventual small step (TODO: Apparently it's supposed to be proven in chapter 5, so might want to move this at some point)
