@@ -562,11 +562,11 @@ module Stm₂-semantic where
                   → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s´) ⟩
 
         IF-TRUEₛₛₛ : ∀ {s b S₁ S₂}
-                   → s ⊢ b ⇒₂b inj₂ tt -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj₁, which seems wrong
+                   → s ⊢ b ⇒₂b inj₂ tt
                    → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₁ , s) ⟩
 
         IF-FALSEₛₛₛ : ∀ {s b S₁ S₂}
-                    → s ⊢ b ⇒₂b inj₂ ff -- TODO right sides of some of these arrows assume the result is terminal value at inj2 instead of inj₁, which seems wrong
+                    → s ⊢ b ⇒₂b inj₂ ff
                     → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
 
         WHILEₛₛₛ : ∀ {s b S}
