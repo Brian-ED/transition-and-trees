@@ -10,6 +10,4 @@ record BigStepSemantics (TS : TransitionSystem) : Set₁ where
     field
         BigStepping : (x y : Γ) → x ⇒ y → T y
 
--- TODO: Complain to book maker that a SmallStepSemantic is a big step semantic too.
-
 -- Section End Page 31
