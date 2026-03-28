@@ -343,7 +343,6 @@ module Bexp-smallstep-transition where
 -- Section End Page 40
 
 module Aexp₂-semantic where
-    open import State using (State; _[_↦_]; lookup; emptyState)
     open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _<_ to _<ℤ_)
     open import Data.String using () renaming (String to Var)
     open import Relation.Binary.PropositionalEquality using (_≡_)
@@ -356,6 +355,7 @@ module Aexp₂-semantic where
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
 
+    open import State Num using (State; _[_↦_]; lookup; emptyState)
 
     -- Section Start Page 44-45
 
@@ -485,7 +485,6 @@ module Aexp₂-semantic where
 
 
 module Stm₂-semantic where
-    open import State using (State; _[_↦_]; lookup; emptyState)
     open import Data.Integer using () renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _<_ to _<ℤ_)
     open import Data.String using () renaming (String to Var)
     open import Relation.Binary.PropositionalEquality using (_≡_)
@@ -498,6 +497,8 @@ module Stm₂-semantic where
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
     open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_)
+
+    open import State Num using (State; _[_↦_]; lookup; emptyState)
 
     -- Section Begin Page 47
 

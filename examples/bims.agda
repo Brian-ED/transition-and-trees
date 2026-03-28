@@ -119,7 +119,6 @@ module Bexp-small-step-example where
 
 -- Section Begin Page 48-52
 module Aexp₂-state-transition-example where
-    open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
     open Bims.Aexp₂-semantic
@@ -127,6 +126,9 @@ module Aexp₂-state-transition-example where
     open import Data.Nat using (ℕ)
     open import Data.Integer using (+_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
+    open import Data.Integer using () renaming (ℤ to Num)
+
+    open import State Num using (State; _[_↦_]; emptyState)
 
     code = ("i" ←₃ (inj₁ (N + 6))) Å₃
         (while inj₁(¬₃ inj₁((inj₁(V "i")) ==₃ (inj₁ (N + 0)))) do₃ (
@@ -176,17 +178,18 @@ module Aexp₂-state-transition-example where
 -- Problem 4.9
 
 module Aexp₂-smallstep-example where
-    open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
     open Bims.Aexp₂-semantic
     open Bims.Stm₂-semantic
     import TransitionSystems as TS
     open import Data.Nat using (ℕ; z≤n) renaming (s≤s to s≤s_)
-    open import Data.Integer using (+_) renaming (+<+ to +<+_)
+    open import Data.Integer using (+_) renaming (+<+ to +<+_; ℤ to Num)
     open import Data.String using (String)
     open import Data.Product using (_,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
+
+    open import State Num using (State; _[_↦_]; emptyState)
 
     S =
         ifStm₂
@@ -248,7 +251,6 @@ module Aexp₂-smallstep-example where
 -- Section Begin Page 55-58
 
 module SmallStep-BigStep-Equivalence where
-    open import State using (State; _[_↦_]; emptyState)
     open import Relation.Binary.PropositionalEquality using (_≡_; refl)
     import Bims
     open Bims.Aexp₂-semantic
@@ -262,6 +264,9 @@ module SmallStep-BigStep-Equivalence where
     open import Data.Bool using (false; true)
     open import TransitionSystems using () renaming (TransitionSystem to T)
     open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _⇒∘_; _⇒_; _∘⇒∘_; x⇒*x)
+    open import Data.Integer using () renaming (ℤ to Num)
+
+    open import State Num using (State; _[_↦_]; emptyState)
 
     L4-12 : {S₁ S₂ : Stm₂} {s s´ : State}
           → inj₁(S₁ , s) ⇒* inj₂ s´

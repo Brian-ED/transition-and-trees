@@ -1,6 +1,5 @@
-module State where
+module State (𝕍 : Set) where
 open import Data.Product using (Σ; _×_; _,_)
-open import Data.Integer using (+_; ℤ)
 open import Data.String using (String; _≟_; _<_)
 open import Data.String.Properties using (_<?_)
 open import Agda.Builtin.String using () renaming ()
@@ -10,7 +9,7 @@ open import Agda.Builtin.Maybe using (Maybe; just; nothing)
 open import Relation.Nullary using (yes)
 open import Data.List using (List; []; _∷_)
 
-data Sorted : List (String × ℤ) → Set where
+data Sorted : List (String × 𝕍) → Set where
   sortedNil  : Sorted []
   sortedOne  : ∀ {x} → Sorted (x ∷ [])
   sortedCons : ∀ {s1 n1 s2 n2 xs}
@@ -18,13 +17,13 @@ data Sorted : List (String × ℤ) → Set where
              → Sorted ((s2 , n2) ∷ xs)
              → Sorted ((s1 , n1) ∷ (s2 , n2) ∷ xs)
 
-State = Σ (List (String × ℤ)) Sorted
+State = Σ (List (String × 𝕍)) Sorted
 
 --infixr 12 _[_↦_]
 
 _[_↦_] : State
        → String
-       → ℤ
+       → 𝕍
        → State
 ([] , _) [ s ↦ n ] = (s , n) ∷ [] , sortedOne
 ((s₁ , _ ) ∷ [] , _) [ s ↦ _ ] with s <? s₁ | s₁ <? s
@@ -51,7 +50,7 @@ _                                             [ _ ↦ _ ]    | f                
 emptyState : State
 emptyState = [] , sortedNil
 
-lookup : String → State → Maybe ℤ
+lookup : String → State → Maybe 𝕍
 lookup x ([] , sortedNil) = nothing
 lookup x ((v , i) ∷ rest , sortedOne      ) = if x == v then just i else nothing
 lookup x ((v , i) ∷ rest , sortedCons x₁ p) = if x == v then just i else lookup x (rest , p)
