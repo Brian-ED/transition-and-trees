@@ -403,7 +403,7 @@ module Aexp₂-semantic where
                 → s ⊢ inj₁ (N n) ⇒ₐ inj₂ n
 
         VAR-BSS_ : ∀ {s x v}
-                 → (lookup x s) ≡ just v
+                 → (lookup s x) ≡ just v
                  → s ⊢ inj₁ (V x) ⇒ₐ inj₂ v
 
     -- The book states that the `⌞ (Aexp₂ ⊎ Num) , (_⊢_⇒ₐ_ s) , T₃ ⌟` transition system is a big-step-semantic, though does not prove it.
@@ -500,7 +500,7 @@ module Stm₂-semantic where
     open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_)
 
     open import Data.String using (String; _<_; _<?_; _==_)
-    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; lookup; emptyState)
+    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; emptyState)
 
     -- Section Begin Page 47
 

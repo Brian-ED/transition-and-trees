@@ -58,7 +58,7 @@ _                                             [ _ ↦ _ ]    | f                
 emptyState : State
 emptyState = [] , sortedNil
 
-lookup : ID → State → Maybe 𝕍
-lookup x ([] , sortedNil) = nothing
-lookup x ((v , i) ∷ rest , sortedOne      ) = if x == v then just i else nothing
-lookup x ((v , i) ∷ rest , sortedCons x₁ p) = if x == v then just i else lookup x (rest , p)
+lookup : State → ID → Maybe 𝕍
+lookup ([] , sortedNil) x = nothing
+lookup ((v , i) ∷ rest , sortedOne      ) x = if x == v then just i else nothing
+lookup ((v , i) ∷ rest , sortedCons x₁ p) x = if x == v then just i else lookup (rest , p) x
