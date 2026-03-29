@@ -128,7 +128,9 @@ module Aexp₂-state-transition-example where
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Integer using () renaming (ℤ to Num)
 
-    open import State Num using (State; _[_↦_]; emptyState)
+    open import Data.String using (String; _<_; _<?_; _==_)
+
+    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; emptyState)
 
     code = ("i" ←₃ (inj₁ (N + 6))) Å₃
         (while inj₁(¬₃ inj₁((inj₁(V "i")) ==₃ (inj₁ (N + 0)))) do₃ (
@@ -189,7 +191,9 @@ module Aexp₂-smallstep-example where
     open import Data.Product using (_,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
-    open import State Num using (State; _[_↦_]; emptyState)
+    open import Data.String using (String; _<_; _<?_; _==_)
+
+    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; emptyState)
 
     S =
         ifStm₂
@@ -266,7 +270,9 @@ module SmallStep-BigStep-Equivalence where
     open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _⇒∘_; _⇒_; _∘⇒∘_; x⇒*x)
     open import Data.Integer using () renaming (ℤ to Num)
 
-    open import State Num using (State; _[_↦_]; emptyState)
+    open import Data.String using (String; _<?_) renaming (_<_ to _<ₛ_; _==_ to _==ₛ_)
+
+    open import State Num String _<ₛ_ _<?_ _==ₛ_ using (State; _[_↦_]; emptyState)
 
     L4-12 : {S₁ S₂ : Stm₂} {s s´ : State}
           → inj₁(S₁ , s) ⇒* inj₂ s´

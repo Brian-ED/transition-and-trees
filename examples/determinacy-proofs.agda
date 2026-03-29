@@ -1,7 +1,6 @@
 module examples.determinacy-proofs where
 -- Section Begin Page 39
 
-open import Data.Integer using (+_) renaming (ℤ to Num)
 open import Function using (_∘_)
 open import Data.String using () renaming (String to Var)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl)
@@ -11,7 +10,7 @@ open import Data.Empty using (⊥; ⊥-elim)
 open import Data.Unit using (⊤; tt)
 open import Data.Nat using (ℕ; suc; zero) renaming ()
 open import TransitionSystems using (TransitionSystem)
-open import Data.Integer using (ℤ) renaming (_+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_)
+open import Data.Integer using (+_) renaming (ℤ to Num; _+_ to _+ℤ_; _-_ to _-ℤ_; _*_ to _*ℤ_; _≟_ to _=ℤ_)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong₂; sym; trans)
 open import Bims using (module Aexp₁-bigstep-semantic; module Aexp₁-smallstep-semantic)
@@ -21,7 +20,7 @@ module Aexp₁-bigstep-determinacy where
 
   -- Determinacy for big step (TODO: Apparently it's supposed to be proven in chapter 5, so might want to move this at some point)
   -- Proof for Theorem 3.13
-  Determinacy₁ : {v1 v2 : Num} → {α : Aexp₁ ⊎ ℤ} → α ⇒₁ inj₂ v1 → α ⇒₁ inj₂ v2 → v1 ≡ v2
+  Determinacy₁ : {v1 v2 : Num} → {α : Aexp₁ ⊎ Num} → α ⇒₁ inj₂ v1 → α ⇒₁ inj₂ v2 → v1 ≡ v2
   Determinacy₁ (x PLUS-BSS x₁) (y PLUS-BSS y₁) = cong₂ _+ℤ_ (Determinacy₁ x y) (Determinacy₁ x₁ y₁)
   Determinacy₁ (x MULT-BSS x₁) (y MULT-BSS y₁) = cong₂ _*ℤ_ (Determinacy₁ x y) (Determinacy₁ x₁ y₁)
   Determinacy₁ (x MINUS-BSS x₁) (y MINUS-BSS y₁) = cong₂ _-ℤ_ (Determinacy₁ x y) (Determinacy₁ x₁ y₁)

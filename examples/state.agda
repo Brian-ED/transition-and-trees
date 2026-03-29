@@ -1,11 +1,12 @@
 module examples.state where
 
-open import State
+open import Data.Integer using (ℤ; +_)
+open import Data.String using (String; _<_; _<?_; _==_)
+open import State ℤ String _<_ _<?_ _==_
 
 open import Data.List.Relation.Binary.Lex using (this)
 open import Data.Nat.Base using (_≤_; z≤n) renaming (s≤s to s≤s_)
 open import Data.Nat using (ℕ; _+_)
-open import Data.Integer using (+_)
 open import Data.Product using (Σ; _×_; _,_)
 open import Data.List using ([]; _∷_)
 open import Data.String using (_<_)

@@ -355,7 +355,8 @@ module Aexp₂-semantic where
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
 
-    open import State Num using (State; _[_↦_]; lookup; emptyState)
+    open import Data.String using (String; _<_; _<?_; _==_)
+    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; lookup; emptyState)
 
     -- Section Start Page 44-45
 
@@ -498,7 +499,8 @@ module Stm₂-semantic where
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
     open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_)
 
-    open import State Num using (State; _[_↦_]; lookup; emptyState)
+    open import Data.String using (String; _<_; _<?_; _==_)
+    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; lookup; emptyState)
 
     -- Section Begin Page 47
 

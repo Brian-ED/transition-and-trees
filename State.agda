@@ -1,28 +1,36 @@
-module State (𝕍 : Set) where
+open import Relation.Binary.Core using (Rel)
+open import Level using (Level)
+open import Relation.Binary.Definitions using (Decidable)
+open import Data.Bool using (if_then_else_; Bool)
+
+module State
+    (𝕍 : Set)
+    (ID : Set)
+    (_<_ : Rel ID Level.0ℓ)
+    (_<?_ : Decidable _<_)
+    (_==_ : ID → ID → Bool)
+    where
+
 open import Data.Product using (Σ; _×_; _,_)
-open import Data.String using (String; _≟_; _<_)
-open import Data.String.Properties using (_<?_)
-open import Agda.Builtin.String using () renaming ()
-open import Data.String using (_==_)
-open import Data.Bool using (if_then_else_)
 open import Agda.Builtin.Maybe using (Maybe; just; nothing)
 open import Relation.Nullary using (yes)
 open import Data.List using (List; []; _∷_)
 
-data Sorted : List (String × 𝕍) → Set where
-  sortedNil  : Sorted []
-  sortedOne  : ∀ {x} → Sorted (x ∷ [])
-  sortedCons : ∀ {s1 n1 s2 n2 xs}
-             → s1 < s2
-             → Sorted ((s2 , n2) ∷ xs)
-             → Sorted ((s1 , n1) ∷ (s2 , n2) ∷ xs)
 
-State = Σ (List (String × 𝕍)) Sorted
+data Sorted : List (ID × 𝕍) → Set where
+    sortedNil  : Sorted []
+    sortedOne  : ∀ {x} → Sorted (x ∷ [])
+    sortedCons : ∀ {s1 n1 s2 n2 xs}
+               → s1 < s2
+               → Sorted ((s2 , n2) ∷ xs)
+               → Sorted ((s1 , n1) ∷ (s2 , n2) ∷ xs)
+
+State = Σ (List (ID × 𝕍)) Sorted
 
 --infixr 12 _[_↦_]
 
 _[_↦_] : State
-       → String
+       → ID
        → 𝕍
        → State
 ([] , _) [ s ↦ n ] = (s , n) ∷ [] , sortedOne
@@ -50,7 +58,7 @@ _                                             [ _ ↦ _ ]    | f                
 emptyState : State
 emptyState = [] , sortedNil
 
-lookup : String → State → Maybe 𝕍
+lookup : ID → State → Maybe 𝕍
 lookup x ([] , sortedNil) = nothing
 lookup x ((v , i) ∷ rest , sortedOne      ) = if x == v then just i else nothing
 lookup x ((v , i) ∷ rest , sortedCons x₁ p) = if x == v then just i else lookup x (rest , p)
