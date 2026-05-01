@@ -1,21 +1,19 @@
 open import Relation.Binary.Core using (Rel)
-open import Level using (Level)
+open import Level using (0ℓ)
 open import Relation.Binary.Definitions using (Decidable)
-open import Data.Bool using (if_then_else_; Bool)
+open import Data.Bool using (if_then_else_; Bool; false; true; _∨_; _∧_)
+open import Data.Product using (Σ; _×_; _,_)
+open import Data.Maybe using (Maybe; just; nothing)
+open import Relation.Nullary using (yes)
+open import Data.List using (List; []; _∷_)
 
 module State
     (𝕍 : Set)
     (ID : Set)
-    (_<_ : Rel ID Level.0ℓ)
+    (_<_ : Rel ID 0ℓ)
     (_<?_ : Decidable _<_)
     (_==_ : ID → ID → Bool)
     where
-
-open import Data.Product using (Σ; _×_; _,_)
-open import Agda.Builtin.Maybe using (Maybe; just; nothing)
-open import Relation.Nullary using (yes)
-open import Data.List using (List; []; _∷_)
-
 
 data Sorted : List (ID × 𝕍) → Set where
     sortedNil  : Sorted []
@@ -62,3 +60,19 @@ lookup : State → ID → Maybe 𝕍
 lookup ([] , sortedNil) x = nothing
 lookup ((v , i) ∷ rest , sortedOne      ) x = if x == v then just i else nothing
 lookup ((v , i) ∷ rest , sortedCons x₁ p) x = if x == v then just i else lookup (rest , p) x
+
+joinOverwrite : (overWrited overWriter : State) → State
+joinOverwrite overWrited (fst , snd) = joinOverwriteNoSort overWrited fst
+    where
+    joinOverwriteNoSort : (overWrited : State) → (overWriter : List (ID × 𝕍)) → State
+    joinOverwriteNoSort overWrited [] = overWrited
+    joinOverwriteNoSort overWrited ((fst , snd) ∷ overWriter) = joinOverwriteNoSort (overWrited [ fst ↦ snd ]) overWriter
+
+_⊢_==ₛ_ : (_==_ : 𝕍 → 𝕍 → Bool) → State → State → Bool
+_==ᵥ_ ⊢ (a , _) ==ₛ (b , _) = a ==ₛ b
+    where
+        _==ₛ_ : List (ID × 𝕍) → List (ID × 𝕍) → Bool
+        [] ==ₛ [] = true
+        [] ==ₛ (x ∷ y)   = false
+        (x ∷ y) ==ₛ [] = false
+        ((aID , aV) ∷ as) ==ₛ ((bID , bV) ∷ bs) = (aV ==ᵥ bV) ∧ (aID == bID) ∧ (as ==ₛ bs)
