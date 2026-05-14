@@ -45,3 +45,5 @@ In the proof of Theorem 4.13, there's a form of referencing done for the sentenc
 Theorem 4.13 only proves 2 out of the 5 cases (see "We show only two cases here") and yet is called a proof in the book. It isn't a proof, because a proof requires proving all sub cases when proving by construction. This is opinionated, because "We show only two cases here" could be implicitly assuming the other 3 cases as some sort of axioms, though it's pretty impropper, imo.
 
 Theorem 4.13 defines s˝´ and yet re-uses s˝. They are equal, so not a mistake, but the proof in Theorem 4.13 proves for s˝, which only works if you assume they are equal. It is an implicit assumption.
+
+The book never defines which set theory it assumes.
