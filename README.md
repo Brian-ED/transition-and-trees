@@ -37,6 +37,8 @@ Lemma 4.14 has ⟨S₁;S₂⟩⇒ᵏs˝, which isn't a valid statement, state in
 
 Lemma 4.14, sentence "k₂ = k₂₂". k₂₂ is never defined, only k₂₁, which I have assumed the author meant.
 
+Table 9.1 generalized variables, two different rules are given the same name "GVAR-1BSS".
+
 ### Opinionated
 The generic transition ⇒ᵏ in transition systems I believe would be simpler if instead of defining it using step 0 and step suc k, and defining ⇒* afterwards, you could just define ⇒* first. Every induction, instead of being reliant on an intiger, could just rely on the length of the transition sequence itself. The reason I believe this is simpler is that it avoids the duplicate information from k, since it's determined by the transition sequence anyways. Duplicate information is annoying when unifying things. It could be that I only believe this because Agda proves by construction, and needs unification a lot.
 
