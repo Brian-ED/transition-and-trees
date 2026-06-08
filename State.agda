@@ -1,21 +1,22 @@
 open import Relation.Binary.Core using (Rel)
-open import Level using (0ℓ)
 open import Relation.Binary.Definitions using (Decidable)
-open import Data.Bool using (if_then_else_; Bool; false; true; _∨_; _∧_)
-open import Data.Product using (Σ; _×_; _,_)
+open import Data.Bool using (if_then_else_; Bool; false; true; _∧_)
+open import Data.Product using (∃; Σ; _×_; _,_)
 open import Data.Maybe using (Maybe; just; nothing)
 open import Relation.Nullary using (yes)
 open import Data.List using (List; []; _∷_)
+open import Relation.Binary.PropositionalEquality using (_≡_)
 
 module State
-    (𝕍 : Set)
-    (ID : Set)
-    (_<_ : Rel ID 0ℓ)
+    {ℓ}
+    (𝕍 : Set ℓ)
+    (ID : Set ℓ)
+    (_<_ : Rel ID ℓ)
     (_<?_ : Decidable _<_)
     (_==_ : ID → ID → Bool)
     where
 
-data Sorted : List (ID × 𝕍) → Set where
+data Sorted : List (ID × 𝕍) → Set ℓ where
     sortedNil  : Sorted []
     sortedOne  : ∀ {x} → Sorted (x ∷ [])
     sortedCons : ∀ {s1 n1 s2 n2 xs}
@@ -24,8 +25,6 @@ data Sorted : List (ID × 𝕍) → Set where
                → Sorted ((s1 , n1) ∷ (s2 , n2) ∷ xs)
 
 State = Σ (List (ID × 𝕍)) Sorted
-
---infixr 12 _[_↦_]
 
 _[_↦_] : State
        → ID
@@ -68,7 +67,7 @@ joinOverwrite overWrited (fst , snd) = joinOverwriteNoSort overWrited fst
     joinOverwriteNoSort overWrited [] = overWrited
     joinOverwriteNoSort overWrited ((fst , snd) ∷ overWriter) = joinOverwriteNoSort (overWrited [ fst ↦ snd ]) overWriter
 
-_⊢_==ₛ_ : (_==_ : 𝕍 → 𝕍 → Bool) → State → State → Bool
+_⊢_==ₛ_ : (_==ᵥ_ : 𝕍 → 𝕍 → Bool) → State → State → Bool
 _==ᵥ_ ⊢ (a , _) ==ₛ (b , _) = a ==ₛ b
     where
         _==ₛ_ : List (ID × 𝕍) → List (ID × 𝕍) → Bool
@@ -76,3 +75,17 @@ _==ᵥ_ ⊢ (a , _) ==ₛ (b , _) = a ==ₛ b
         [] ==ₛ (x ∷ y)   = false
         (x ∷ y) ==ₛ [] = false
         ((aID , aV) ∷ as) ==ₛ ((bID , bV) ∷ bs) = (aV ==ᵥ bV) ∧ (aID == bID) ∧ (as ==ₛ bs)
+
+sorted→PopSorted : ∀ {e v} → Sorted (e ∷ v) → Sorted v
+sorted→PopSorted sortedOne = sortedNil
+sorted→PopSorted (sortedCons x x₁) = x₁
+
+delete : (id : ID) → (l : List (ID × 𝕍)) → (p : Sorted l) → (∃ λ v → lookup (l , p) id ≡ just v) → State
+delete id [] sortedNil ()
+delete id ((id₁ , v₁) ∷ []) sortedOne (a , b) with id == id₁
+... | true = [] , sortedNil
+... | false with b
+... | ()
+delete id ((id₁ , v₁) ∷ fst) (sortedCons x snd) z with id == id₁
+... | true = fst , snd
+... | false = delete id fst snd z [ id₁ ↦ v₁ ]
