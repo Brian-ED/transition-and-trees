@@ -122,15 +122,13 @@ module Aexp₂-state-transition-example where
     open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
     open Bims.Aexp₂-semantic
-    open Bims.Stm₂-semantic
+    open Bims.Stm₂-semantic hiding (<<str)
     open import Data.Nat using (ℕ)
-    open import Data.Integer using (+_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
-    open import Data.Integer using () renaming (ℤ to Num)
 
+    open import Data.Integer using (ℤ; +_)
     open import Data.String using (String; _<_; _<?_; _==_)
-
-    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; emptyState)
+    open import State ℤ String _<_ <<str _<?_ _==_
 
     code = ("i" ←₃ (inj₁ (N + 6))) Å₃
         (while inj₁(¬₃ inj₁((inj₁(V "i")) ==₃ (inj₁ (N + 0)))) do₃ (
@@ -138,8 +136,8 @@ module Aexp₂-state-transition-example where
             ("i" ←₃ inj₁(inj₁(V "i") - inj₁(N + 2)))
         ))
 
-    beginState = emptyState [ "x" ↦ + 5 ]
-    endState = (emptyState [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
+    beginState = [] [ "x" ↦ + 5 ]
+    endState = ([] [ "x" ↦ + 17 ]) [ "i" ↦ + 0 ]
     P2 : ⟨ code , beginState ⟩⇒₂ endState
     P2 = COMP-BSS
         (ASS-BSS NUM-BSS)
@@ -166,9 +164,9 @@ module Aexp₂-state-transition-example where
     S = while inj₁(inj₁(N + 0) ==₃ inj₁(N + 0)) do₃ skip₃
 
     neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
-    neverTerminates s = emptyState , f
+    neverTerminates s = [] , f
         where
-            f : {s : State} → ⟨ S , s ⟩⇒₂ emptyState → ⊥
+            f : {s : State} → ⟨ S , s ⟩⇒₂ [] → ⊥
             f (WHILE-TRUE-BSS _ _ x₂) = f x₂
             f (WHILE-FALSE-BSS (EQUALS-2-BSS NUM-BSS NUM-BSS x₃)) = x₃ refl
 
@@ -183,7 +181,7 @@ module Aexp₂-smallstep-example where
     open import Relation.Binary.PropositionalEquality using (refl)
     import Bims
     open Bims.Aexp₂-semantic
-    open Bims.Stm₂-semantic
+    open Bims.Stm₂-semantic hiding (<<str)
     import TransitionSystems as TS
     open import Data.Nat using (ℕ; z≤n) renaming (s≤s to s≤s_)
     open import Data.Integer using (+_) renaming (+<+ to +<+_; ℤ to Num)
@@ -191,9 +189,9 @@ module Aexp₂-smallstep-example where
     open import Data.Product using (_,_)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
 
+    open import Data.Integer using (ℤ; +_)
     open import Data.String using (String; _<_; _<?_; _==_)
-
-    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; emptyState)
+    open import State ℤ String _<_ <<str _<?_ _==_
 
     S =
         ifStm₂
@@ -204,7 +202,7 @@ module Aexp₂-smallstep-example where
                 ("y" ←₃ inj₁(N + 4))
             )
         else skip₃
-    s = emptyState [ "x" ↦ + 4 ]
+    s = [] [ "x" ↦ + 4 ]
 
     open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong)
 
@@ -258,7 +256,7 @@ module SmallStep-BigStep-Equivalence where
     open import Relation.Binary.PropositionalEquality using (_≡_; refl)
     import Bims
     open Bims.Aexp₂-semantic
-    open Bims.Stm₂-semantic
+    open Bims.Stm₂-semantic hiding (<<str)
     open Bims.Aexp₁-bigstep-semantic
     open import Data.Nat using (ℕ; suc; zero) renaming (_+_ to _+ℕ_)
     open import Data.Integer using (+_)
@@ -268,11 +266,10 @@ module SmallStep-BigStep-Equivalence where
     open import Data.Bool using (false; true)
     open import TransitionSystems using () renaming (TransitionSystem to T)
     open T ⟨_⟩⇒₂⟨_⟩-transition using (_⇒∘⇒_; x⇒x; _⇒*_; _⇒⟨_⟩_; _⇒∘_; _⇒_; _∘⇒∘_; x⇒*x)
-    open import Data.Integer using () renaming (ℤ to Num)
 
-    open import Data.String using (String; _<?_) renaming (_<_ to _<ₛ_; _==_ to _==ₛ_)
-
-    open import State Num String _<ₛ_ _<?_ _==ₛ_ using (State; _[_↦_]; emptyState)
+    open import Data.Integer using (ℤ; +_)
+    open import Data.String using (String; _<?_) renaming (_==_ to _==s_; _<_ to _<s_)
+    open import State ℤ String _<s_ <<str _<?_ _==s_
 
     L4-12 : {S₁ S₂ : Stm₂} {s s´ : State}
           → inj₁(S₁ , s) ⇒* inj₂ s´

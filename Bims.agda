@@ -356,7 +356,13 @@ module Aexp₂-semantic where
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
 
     open import Data.String using (String; _<_; _<?_; _==_)
-    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; lookup; emptyState)
+    <<str = λ a b c → <-isStrictPartialOrder-≈ .trans {a} {b} {c}
+        where
+            open import Relation.Binary.Structures using (IsStrictPartialOrder)
+            open IsStrictPartialOrder using (trans)
+            open import Data.String.Properties using (<-isStrictPartialOrder-≈)
+
+    open import State Num String _<_ <<str _<?_ _==_ using (State; _[_↦_]; lookup)
 
     -- Section Start Page 44-45
 
@@ -497,10 +503,18 @@ module Stm₂-semantic where
     open import Agda.Builtin.Maybe using (Maybe; just; nothing)
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
+    open import Data.Product using (_×_)
     open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_)
 
     open import Data.String using (String; _<_; _<?_; _==_)
-    open import State Num String _<_ _<?_ _==_ using (State; _[_↦_]; emptyState)
+    <<str = λ a b c → <-isStrictPartialOrder-≈ .trans {a} {b} {c}
+        where
+            open import Relation.Binary.Structures using (IsStrictPartialOrder)
+            open IsStrictPartialOrder using (trans)
+            open import Data.String.Properties using (<-isStrictPartialOrder-≈)
+
+    open import State Num String _<_ <<str _<?_ _==_ using (State; _[_↦_])
+
 
     -- Section Begin Page 47
 

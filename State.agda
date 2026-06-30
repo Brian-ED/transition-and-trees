@@ -1,91 +1,91 @@
 open import Relation.Binary.Core using (Rel)
 open import Relation.Binary.Definitions using (Decidable)
 open import Data.Bool using (if_then_else_; Bool; false; true; _∧_)
-open import Data.Product using (∃; Σ; _×_; _,_)
-open import Data.Maybe using (Maybe; just; nothing)
-open import Relation.Nullary using (yes)
-open import Data.List using (List; []; _∷_)
+open import Data.Product using (∃; Σ; _×_; _,_; proj₁; proj₂; uncurry)
+open import Data.Maybe using (Maybe; just; map)
+open import Relation.Nullary using (yes; no)
+open import Data.List using (findᵇ; foldr)
 open import Relation.Binary.PropositionalEquality using (_≡_)
+open import Relation.Nary using (⌊_⌋)
+open import Data.List.Fresh using (List#; cons; []; _∷#_; fresh; toList)
+open import Function using (_∘_)
+
+import Level
 
 module State
-    {ℓ}
-    (𝕍 : Set ℓ)
-    (ID : Set ℓ)
-    (_<_ : Rel ID ℓ)
+    {ℓ₁} {ℓ₂}
+    (𝕍 : Set ℓ₁)
+    (ID : Set ℓ₂)
+    (_<_ : Rel ID ℓ₂)
+    (<<ID : ∀ a b c → a < b → b < c → a < c ) -- takes explicit args because calling a module with a func as arg that takes implicit args errors as Agda doesn't always match them correctly
     (_<?_ : Decidable _<_)
     (_==_ : ID → ID → Bool)
     where
 
-data Sorted : List (ID × 𝕍) → Set ℓ where
-    sortedNil  : Sorted []
-    sortedOne  : ∀ {x} → Sorted (x ∷ [])
-    sortedCons : ∀ {s1 n1 s2 n2 xs}
-               → s1 < s2
-               → Sorted ((s2 , n2) ∷ xs)
-               → Sorted ((s1 , n1) ∷ (s2 , n2) ∷ xs)
+open Data.List.Fresh using ([]) public
 
-State = Σ (List (ID × 𝕍)) Sorted
+_<<_ = λ {a} {b} {c} → <<ID a b c
 
-_[_↦_] : State
-       → ID
-       → 𝕍
-       → State
-([] , _) [ s ↦ n ] = (s , n) ∷ [] , sortedOne
-((s₁ , _ ) ∷ [] , _) [ s ↦ _ ] with s <? s₁ | s₁ <? s
-((s₁ , n₁) ∷ [] , _) [ s ↦ n ]    | yes a   | _     = (s , n) ∷ (s₁ , n₁) ∷ [] , sortedCons a sortedOne
-((s₁ , n₁) ∷ [] , _) [ s ↦ n ]    | _       | yes a = (s₁ , n₁) ∷ (s , n) ∷ [] , sortedCons a sortedOne
-((s₁ , _ ) ∷ [] , _) [ _ ↦ n ]    | _       | _     = (s₁ , n) ∷ [] , sortedOne
+cmp : (a : ID × 𝕍) → (b : ID × 𝕍) → Relation.Nullary.Dec (a .proj₁ < b .proj₁)
+cmp (a , b) (x , y) = a <? x
 
--- I need to prove that the first element of a sorted list is the lowest, and that s is heigher or equal to that element, and also that s and s1 aren't equal.
--- The first of these is hard.
--- Second of these is easy: via the already supposed (s₁ ≤ s) (`s <? s₁`'s `because ofⁿ` branch).
--- Third needs another case created.
--- →→ first element of f has to be larger than s₁
--- Using this I can prove the current goal `Sorted ((s₁ , n₁) ∷ f)`
+State = List# {r = ℓ₂} {a = ℓ₁ Level.⊔ ℓ₂} (ID × 𝕍) ⌊ cmp ⌋
+myFresh = fresh (ID × 𝕍) ⌊ cmp ⌋
 
--- s1 < is₁ ≤ s
+toDec : ∀ {s₁ s} → s₁ < s → ⌊ s₁ <? s ⌋
+toDec {s₁} {s} x .Level.lower with s₁ <? s
+... | yes p = _
+... | no p = p x
 
-(            (s₁ , _ ) ∷ xs , sortedCons _ b) [ s ↦ n ] with (xs , b) [ s ↦ n ]   | s <? s₁
-(            xs             , pp            ) [ s ↦ n ]    | _                    | yes a = (s  , n ) ∷ xs , sortedCons a pp
-(            (s₁ , n₁) ∷ _  , _             ) [ s ↦ n ]    | [] , g               | _     = (s₁ , n) ∷ [] , sortedOne
-((s₁ , n₁) ∷ (s₂ , n₂) ∷ _ , _              ) [ s ↦ n ]    | (is₁ , in₁) ∷ f , pp | _ with s₁ <? is₁
-((s₁ , n₁) ∷ (s₂ , n₂) ∷ _ , _              ) [ s ↦ n ]    | (is₁ , in₁) ∷ f , pp | _    | yes aa = (s₁ , n₁) ∷ (is₁ , in₁) ∷ f , sortedCons aa pp
-_                                             [ _ ↦ _ ]    | f                    | _    | _      = f -- The keys of first elem match with the new one, so just throw the old key away
+fromDec : ∀ {id} {id₁} → ⌊ id <? id₁ ⌋ → id < id₁
+fromDec {id} {id₁} _ with id <? id₁
+fromDec _ | yes p = p
 
-emptyState : State
-emptyState = [] , sortedNil
+appendFresh : ∀ {s n id val xs₁} x → s < id → myFresh (s , n) (cons (id , val) xs₁ x)
+appendFresh {xs₁ = []} _ ordered = toDec ordered , _
+appendFresh {xs₁ = cons (id₁ , val₁) xs₁ lower} (lower₁ , snd₁) ordered = toDec ordered , appendFresh lower (ordered << fromDec lower₁)
+
+_[_↦_] : (s : State) → (id : ID) → (v : 𝕍) → State
+[] [ id ↦ v ] = (id , v) ∷# []
+cons (id₁ , v₁) _ p₁ [ id ↦ v ] with id <? id₁ | id₁ <? id
+cons s₁ [] p₁ [ id ↦ v ] | yes p | q = cons (id , v) (s₁ ∷# []) (toDec p , _)
+cons s₁ [] p₁ [ id ↦ v ] | no  p | yes q = cons s₁ ((id , v) ∷# []) (toDec q , _)
+cons s₁ [] p₁ [ id ↦ v ] | no  p | no  q = (id , v) ∷# []
+cons s₁ s p₁ [ id ↦ v ] | yes p | q = cons (id , v) (cons s₁ s p₁) (appendFresh p₁ p)
+cons (id₁ , _ ) (cons (id₂ , v₂) s p₂) p₁ [ id ↦ v ] | no p | no  q = cons (id₁ , v) (cons (id₂ , v₂) s p₂) (appendFresh p₂ (fromDec (proj₁ p₁)))
+cons (id₁ , v₁) (cons (id₂ , v₂) s p₂) p₁ [ id ↦ v ] | no p | yes q
+    with (cons (id₂ , v₂) s p₂) [ id ↦ v ]
+... | [] = (id₁ , v₁) ∷# [] -- TODO The recursive case can never give empty so this case should be proven impossible
+... | cons (idᵣ₁ , vᵣ₁) r pᵣ₁ with id₁ <? idᵣ₁ -- TODO Should always be true since recursive case can only ever put an element higher than id₁ at first index, but I wasn't able to prove it
+... | yes pp = cons (id₁ , v₁) (cons (idᵣ₁ , vᵣ₁) r pᵣ₁) (appendFresh pᵣ₁ pp)
+... | no  pp = [] -- See comment 2 lines above
+
+-- Older impl
+--[] [ s ↦ n ] = (s , n) ∷# []
+--((s₁ , _ ) ∷# []) [ s ↦ _ ] with s <? s₁ | s₁ <? s
+--(x₁        ∷# []) [ s ↦ n ]    | yes a   | _     = cons (s , n) (x₁ ∷# []) (toDec a , _)
+--(x₁        ∷# []) [ s ↦ n ]    | _       | yes a = cons x₁ ((s , n) ∷# []) (toDec a , _)
+--(_         ∷# []) [ s ↦ n ]    | _       | _     = (s , n) ∷# []
+--((s₁ , _ ) ∷#    (cons x₂ xs pp)                  ) [ s ↦ n ] with (cons x₂ xs pp) [ s ↦ n ] | s <? s₁
+--(cons _          (cons (x , y) xs pp) (pl , pr)   ) [ s ↦ n ] | _                     | yes a = cons (s , n) (cons (x , y) xs pp) (appendFresh pp (a << fromDec pl))
+--_                                                   [ s ↦ n ] | []                    | _     = (s , n) ∷# []
+--((s₁ , _ ) ∷# (s₂ , _ ) ∷# _                      ) [ _ ↦ _ ] | cons (is₁ , _) _ _    | _ with s₁ <? is₁
+--(a₁        ∷# _         ∷# _                      ) [ s ↦ n ] | cons ix₁ f pp | _    | yes aa = cons a₁ (cons ix₁ f pp) (appendFresh pp aa)
+--_                                                   [ _ ↦ _ ] | f                     | _    | _      = f
 
 lookup : State → ID → Maybe 𝕍
-lookup ([] , sortedNil) x = nothing
-lookup ((v , i) ∷ rest , sortedOne      ) x = if x == v then just i else nothing
-lookup ((v , i) ∷ rest , sortedCons x₁ p) x = if x == v then just i else lookup (rest , p) x
+lookup xs id = map proj₂ (findᵇ (id ==_ ∘ proj₁) (toList xs .proj₁))
 
 joinOverwrite : (overWrited overWriter : State) → State
-joinOverwrite overWrited (fst , snd) = joinOverwriteNoSort overWrited fst
-    where
-    joinOverwriteNoSort : (overWrited : State) → (overWriter : List (ID × 𝕍)) → State
-    joinOverwriteNoSort overWrited [] = overWrited
-    joinOverwriteNoSort overWrited ((fst , snd) ∷ overWriter) = joinOverwriteNoSort (overWrited [ fst ↦ snd ]) overWriter
+joinOverwrite overWrited overWriter = foldr (λ x y → uncurry (y [_↦_]) x) overWrited (toList overWriter .proj₁)
 
 _⊢_==ₛ_ : (_==ᵥ_ : 𝕍 → 𝕍 → Bool) → State → State → Bool
-_==ᵥ_ ⊢ (a , _) ==ₛ (b , _) = a ==ₛ b
-    where
-        _==ₛ_ : List (ID × 𝕍) → List (ID × 𝕍) → Bool
-        [] ==ₛ [] = true
-        [] ==ₛ (x ∷ y)   = false
-        (x ∷ y) ==ₛ [] = false
-        ((aID , aV) ∷ as) ==ₛ ((bID , bV) ∷ bs) = (aV ==ᵥ bV) ∧ (aID == bID) ∧ (as ==ₛ bs)
+_ ⊢ [] ==ₛ [] = true
+_ ⊢ [] ==ₛ _  = false
+_ ⊢ _  ==ₛ [] = false
+_==ᵥ_ ⊢ (aID , aV) ∷# as ==ₛ ((bID , bV) ∷# bs) = (aV ==ᵥ bV) ∧ (aID == bID) ∧ (_==ᵥ_ ⊢ as ==ₛ bs)
 
-sorted→PopSorted : ∀ {e v} → Sorted (e ∷ v) → Sorted v
-sorted→PopSorted sortedOne = sortedNil
-sorted→PopSorted (sortedCons x x₁) = x₁
-
-delete : (id : ID) → (l : List (ID × 𝕍)) → (p : Sorted l) → (∃ λ v → lookup (l , p) id ≡ just v) → State
-delete id [] sortedNil ()
-delete id ((id₁ , v₁) ∷ []) sortedOne (a , b) with id == id₁
-... | true = [] , sortedNil
-... | false with b
-... | ()
-delete id ((id₁ , v₁) ∷ fst) (sortedCons x snd) z with id == id₁
-... | true = fst , snd
-... | false = delete id fst snd z [ id₁ ↦ v₁ ]
+delete : (id : ID) → (s : State) → (∃ λ v → lookup s id ≡ just v) → State
+delete id ((id₁ , v₁) ∷# xs) z with id == id₁
+... | true = xs
+... | false = delete id xs z [ id₁ ↦ v₁ ]
