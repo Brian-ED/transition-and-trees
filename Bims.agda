@@ -437,56 +437,62 @@ module Aexp₂-semantic where
     data Bexp₂ : Set where
         _==₃_ : Aexp₂ ⊎ Num → Aexp₂ ⊎ Num → Bexp₂
         _<₃_ : Aexp₂ ⊎ Num → Aexp₂ ⊎ Num → Bexp₂
-        ¬₃_ : Bexp₂ ⊎ Bool → Bexp₂
-        _∧₃_ : Bexp₂ ⊎ Bool → Bexp₂ ⊎ Bool → Bexp₂
-        ⟨_⟩₃ : Bexp₂ ⊎ Bool → Bexp₂
+        ¬₃_ : Bexp₂ → Bexp₂
+        _∧₃_ : Bexp₂ → Bexp₂ → Bexp₂
+        ⟨_⟩₃ : Bexp₂ → Bexp₂
+        _ᵇ : Bool → Bexp₂
 
-    data _⊢_⇒₂b_ : State → Bexp₂ ⊎ Bool → Bexp₂ ⊎ Bool → Set where
+    infix 21 _ᵇ ¬₃_
+
+    data _⊢_⇒₂b_ : State → Bexp₂ → Bexp₂ → Set where
 
         _EQUAL-1-BSS_ : ∀ {s α₁ α₂ v}
                       → s ⊢ α₁ ⇒ₐ inj₂ v
                       → s ⊢ α₂ ⇒ₐ inj₂ v
-                      → s ⊢ (inj₁ (α₁ ==₃ α₂)) ⇒₂b inj₂ tt
+                      → s ⊢ α₁ ==₃ α₂ ⇒₂b tt ᵇ
 
         EQUALS-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
                      → s ⊢ α₁ ⇒ₐ inj₂ v₁
                      → s ⊢ α₂ ⇒ₐ inj₂ v₂
                      → not (v₁ ≡ v₂)
-                     → s ⊢ inj₁ (α₁ ==₃ α₂) ⇒₂b inj₂ ff
+                     → s ⊢ α₁ ==₃ α₂ ⇒₂b ff ᵇ
 
         GREATERTHAN-1-BSS : ∀ {s α₁ α₂ v₁ v₂}
                           → s ⊢ α₁ ⇒ₐ inj₂ v₁
                           → s ⊢ α₂ ⇒ₐ inj₂ v₂
                           → v₁ <ℤ v₂
-                          → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ tt
+                          → s ⊢ α₁ <₃ α₂ ⇒₂b tt ᵇ
 
         GREATERTHAN-2-BSS : ∀ {s α₁ α₂ v₁ v₂}
                           → s ⊢ α₁ ⇒ₐ inj₂ v₁
                           → s ⊢ α₂ ⇒ₐ inj₂ v₂
                           → not (v₁ <ℤ v₂)
-                          → s ⊢ inj₁ (α₁ <₃ α₂) ⇒₂b inj₂ ff
+                          → s ⊢ α₁ <₃ α₂ ⇒₂b ff ᵇ
 
         NOT-1-BSS_ : ∀ {s b}
-                   → s ⊢ b ⇒₂b inj₂ ff
-                   → s ⊢ inj₁ (¬₃ b) ⇒₂b inj₂ tt
+                   → s ⊢ b ⇒₂b ff ᵇ
+                   → s ⊢ ¬₃ b ⇒₂b tt ᵇ
 
         NOT-2-BSS_ : ∀ {s b}
-                   → s ⊢ b ⇒₂b inj₂ tt
-                   → s ⊢ inj₁ (¬₃ b) ⇒₂b inj₂ ff
+                   → s ⊢ b ⇒₂b tt ᵇ
+                   → s ⊢ ¬₃ b ⇒₂b ff ᵇ
 
         PARENTH-B-BSS : ∀ {s b v}
                       → s ⊢ b ⇒₂b v
-                      → s ⊢ inj₁ ⟨ b ⟩₃ ⇒₂b v
+                      → s ⊢ ⟨ b ⟩₃ ⇒₂b v
 
         AND-1-BSS : ∀ {s b₁ b₂}
-                  → s ⊢ b₁ ⇒₂b inj₂ tt
-                  → s ⊢ b₂ ⇒₂b inj₂ tt
-                  → s ⊢ inj₁ (b₁ ∧₃ b₂) ⇒₂b inj₂ tt
+                  → s ⊢ b₁ ⇒₂b tt ᵇ
+                  → s ⊢ b₂ ⇒₂b tt ᵇ
+                  → s ⊢ b₁ ∧₃ b₂ ⇒₂b tt ᵇ
 
         AND-2-BSS : ∀ {s b₁ b₂}
-                  → (s ⊢ b₁ ⇒₂b inj₂ ff)
-                  ⊎ (s ⊢ b₂ ⇒₂b inj₂ ff)
-                  → s ⊢ inj₁ (b₁ ∧₃ b₂) ⇒₂b inj₂ ff
+                  → (s ⊢ b₁ ⇒₂b ff ᵇ)
+                  → s ⊢ b₁ ∧₃ b₂ ⇒₂b ff ᵇ
+
+        AND-3-BSS : ∀ {s b₁ b₂}
+                  → (s ⊢ b₂ ⇒₂b ff ᵇ)
+                  → s ⊢ b₁ ∧₃ b₂ ⇒₂b ff ᵇ
 
     -- Section End Page 46
 
@@ -504,7 +510,7 @@ module Stm₂-semantic where
     open import Data.Sum using (_⊎_; inj₁; inj₂)
     open import Data.Bool using (Bool) renaming (true to tt; false to ff)
     open import Data.Product using (_×_)
-    open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_)
+    open Aexp₂-semantic using (Aexp₂; Bexp₂; _⊢_⇒ₐ_; _⊢_⇒₂b_; _ᵇ)
 
     open import Data.String using (String; _<_; _<?_; _==_)
     <<str = λ a b c → <-isStrictPartialOrder-≈ .trans {a} {b} {c}
@@ -522,8 +528,8 @@ module Stm₂-semantic where
         skip₃ : Stm₂
         _←₃_ : Var → Aexp₂ ⊎ Num → Stm₂
         _Å₃_ : Stm₂ → Stm₂ → Stm₂
-        ifStm₂_then_else_ : Bexp₂ ⊎ Bool → Stm₂ → Stm₂ → Stm₂
-        while_do₃_ : Bexp₂ ⊎ Bool → Stm₂ → Stm₂
+        ifStm₂_then_else_ : Bexp₂ → Stm₂ → Stm₂ → Stm₂
+        while_do₃_ : Bexp₂ → Stm₂ → Stm₂
 
     data ⟨_,_⟩⇒₂_ : Stm₂ → State → State → Set where
         ASS-BSS         : ∀ {x a s v}
@@ -540,22 +546,22 @@ module Stm₂-semantic where
 
         IF-TRUE-BSS     : ∀ {S₁ S₂ s s´ b}
                         → ⟨ S₁ , s ⟩⇒₂ s´
-                        → s ⊢ b ⇒₂b inj₂ tt
+                        → s ⊢ b ⇒₂b tt ᵇ
                         → ⟨ (ifStm₂ b then S₁ else S₂) , s ⟩⇒₂ s´
 
         IF-FALSE-BSS    : ∀ {S₁ S₂ s s´ b}
                         → ⟨ S₂ , s ⟩⇒₂ s´
-                        → s ⊢ b ⇒₂b inj₂ ff
+                        → s ⊢ b ⇒₂b ff ᵇ
                         → ⟨ (ifStm₂ b then S₁ else S₂) , s ⟩⇒₂ s´
 
         WHILE-TRUE-BSS  : ∀ {S s s´ s˝ b}
-                        → s ⊢ b ⇒₂b inj₂ tt
+                        → s ⊢ b ⇒₂b tt ᵇ
                         → ⟨ S , s ⟩⇒₂ s˝
                         → ⟨ (while b do₃ S) , s˝ ⟩⇒₂ s´
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s´
 
         WHILE-FALSE-BSS : ∀ {S s b}
-                        → s ⊢ b ⇒₂b inj₂ ff
+                        → s ⊢ b ⇒₂b ff ᵇ
                         → ⟨ (while b do₃ S) , s ⟩⇒₂ s
 
     -- Section End Page 47
@@ -579,11 +585,11 @@ module Stm₂-semantic where
                   → ⟨ inj₁ (S₁ Å₃ S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s´) ⟩
 
         IF-TRUEₛₛₛ : ∀ {s b S₁ S₂}
-                   → s ⊢ b ⇒₂b inj₂ tt
+                   → s ⊢ b ⇒₂b tt ᵇ
                    → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₁ , s) ⟩
 
         IF-FALSEₛₛₛ : ∀ {s b S₁ S₂}
-                    → s ⊢ b ⇒₂b inj₂ ff
+                    → s ⊢ b ⇒₂b ff ᵇ
                     → ⟨ inj₁ (ifStm₂ b then S₁ else S₂ , s) ⟩⇒₂⟨ inj₁ (S₂ , s) ⟩
 
         WHILEₛₛₛ : ∀ {s b S}

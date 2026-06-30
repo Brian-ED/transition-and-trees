@@ -131,7 +131,7 @@ module Aexp₂-state-transition-example where
     open import State ℤ String _<_ <<str _<?_ _==_
 
     code = ("i" ←₃ (inj₁ (N + 6))) Å₃
-        (while inj₁(¬₃ inj₁((inj₁(V "i")) ==₃ (inj₁ (N + 0)))) do₃ (
+        (while ¬₃ (inj₁ (V "i") ==₃ inj₁ (N + 0)) do₃ (
             ("x" ←₃ inj₁(inj₁(V "x") + (inj₁(V "i")))) Å₃
             ("i" ←₃ inj₁(inj₁(V "i") - inj₁(N + 2)))
         ))
@@ -161,7 +161,7 @@ module Aexp₂-state-transition-example where
     open import Relation.Nullary.Negation using () renaming (¬_ to not_)
     open import Data.Empty using (⊥)
 
-    S = while inj₁(inj₁(N + 0) ==₃ inj₁(N + 0)) do₃ skip₃
+    S = while inj₁(N + 0) ==₃ inj₁(N + 0) do₃ skip₃
 
     neverTerminates : ∀ s → ∃ λ s´ → not ⟨ S , s ⟩⇒₂ s´
     neverTerminates s = [] , f
@@ -195,7 +195,7 @@ module Aexp₂-smallstep-example where
 
     S =
         ifStm₂
-            inj₁(inj₁(N + 3) <₃ inj₁(V "x"))
+            inj₁(N + 3) <₃ inj₁(V "x")
         then
             (
                 ("x" ←₃ inj₁(inj₁(N + 3) + inj₁(V "x"))) Å₃
