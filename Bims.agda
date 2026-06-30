@@ -432,10 +432,8 @@ module Aexp₂-semantic where
     Aexp₂Semantic s = ⌞ (Aexp₂ ⊎ Num) , (_⊢_⇒ₐ_ s) , T₃ ⌟
 
     Aexp₂-is-big-step-proof : ∀ s x y → s ⊢ x ⇒ₐ y → T₃ y
-    Aexp₂-is-big-step-proof s (inj₂ x) (inj₂ x₁) = λ _ → ttt
-    Aexp₂-is-big-step-proof s (inj₂ x) (inj₁ y) ()
-    Aexp₂-is-big-step-proof s (inj₁ y₁) (inj₂ x) = λ _ → ttt
-    Aexp₂-is-big-step-proof s (inj₁ y₁) (inj₁ y) ()
+    Aexp₂-is-big-step-proof _ _ (inj₂ _) _ = ttt
+
     Aexp₂big-semantic : ∀ s → BigStepSemantics (Aexp₂Semantic s)
     Aexp₂big-semantic s = ⌈> (Aexp₂-is-big-step-proof s)
 
