@@ -60,19 +60,6 @@ cons (id₁ , v₁) (cons (id₂ , v₂) s p₂) p₁ [ id ↦ v ] | no p | yes 
 ... | yes pp = cons (id₁ , v₁) (cons (idᵣ₁ , vᵣ₁) r pᵣ₁) (appendFresh pᵣ₁ pp)
 ... | no  pp = [] -- See comment 2 lines above
 
--- Older impl
---[] [ s ↦ n ] = (s , n) ∷# []
---((s₁ , _ ) ∷# []) [ s ↦ _ ] with s <? s₁ | s₁ <? s
---(x₁        ∷# []) [ s ↦ n ]    | yes a   | _     = cons (s , n) (x₁ ∷# []) (toDec a , _)
---(x₁        ∷# []) [ s ↦ n ]    | _       | yes a = cons x₁ ((s , n) ∷# []) (toDec a , _)
---(_         ∷# []) [ s ↦ n ]    | _       | _     = (s , n) ∷# []
---((s₁ , _ ) ∷#    (cons x₂ xs pp)                  ) [ s ↦ n ] with (cons x₂ xs pp) [ s ↦ n ] | s <? s₁
---(cons _          (cons (x , y) xs pp) (pl , pr)   ) [ s ↦ n ] | _                     | yes a = cons (s , n) (cons (x , y) xs pp) (appendFresh pp (a << fromDec pl))
---_                                                   [ s ↦ n ] | []                    | _     = (s , n) ∷# []
---((s₁ , _ ) ∷# (s₂ , _ ) ∷# _                      ) [ _ ↦ _ ] | cons (is₁ , _) _ _    | _ with s₁ <? is₁
---(a₁        ∷# _         ∷# _                      ) [ s ↦ n ] | cons ix₁ f pp | _    | yes aa = cons a₁ (cons ix₁ f pp) (appendFresh pp aa)
---_                                                   [ _ ↦ _ ] | f                     | _    | _      = f
-
 lookup : State → ID → Maybe 𝕍
 lookup xs id = map proj₂ (findᵇ (id ==_ ∘ proj₁) (toList xs .proj₁))
 
