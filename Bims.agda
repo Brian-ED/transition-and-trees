@@ -95,12 +95,13 @@ module Aexp₁-smallstep-semantic where
         _-_ : Aexp₁ss → Aexp₁ss → Aexp₁ss
         [_] : Aexp₁ss → Aexp₁ss
 
-    data Bexp : Set where
-        _==_ : Aexp₁ss → Aexp₁ss → Bexp
-        _<_ : Aexp₁ss → Aexp₁ss → Bexp
-        ¬_ : Bexp ⊎ Bool → Bexp
-        _∧_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Bexp
-        ⟨_⟩ : Bexp ⊎ Bool → Bexp
+    data Bexpₛₛ : Set where
+        _==_ : Aexp₁ss → Aexp₁ss → Bexpₛₛ
+        _<_ : Aexp₁ss → Aexp₁ss → Bexpₛₛ
+        ¬_ : Bexpₛₛ → Bexpₛₛ
+        _∧_ : Bexpₛₛ → Bexpₛₛ → Bexpₛₛ
+        ⟨_⟩ : Bexpₛₛ → Bexpₛₛ
+        _ᵇ : Bool → Bexpₛₛ
 
     infixr 6 N_
     infixr 5 _*_
@@ -108,6 +109,7 @@ module Aexp₁-smallstep-semantic where
     infixr 4 _-_
     infix 3 _==_
     infix 3 _<_
+    infix 3 _∧_
     infix 2 _⇒₂_
 
     infixr 5 PLUS-1ₛₛₛ_
@@ -268,75 +270,68 @@ module Bexp-smallstep-transition where
 
     open import Data.Bool using (if_then_else_; Bool) renaming (true to tt; false to ff)
 
-    data _⇒b_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Set where
+    infix 2 _⇒b_
 
-        EQUALS-1-BSS_ : ∀ {α₁ α₁´ α₂}
+    data _⇒b_ : Bexpₛₛ → Bexpₛₛ → Set where
+
+        EQUALS-1-SSS_ : ∀ {α₁ α₁´ α₂}
                       → α₁ ⇒₂ α₁´
-                      → inj₁ (α₁ == α₂) ⇒b inj₁ (α₁´ == α₂)
+                      → α₁ == α₂ ⇒b α₁´ == α₂
 
-        EQUALS-2-BSS_ : ∀ {α₁ α₂ α₂´}
+        EQUALS-2-SSS_ : ∀ {α₁ α₂ α₂´}
                       → α₂ ⇒₂ α₂´
-                      → inj₁ (α₁ == α₂) ⇒b inj₁ (α₁ == α₂´)
+                      → α₁ == α₂ ⇒b α₁ == α₂´
 
-        EQUALS-3-BSS : ∀ {x}
-                     → inj₁ (V x == V x) ⇒b inj₂ tt
+        EQUALS-3-SSS : ∀ {x}
+                     → V x == V x ⇒b tt ᵇ
 
-        EQUALS-4-BSS : ∀ {x y}
+        EQUALS-4-SSS : ∀ {x y}
                      → not x ≡ y
-                     → inj₁ (V x == V y) ⇒b inj₂ ff
+                     → V x == V y ⇒b ff ᵇ
 
-        GREATERTHAN-1-BSS_ : ∀ {α₁ α₁´ α₂}
+        GREATERTHAN-1-SSS_ : ∀ {α₁ α₁´ α₂}
                            → α₁ ⇒₂ α₁´
-                           → inj₁(α₁ < α₂) ⇒b inj₁(α₁´ < α₂)
+                           → α₁ < α₂ ⇒b α₁´ < α₂
 
-        GREATERTHAN-2-BSS_ : ∀ {α₁ α₂ α₂´}
+        GREATERTHAN-2-SSS_ : ∀ {α₁ α₂ α₂´}
                            → α₂ ⇒₂ α₂´
-                           → inj₁(α₁ < α₂) ⇒b inj₁(α₁ < α₂´)
+                           → α₁ < α₂ ⇒b α₁ < α₂´
 
-        GREATERTHAN-3-BSS : ∀ {x y}
+        GREATERTHAN-3-SSS : ∀ {x y}
                           → x <ℤ y
-                          → inj₁(V x < V y) ⇒b inj₂ tt
+                          → V x < V y ⇒b tt ᵇ
 
-        GREATERTHAN-4-BSS : ∀ {x y}
+        GREATERTHAN-4-SSS : ∀ {x y}
                           → not x <ℤ y
-                          → inj₁(V x < V y) ⇒b inj₂ ff
+                          → V x < V y ⇒b ff ᵇ
 
-        NOT-1-BSS_ : ∀ {α α´}
+        NOT-1-SSS_ : ∀ {α α´}
                    → α ⇒b α´
-                   → inj₁ (¬ α) ⇒b inj₁ (¬ α´)
+                   → ¬ α ⇒b ¬ α´
 
-        NOT-2-BSS : ∀ {b}
-                  → b ⇒b inj₂ ff
-                  → inj₁ (¬ b) ⇒b inj₂ tt
+        NOT-2-SSS : ¬ (ff ᵇ) ⇒b tt ᵇ
 
-        NOT-3-BSS : ∀ {b}
-                  → b ⇒b inj₂ tt
-                  → inj₁ (¬ b) ⇒b inj₂ ff
+        NOT-3-SSS : ¬ (tt ᵇ) ⇒b ff ᵇ
 
         PARENTH-B-BSS : ∀ {α α´}
                       → α ⇒b α´
-                      → inj₁ ⟨ α ⟩ ⇒b inj₁ ⟨ α´ ⟩
+                      → ⟨ α ⟩ ⇒b ⟨ α´ ⟩
 
-        AND-1-BSS_ : ∀ {α₁ α₁´ α₂}
+        AND-1-SSS_ : ∀ {α₁ α₁´ α₂}
                    → α₁ ⇒b α₁´
-                   → inj₁ (α₁ ∧ α₂) ⇒b inj₁ (α₁´ ∧ α₂)
+                   → α₁ ∧ α₂ ⇒b α₁´ ∧ α₂
 
-        AND-2-BSS_ : ∀ {α₁ α₂ α₂´}
+        AND-2-SSS_ : ∀ {α₁ α₂ α₂´}
                    → α₂ ⇒b α₂´
-                   → inj₁ (α₁ ∧ α₂) ⇒b inj₁ (α₁ ∧ α₂´)
+                   → α₁ ∧ α₂ ⇒b α₁ ∧ α₂´
 
-        AND-3-BSS : ∀ {α₁ α₂}
-                  → α₁ ⇒b inj₂ tt
-                  → α₂ ⇒b inj₂ tt
-                  → inj₁ (α₁ ∧ α₂) ⇒b inj₂ tt
+        AND-3-SSS : tt ᵇ ∧ tt ᵇ ⇒b tt ᵇ
 
-        AND-4-BSS : ∀ {α₁ α₂}
-                  → α₁ ≡ ff
-                  → inj₁ (inj₂ α₁ ∧ α₂) ⇒b inj₂ ff
+        AND-4-SSS : ∀ {α}
+                  → ff ᵇ ∧ α ⇒b ff ᵇ
 
-        AND-5-BSS : ∀ {α₁ α₂}
-                  → α₂ ≡ ff
-                  → inj₁ (α₁ ∧ inj₂ α₂) ⇒b inj₂ ff
+        AND-5-SSS : ∀ {α}
+                  → α ∧ ff ᵇ ⇒b ff ᵇ
 
 
 -- Section End Page 40
