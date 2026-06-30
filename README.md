@@ -49,3 +49,5 @@ Theorem 4.13 only proves 2 out of the 5 cases (see "We show only two cases here"
 Theorem 4.13 defines s˝´ and yet re-uses s˝. They are equal, so not a mistake, but the proof in Theorem 4.13 proves for s˝, which only works if you assume they are equal. It is an implicit assumption.
 
 The book never defines which set theory it assumes.
+
+Tabele 3.2 table and 4.1 have identical descriptions but different content. Both claim to be transition rules for Aexp but the two "Aexp"s are different.
