@@ -50,15 +50,15 @@ module Aexp₁-bigstep-semantic where
                    → inj₁ α₂ ⇒₁ inj₂ v₂
                    → inj₁ (α₁ + α₂) ⇒₁ inj₂ (v₁ +ℤ v₂)
 
-        _MULT-BSS_ : ∀ {α₁ α₂ v₁ v₂}
-                   → inj₁ α₁ ⇒₁ inj₂ v₁
-                   → inj₁ α₂ ⇒₁ inj₂ v₂
-                   → inj₁ (α₁ * α₂) ⇒₁ inj₂ (v₁ *ℤ v₂)
-
         _MINUS-BSS_ : ∀ {α₁ α₂ v₁ v₂}
                     → inj₁ α₁ ⇒₁ inj₂ v₁
                     → inj₁ α₂ ⇒₁ inj₂ v₂
                     → inj₁ ( α₁ - α₂ ) ⇒₁ inj₂ (v₁ -ℤ v₂)
+
+        _MULT-BSS_ : ∀ {α₁ α₂ v₁ v₂}
+                   → inj₁ α₁ ⇒₁ inj₂ v₁
+                   → inj₁ α₂ ⇒₁ inj₂ v₂
+                   → inj₁ (α₁ * α₂) ⇒₁ inj₂ (v₁ *ℤ v₂)
 
         PARENT-BSS_ : ∀ {α₁ v₁}
                     → inj₁ α₁ ⇒₁ inj₂ v₁
@@ -71,6 +71,21 @@ module Aexp₁-bigstep-semantic where
     infixr 5 _MULT-BSS_
     infixr 5 _MINUS-BSS_
     infixr 5 PARENT-BSS_
+
+    open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
+    open import Data.Product using (_×_)
+    open import Data.Empty using (⊥)
+    open import Data.Unit using (⊤)
+
+    transitionSystem = ⌞ Γ , _⇒₁_ , T ⌟
+        where
+            Γ = Aexp₁ ⊎ Num
+            T : Γ → Set
+            T (inj₁ _) = ⊥
+            T (inj₂ _) = ⊤
+
+    open TransitionSystem transitionSystem public
+
 
 -- Section End Page 32-33
 
