@@ -89,24 +89,26 @@ module Aexp₁-smallstep-semantic where
     -- Aexp such that values become elements of Aexp"
     data Aexp₁ss : Set where
         N_ : Num → Aexp₁ss -- Number literals
-        -- V_ : Var → Aexp₁ss -- The book decides to not define variables yet
-        _+_ : Aexp₁ss ⊎ Num → Aexp₁ss ⊎ Num → Aexp₁ss
-        _*_ : Aexp₁ss ⊎ Num → Aexp₁ss ⊎ Num → Aexp₁ss
-        _-_ : Aexp₁ss ⊎ Num → Aexp₁ss ⊎ Num → Aexp₁ss
-        [_] : Aexp₁ss ⊎ Num → Aexp₁ss
+        V_ : Num → Aexp₁ss -- Number value
+        _+_ : Aexp₁ss → Aexp₁ss → Aexp₁ss
+        _*_ : Aexp₁ss → Aexp₁ss → Aexp₁ss
+        _-_ : Aexp₁ss → Aexp₁ss → Aexp₁ss
+        [_] : Aexp₁ss → Aexp₁ss
 
     data Bexp : Set where
-        _==_ : Aexp₁ss ⊎ Num → Aexp₁ss ⊎ Num → Bexp
-        _<_ : Aexp₁ss ⊎ Num → Aexp₁ss ⊎ Num → Bexp
+        _==_ : Aexp₁ss → Aexp₁ss → Bexp
+        _<_ : Aexp₁ss → Aexp₁ss → Bexp
         ¬_ : Bexp ⊎ Bool → Bexp
         _∧_ : Bexp ⊎ Bool → Bexp ⊎ Bool → Bexp
         ⟨_⟩ : Bexp ⊎ Bool → Bexp
 
-    infixr 5 N_
-    infixr 3 _*_
+    infixr 6 N_
+    infixr 5 _*_
     infixr 4 _+_
     infixr 4 _-_
-    infix 4 _⇒₂_
+    infix 3 _==_
+    infix 3 _<_
+    infix 2 _⇒₂_
 
     infixr 5 PLUS-1ₛₛₛ_
     infixr 5 PLUS-2ₛₛₛ_
@@ -120,58 +122,56 @@ module Aexp₁-smallstep-semantic where
     infixr 5 PARENT-1ₛₛₛ_
     infixr 5 NUMₛₛₛ_
 
-    data _⇒₂_ : Aexp₁ss ⊎ Num → Aexp₁ss ⊎ Num → Set where
+    data _⇒₂_ : Aexp₁ss → Aexp₁ss → Set where
 
         -- PLUS
         PLUS-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
                    → α₁ ⇒₂ α₁´
-                   → inj₁ (α₁ + α₂) ⇒₂ inj₁(α₁´ + α₂)
+                   → α₁ + α₂ ⇒₂ α₁´ + α₂
 
         PLUS-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
                    → α₂ ⇒₂ α₂´
-                   → inj₁ (α₁ + α₂) ⇒₂ inj₁ (α₁ + α₂´)
+                   → α₁ + α₂ ⇒₂ α₁ + α₂´
 
         PLUS-3ₛₛₛ : ∀ {n₁ n₂}
-                  → inj₁ (inj₂ n₁ + inj₂ n₂) ⇒₂ inj₂ (n₁ +ℤ n₂)
+                  → V n₁ + V n₂ ⇒₂ V (n₁ +ℤ n₂)
 
         -- MULT
         MULT-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
                    → α₁ ⇒₂ α₁´
-                   → inj₁ (α₁ * α₂) ⇒₂ inj₁ (α₁´ * α₂)
+                   → α₁ * α₂ ⇒₂ α₁´ * α₂
 
         MULT-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
                    → α₂ ⇒₂ α₂´
-                   → inj₁ (α₁ * α₂) ⇒₂ inj₁ (α₁ * α₂´)
+                   → α₁ * α₂ ⇒₂ α₁ * α₂´
 
-        MULT-3ₛₛₛ : ∀ {v v₁ v₂}
-                  → v ≡ v₁ *ℤ v₂
-                  → inj₁ (inj₂ v₁ * inj₂ v₂) ⇒₂ inj₂ v
+        MULT-3ₛₛₛ : ∀ {v₁ v₂}
+                  → V v₁ * V v₂ ⇒₂ V (v₁ *ℤ v₂)
 
         -- SUB
         SUB-1ₛₛₛ_ : ∀ {α₁ α₁´ α₂}
                   → α₁ ⇒₂ α₁´
-                  → inj₁ (α₁ - α₂) ⇒₂ inj₁ (α₁´ - α₂)
+                  → α₁ - α₂ ⇒₂ α₁´ - α₂
 
         SUB-2ₛₛₛ_ : ∀ {α₁ α₂ α₂´}
                   → α₂ ⇒₂ α₂´
-                  → inj₁ (α₁ - α₂) ⇒₂ inj₁ (α₁ - α₂´)
+                  → α₁ - α₂ ⇒₂ α₁ - α₂´
 
         SUB-3ₛₛₛ : ∀ {x y}
-                 → inj₁ (inj₂ x - inj₂ y) ⇒₂ inj₂ (x -ℤ y)
+                 → V x - V y ⇒₂ V (x -ℤ y)
 
         -- PARENTHESES
         PARENT-1ₛₛₛ_ : ∀ {α α´} -- The book uses α₁ and α₁´, I don't know why it adds the ₁
                      → α ⇒₂ α´
-                     → inj₁ [ α ] ⇒₂ inj₁ [ α´ ]
+                     → [ α ] ⇒₂ [ α´ ]
 
         PARENT-2ₛₛₛ_ : ∀ {x y}
                      → x ≡ y
-                     → inj₁ [ inj₂ x ] ⇒₂ inj₂ y
+                     → [ V x ] ⇒₂ V y
 
         -- NUM
-        NUMₛₛₛ_ : ∀ {x y}
-                → x ≡ y
-                → inj₁ (N x) ⇒₂ inj₂ y
+        NUMₛₛₛ_ : ∀ {x}
+                  → N x ⇒₂ V x
 
     open import TransitionSystems using (TransitionSystem; ⌞_,_,_⌟)
     open import Data.Product using (_×_)
@@ -180,10 +180,10 @@ module Aexp₁-smallstep-semantic where
 
     transitionSystem = ⌞ Γ , _⇒₂_ , T ⌟
         where
-            Γ = Aexp₁ss ⊎ Num
+            Γ = Aexp₁ss
             T : Γ → Set
-            T (inj₁ x) = ⊥
-            T (inj₂ y) = ⊤
+            T (V _) = ⊤
+            T _ = ⊥
 
     open TransitionSystem transitionSystem public
 
@@ -278,13 +278,12 @@ module Bexp-smallstep-transition where
                       → α₂ ⇒₂ α₂´
                       → inj₁ (α₁ == α₂) ⇒b inj₁ (α₁ == α₂´)
 
-        EQUALS-3-BSS : ∀ {x y}
-                     → x ≡ y
-                     → inj₁ ((inj₂ x) == (inj₂ y)) ⇒b inj₂ tt
+        EQUALS-3-BSS : ∀ {x}
+                     → inj₁ (V x == V x) ⇒b inj₂ tt
 
         EQUALS-4-BSS : ∀ {x y}
                      → not x ≡ y
-                     → inj₁ ((inj₂ x) == (inj₂ y)) ⇒b inj₂ ff
+                     → inj₁ (V x == V y) ⇒b inj₂ ff
 
         GREATERTHAN-1-BSS_ : ∀ {α₁ α₁´ α₂}
                            → α₁ ⇒₂ α₁´
@@ -296,11 +295,11 @@ module Bexp-smallstep-transition where
 
         GREATERTHAN-3-BSS : ∀ {x y}
                           → x <ℤ y
-                          → inj₁((inj₂ x) < (inj₂ y)) ⇒b inj₂ tt
+                          → inj₁(V x < V y) ⇒b inj₂ tt
 
         GREATERTHAN-4-BSS : ∀ {x y}
                           → not x <ℤ y
-                          → inj₁((inj₂ x) < (inj₂ y)) ⇒b inj₂ ff
+                          → inj₁(V x < V y) ⇒b inj₂ ff
 
         NOT-1-BSS_ : ∀ {α α´}
                    → α ⇒b α´
